@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>内容后台｜印造所</title><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="admin.css"></head>
+<body>
+<header class="admin-header"><div class="container"><a class="brand" href="index.html"><span class="brand-mark">印</span><span>印造所<small>CONTENT ADMIN</small></span></a><div><a href="index.html">查看网站 ↗</a><button id="resetData">恢复默认数据</button></div></div></header>
+<main class="container admin-main">
+  <div class="admin-intro"><p class="eyebrow">CONTENT MANAGEMENT</p><h1>内容后台</h1><p>模板像商品一样维护，文章像公众号一样编辑。保存后，本浏览器中的前台会立即更新。</p></div>
+  <div class="admin-tabs"><button class="active" data-type="products">产品中心</button><button data-type="templates">模板素材</button><button data-type="knowledge">印刷知识</button><button data-type="articles">品牌资讯</button></div>
+  <section class="admin-layout">
+    <aside><button class="new-item" id="newItem">＋ 新增内容</button><div class="group-manager" id="categoryManager"><strong id="categoryManagerTitle">模板品类</strong><div id="categoryList"></div><div class="group-add"><input id="newCategory" placeholder="添加分类"><button id="addCategory">添加</button></div></div><div class="group-manager" id="groupManager"><strong>风格分组</strong><div id="groupList"></div><div class="group-add"><input id="newGroup" placeholder="添加风格分组"><button id="addGroup">添加</button></div></div><div id="itemList"></div></aside>
+    <form id="editorForm">
+      <div class="editor-heading"><span id="editorMode">编辑内容</span><strong id="saveState"></strong></div>
+      <input type="hidden" name="id">
+      <label>标题<input name="title" required placeholder="例如：春日订婚宴迎宾牌"></label>
+      <label id="categoryLabel">模板品类<select name="category"></select></label>
+      <label id="styleLabel">风格 / 分组<select name="style"></select></label>
+      <label>摘要 / 描述<textarea name="excerpt" rows="3" placeholder="让客户快速了解这个内容"></textarea></label>
+      <div class="template-fields">
+        <label>尺寸<input name="size" placeholder="例如：80 × 120cm"></label><label>制作价格参考<input name="price" placeholder="例如：¥199 起"></label><label>标签（用逗号分隔）<input name="tags" placeholder="订婚,迎宾牌"></label>
+        <div class="upload-field"><span>缩略图</span><div class="drop-zone" data-field="thumb">拖入图片，或点击选择<input type="file" accept="image/*"></div><input name="thumb" class="path-input" placeholder="也可填写图片路径"></div>
+        <div class="upload-field"><span>设计素材图</span><div class="drop-zone" data-field="designImage">拖入图片，或点击选择<input type="file" accept="image/*"></div><input name="designImage" class="path-input"></div>
+        <div class="upload-field"><span>尺寸说明图</span><div class="drop-zone" data-field="sizeImage">拖入图片，或点击选择<input type="file" accept="image/*"></div><input name="sizeImage" class="path-input"></div>
+        <div class="upload-field"><span>实景效果图</span><div class="drop-zone" data-field="sceneImage">拖入图片，或点击选择<input type="file" accept="image/*"></div><input name="sceneImage" class="path-input"></div>
+      </div>
+      <div class="product-fields"><label>产品编号<input name="productId" placeholder="例如：P013"></label><label>产品价格<input name="productPrice" placeholder="例如：¥99 起"></label><label class="product-intro-field">产品介绍<textarea name="productIntro" rows="5" placeholder="用于产品详情页和场景弹窗的完整介绍"></textarea></label><div class="upload-field"><span>产品缩略图</span><div class="drop-zone" data-field="productThumb">拖入图片，或点击选择<input type="file" accept="image/*"></div><input name="productThumb" class="path-input"></div><div class="upload-field"><span>场景缩略图</span><div class="drop-zone" data-field="productSceneImage">拖入图片，或点击选择<input type="file" accept="image/*"></div><input name="productSceneImage" class="path-input"></div><label class="product-options-editor">自定义可选项<div id="productOptionsEditor"></div><button type="button" class="add-option" id="addProductOption">＋ 添加规格</button></label></div>
+      <div class="article-only-fields"><label>发布日期<input name="date" placeholder="2026.09.19"></label><div class="upload-field"><span>文章缩略图 / 封面图</span><div class="drop-zone" data-field="cover">拖入封面图，或点击选择<input type="file" accept="image/*"></div><input name="cover" class="path-input" placeholder="也可填写图片路径"></div></div>
+      <div class="rich-editor-wrap"><div class="rich-toolbar"><button type="button" data-command="formatBlock" data-value="p">正文</button><button type="button" data-command="formatBlock" data-value="h2">小标题</button><select id="fontSizeSelect" aria-label="字号"><option value="3">字号</option><option value="2">小号</option><option value="4">大号</option><option value="5">特大</option></select><button type="button" data-command="bold">加粗</button><button type="button" data-command="justifyLeft">左对齐</button><button type="button" data-command="justifyCenter">居中</button><button type="button" id="insertImage">插入图片</button><button type="button" id="insertVideo">视频外链</button><span class="image-tools">图片：<button type="button" data-image-size="small">小</button><button type="button" data-image-size="medium">中</button><button type="button" data-image-size="large">大</button><button type="button" data-image-align="left">左</button><button type="button" data-image-align="center">中</button><button type="button" data-image-align="right">右</button></span></div><div id="richEditor" class="rich-editor" contenteditable="true" data-placeholder="直接在这里写文章。可以选中文字后调整格式，也可以插入图片或粘贴视频链接。"></div><input type="file" id="articleImageInput" accept="image/*" hidden></div>
+      <textarea name="content" id="contentStore" hidden></textarea>
+      <!-- GitHub 自动同步模块开始 -->
+      <div class="github-sync-card" style="margin-top: 20px; padding: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+        <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 12px;">
+          <label style="font-size: 13px; font-weight: 600; color: #475569; white-space: nowrap;">GitHub Token:</label>
+          <input type="password" id="ghTokenInput" placeholder="输入 ghp_ 开头的 Personal Access Token" style="flex: 1; padding: 7px 10px; font-size: 13px; border: 1px solid #cbd5e1; border-radius: 6px; background: #fff;">
+          <button type="button" id="saveTokenBtn" class="button button-light" style="padding: 7px 14px; font-size: 13px;">记住密钥</button>
+        </div>
+        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+          <button class="button button-dark" type="submit">保存到本浏览器 <span>↗</span></button>
+          <button type="button" id="syncGithubBtn" class="button" style="background: #16a34a; color: #fff; border: none; font-weight: 600;">🚀 保存并同步到 GitHub <span>↑</span></button>
+          <button class="button button-light" type="button" id="exportData">导出线上数据 <span>↓</span></button>
+          <span id="syncStatus" style="font-size: 13px; font-weight: 500;"></span>
+        </div>
+      </div>
+      <!-- GitHub 自动同步模块结束 -->
+    </form>
+  </section>
+</main><div class="toast" id="adminToast">已保存，前台数据已更新</div><script src="site-data.js"></script><script src="admin.js"></script>
+</body></html>

@@ -1,0 +1,11 @@
+# Local browser/editor data
+.vscode/*.log
+*.local
+
+# Do not publish local runtime caches
+Thumbs.db
+.DS_Store
+
+# Keep personal working files out of the site
+备份/
+临时/
