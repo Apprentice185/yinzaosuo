@@ -197,17 +197,27 @@
         <!-- 调价与打折控制卡片 -->
         <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-4 space-y-4">
           
-          <!-- 倍率调整 -->
-          <div>
-            <div class="flex items-center justify-between mb-1.5">
-              <span class="text-xs font-bold text-slate-700">单价倍率调整</span>
-              <span class="text-xs font-mono text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded font-bold" id="rate-display">× 1.0</span>
+          <!-- 单价调整 (默认折叠的小选项) -->
+          <div class="rounded-xl border border-slate-200 bg-slate-50/50 overflow-hidden">
+            <button type="button" onclick="toggleRateCollapse()" class="w-full px-3 py-2.5 flex items-center justify-between text-left hover:bg-slate-100/70 transition select-none">
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs font-bold text-slate-700">单价调整</span>
+                <span class="text-[10px] text-slate-600">(倍率浮动)</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-mono text-indigo-600 bg-white border border-slate-200 px-2 py-0.5 rounded font-bold" id="rate-display">× 1.0</span>
+                <span id="rate-toggle-icon" class="text-xs text-slate-600 transition-transform duration-200">▼</span>
+              </div>
+            </button>
+
+            <!-- 折叠内容主体 (默认隐藏) -->
+            <div id="rate-collapse-body" class="hidden px-3 pb-3 pt-1 border-t border-slate-100 bg-white space-y-2">
+              <div class="flex items-center gap-3 pt-2">
+                <input type="range" id="rate-slider" min="0.8" max="3.0" step="0.1" value="1.0" oninput="onRateSliderChange(this.value)" class="w-full accent-indigo-600 cursor-pointer" />
+                <input type="number" id="rate-number" min="0.8" max="3.0" step="0.1" value="1.0" onchange="onRateNumberChange(this.value)" class="w-16 px-2 py-1 border border-slate-200 rounded-lg text-center font-mono text-xs font-semibold focus:outline-hidden focus:border-indigo-500" />
+              </div>
+              <p class="text-[11px] text-slate-600">调节幅度 0.1，单价自动四舍五入到整数（导出微信清单中彻底隐藏倍率）</p>
             </div>
-            <div class="flex items-center gap-3">
-              <input type="range" id="rate-slider" min="0.8" max="3.0" step="0.1" value="1.0" oninput="onRateSliderChange(this.value)" class="w-full accent-indigo-600 cursor-pointer" />
-              <input type="number" id="rate-number" min="0.8" max="3.0" step="0.1" value="1.0" onchange="onRateNumberChange(this.value)" class="w-16 px-2 py-1 border border-slate-200 rounded-lg text-center font-mono text-xs font-semibold focus:outline-hidden focus:border-indigo-500" />
-            </div>
-            <p class="text-[11px] text-slate-600 mt-1">步进 0.1，单价自动四舍五入到整数（微信报价中完全隐藏此倍率）</p>
           </div>
 
           <!-- 满额优惠阶梯提醒横幅 -->
@@ -297,6 +307,7 @@
     let currentRate = 1.0;
     let currentDiscount = 1.0;
     let bracketMode = false; // 是否需要板材支架
+    let isRateCollapsed = true; // 单价调整默认折叠
 
     // 支架型号元数据
     const BRACKET_DEFS = [
@@ -350,6 +361,20 @@
       setTimeout(() => {
         toast.classList.add('opacity-0', 'pointer-events-none');
       }, 1800);
+    }
+
+    /* ================= 单价调整折叠控制 ================= */
+    function toggleRateCollapse() {
+      isRateCollapsed = !isRateCollapsed;
+      const body = document.getElementById('rate-collapse-body');
+      const icon = document.getElementById('rate-toggle-icon');
+      if (isRateCollapsed) {
+        body.classList.add('hidden');
+        icon.style.transform = 'rotate(0deg)';
+      } else {
+        body.classList.remove('hidden');
+        icon.style.transform = 'rotate(180deg)';
+      }
     }
 
     /* ================= 板块 1：板材写真逻辑 ================= */
@@ -1466,10 +1491,13 @@
       bracketMode = false;
       currentRate = 1.0;
       currentDiscount = 1.0;
+      isRateCollapsed = true;
 
       document.getElementById('rate-slider').value = '1.0';
       document.getElementById('rate-number').value = '1.0';
       document.getElementById('rate-display').innerText = '× 1.0';
+      document.getElementById('rate-collapse-body').classList.add('hidden');
+      document.getElementById('rate-toggle-icon').style.transform = 'rotate(0deg)';
 
       setBracketMode(false);
       renderPlateList();
