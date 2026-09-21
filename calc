@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>广告印刷综合快速算价工具</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* 彻底防止移动端输入聚焦时页面被放大推拉 */
+    input, select, textarea {
+      font-size: 16px !important;
+      touch-action: manipulation;
+    }
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type="number"] {
+      -moz-appearance: textfield;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen pb-28 lg:pb-12 antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- 顶部导航条 -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-lg shadow-sm">印</span>
+        <h1 class="text-base sm:text-lg font-bold text-slate-800 tracking-tight">广告印刷报价系统</h1>
+      </div>
+      <div class="flex items-center gap-2 text-xs">
+        <button onclick="resetAllData()" class="px-2.5 py-1.5 rounded-md border border-slate-200 text-slate-600 hover:bg-slate-100 transition">清空重置</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主工作台容器 -->
+  <main class="max-w-7xl mx-auto px-4 py-5">
+    
+    <!-- 顶部快捷添加品类导航栏 -->
+    <section class="mb-6">
+      <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2.5">点击快捷添加品类产品</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+        <button onclick="addPlateItem()" class="p-3 bg-white border border-slate-200 hover:border-indigo-400 hover:shadow-xs rounded-xl flex items-center gap-2.5 transition text-left group">
+          <div class="w-9 h-9 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg font-bold group-hover:scale-105 transition">板</div>
+          <div>
+            <div class="text-xs sm:text-sm font-bold text-slate-700 group-hover:text-indigo-600">板材写真类</div>
+            <div class="text-[11px] text-slate-600">KT板 / PVC / 支架</div>
+          </div>
+        </button>
+
+        <button onclick="addRollItem()" class="p-3 bg-white border border-slate-200 hover:border-emerald-400 hover:shadow-xs rounded-xl flex items-center gap-2.5 transition text-left group">
+          <div class="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg font-bold group-hover:scale-105 transition">卷</div>
+          <div>
+            <div class="text-xs sm:text-sm font-bold text-slate-700 group-hover:text-emerald-600">卷材画面类</div>
+            <div class="text-[11px] text-slate-600">背胶 / 车贴 / 灯片</div>
+          </div>
+        </button>
+
+        <button onclick="addStandItem()" class="p-3 bg-white border border-slate-200 hover:border-amber-400 hover:shadow-xs rounded-xl flex items-center gap-2.5 transition text-left group">
+          <div class="w-9 h-9 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-lg font-bold group-hover:scale-105 transition">展</div>
+          <div>
+            <div class="text-xs sm:text-sm font-bold text-slate-700 group-hover:text-amber-600">海报展架套组</div>
+            <div class="text-[11px] text-slate-600">X展架 / 门型 / 易拉宝</div>
+          </div>
+        </button>
+
+        <button onclick="addFabricItem()" class="p-3 bg-white border border-slate-200 hover:border-rose-400 hover:shadow-xs rounded-xl flex items-center gap-2.5 transition text-left group">
+          <div class="w-9 h-9 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center text-lg font-bold group-hover:scale-105 transition">布</div>
+          <div>
+            <div class="text-xs sm:text-sm font-bold text-slate-700 group-hover:text-rose-600">锦旗横幅布艺类</div>
+            <div class="text-[11px] text-slate-600">喷绘布 / 横幅 / 锦旗</div>
+          </div>
+        </button>
+      </div>
+    </section>
+
+    <!-- 电脑端自适应布局：左侧产品录入，右侧常驻清单工作台 -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      
+      <!-- 左侧：产品配置与编辑区 (7列) -->
+      <div class="lg:col-span-7 space-y-6">
+
+        <!-- 板块 1：板材写真类 (按需展开) -->
+        <div id="section-plates" class="hidden bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden transition-all duration-300">
+          <div class="px-4 py-3.5 bg-slate-50/80 border-b border-slate-200 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+              <h2 class="font-bold text-slate-800 text-sm sm:text-base">板材写真类</h2>
+              <span id="plate-count-badge" class="text-xs px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600 font-medium">0件</span>
+            </div>
+            <button onclick="addPlateItem()" class="text-xs px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg shadow-xs flex items-center gap-1 transition">
+              <span>+ 添加板材</span>
+            </button>
+          </div>
+
+          <div class="p-4 space-y-4">
+            <!-- 板材列表 -->
+            <div id="plates-container" class="space-y-3.5"></div>
+
+            <!-- 板材支架配置 -->
+            <div class="pt-4 border-t border-slate-100 mt-2">
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-bold text-slate-700">配套支架配置</span>
+                  <div class="inline-flex rounded-lg p-0.5 bg-slate-100 text-xs">
+                    <button id="bracket-mode-no" onclick="setBracketMode(false)" class="px-2.5 py-1 rounded-md transition font-medium text-slate-600">无需支架</button>
+                    <button id="bracket-mode-yes" onclick="setBracketMode(true)" class="px-2.5 py-1 rounded-md transition font-medium text-slate-600">需要支架</button>
+                  </div>
+                </div>
+
+                <!-- 自动匹配支架按钮 -->
+                <div id="auto-bracket-box" class="hidden">
+                  <button onclick="autoMatchBrackets()" class="text-xs px-3 py-1 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-medium rounded-lg shadow-xs flex items-center gap-1 transition">
+                    <span>⚡ 智能匹配支架</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- 支架列表 -->
+              <div id="brackets-panel" class="hidden space-y-2.5 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                <div id="brackets-container" class="space-y-2"></div>
+                <button onclick="addBracketItem()" class="w-full py-1.5 border border-dashed border-slate-300 hover:border-indigo-400 text-slate-600 hover:text-indigo-600 text-xs rounded-lg transition flex items-center justify-center gap-1">
+                  <span>+ 自选添加支架型号</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 板块 2：卷材画面类 (按需展开) -->
+        <div id="section-rolls" class="hidden bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden transition-all duration-300">
+          <div class="px-4 py-3.5 bg-slate-50/80 border-b border-slate-200 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+              <h2 class="font-bold text-slate-800 text-sm sm:text-base">卷材画面类</h2>
+              <span id="roll-count-badge" class="text-xs px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 font-medium">0件</span>
+            </div>
+            <button onclick="addRollItem()" class="text-xs px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg shadow-xs flex items-center gap-1 transition">
+              <span>+ 添加卷材</span>
+            </button>
+          </div>
+          <div class="p-4">
+            <div id="rolls-container" class="space-y-3.5"></div>
+          </div>
+        </div>
+
+        <!-- 板块 3：海报展架套组 (按需展开) -->
+        <div id="section-stands" class="hidden bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden transition-all duration-300">
+          <div class="px-4 py-3.5 bg-slate-50/80 border-b border-slate-200 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+              <h2 class="font-bold text-slate-800 text-sm sm:text-base">海报展架套组</h2>
+              <span id="stand-count-badge" class="text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 font-medium">0套</span>
+            </div>
+            <button onclick="addStandItem()" class="text-xs px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded-lg shadow-xs flex items-center gap-1 transition">
+              <span>+ 添加展架</span>
+            </button>
+          </div>
+          <div class="p-4">
+            <div id="stands-container" class="space-y-3.5"></div>
+          </div>
+        </div>
+
+        <!-- 板块 4：锦旗横幅布艺类 (按需展开) -->
+        <div id="section-fabrics" class="hidden bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden transition-all duration-300">
+          <div class="px-4 py-3.5 bg-slate-50/80 border-b border-slate-200 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+              <h2 class="font-bold text-slate-800 text-sm sm:text-base">锦旗横幅布艺类</h2>
+              <span id="fabric-count-badge" class="text-xs px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 font-medium">0件</span>
+            </div>
+            <button onclick="addFabricItem()" class="text-xs px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-medium rounded-lg shadow-xs flex items-center gap-1 transition">
+              <span>+ 添加布艺/锦旗</span>
+            </button>
+          </div>
+          <div class="p-4">
+            <div id="fabrics-container" class="space-y-3.5"></div>
+          </div>
+        </div>
+
+        <!-- 空白提示占位 -->
+        <div id="empty-tips-card" class="bg-white border-2 border-dashed border-slate-200 rounded-2xl p-8 text-center">
+          <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center mx-auto text-xl font-bold mb-3">📋</div>
+          <h3 class="font-bold text-slate-700 text-sm mb-1">当前未添加任何产品</h3>
+          <p class="text-xs text-slate-600">请点击顶部快捷按钮，开始选择并添加所需广告印刷物料</p>
+        </div>
+
+      </div>
+
+      <!-- 右侧：报价信息清单 & 算价控制 (5列，电脑大屏吸顶跟随) -->
+      <div class="lg:col-span-5 lg:sticky lg:top-16 space-y-4">
+
+        <!-- 调价与打折控制卡片 -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-4 space-y-4">
+          
+          <!-- 倍率调整 -->
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-xs font-bold text-slate-700">单价倍率调整</span>
+              <span class="text-xs font-mono text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded font-bold" id="rate-display">× 1.0</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <input type="range" id="rate-slider" min="0.8" max="3.0" step="0.1" value="1.0" oninput="onRateSliderChange(this.value)" class="w-full accent-indigo-600 cursor-pointer" />
+              <input type="number" id="rate-number" min="0.8" max="3.0" step="0.1" value="1.0" onchange="onRateNumberChange(this.value)" class="w-16 px-2 py-1 border border-slate-200 rounded-lg text-center font-mono text-xs font-semibold focus:outline-hidden focus:border-indigo-500" />
+            </div>
+            <p class="text-[11px] text-slate-600 mt-1">步进 0.1，单价自动四舍五入到整数（微信报价中完全隐藏此倍率）</p>
+          </div>
+
+          <!-- 满额优惠阶梯提醒横幅 -->
+          <div id="discount-banner" class="hidden p-3 rounded-xl bg-amber-50 border border-amber-200">
+            <div class="flex items-start gap-2 mb-2">
+              <span class="text-amber-500 text-sm">💡</span>
+              <div>
+                <p class="text-xs font-bold text-amber-800" id="discount-tip-title">总金额达到满额门槛</p>
+                <p class="text-[11px] text-amber-600">是否需要给予专属折扣？（最大8折）</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-5 gap-1 text-center">
+              <button onclick="setDiscount(1.0)" id="disc-btn-10" class="py-1 rounded text-xs font-medium border border-amber-300 bg-white text-slate-700 hover:bg-amber-100 transition">原价</button>
+              <button onclick="setDiscount(0.95)" id="disc-btn-95" class="py-1 rounded text-xs font-medium border border-amber-300 bg-white text-slate-700 hover:bg-amber-100 transition">9.5折</button>
+              <button onclick="setDiscount(0.90)" id="disc-btn-90" class="py-1 rounded text-xs font-medium border border-amber-300 bg-white text-slate-700 hover:bg-amber-100 transition">9折</button>
+              <button onclick="setDiscount(0.85)" id="disc-btn-85" class="py-1 rounded text-xs font-medium border border-amber-300 bg-white text-slate-700 hover:bg-amber-100 transition">8.5折</button>
+              <button onclick="setDiscount(0.80)" id="disc-btn-80" class="py-1 rounded text-xs font-medium border border-amber-300 bg-white text-slate-700 hover:bg-amber-100 transition">8折</button>
+            </div>
+          </div>
+
+          <!-- 金额看板 -->
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between">
+            <div>
+              <div class="text-[11px] text-slate-600 font-medium" id="preview-tag">应收总额</div>
+              <div class="flex items-baseline gap-2">
+                <span class="text-2xl font-black text-slate-900 tracking-tight" id="preview-final-price">¥ 0</span>
+                <span class="text-xs text-slate-600 line-through hidden" id="preview-original-price"></span>
+              </div>
+            </div>
+            <div class="text-right">
+              <span id="preview-total-count" class="text-xs text-slate-600 font-medium">总计 0 件品类</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 报价信息清单板块 (用于预览与一键复制) -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-4 flex flex-col">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
+              <span>报价信息清单</span>
+              <span class="text-[11px] font-normal text-slate-600">（微信快速排版）</span>
+            </h3>
+            <button onclick="copyQuotation()" id="copy-btn-desktop" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white rounded-lg text-xs font-bold shadow-xs transition flex items-center gap-1.5">
+              <span>📋 一键复制微信报价</span>
+            </button>
+          </div>
+
+          <!-- 文本预览区域 -->
+          <div class="relative">
+            <pre id="quotation-preview" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-mono text-slate-700 whitespace-pre-wrap break-words max-h-72 overflow-y-auto leading-relaxed select-all">当前暂无报价信息，请在左侧添加产品后自动生成。</pre>
+          </div>
+
+          <!-- 自定义备注调整 -->
+          <div class="mt-3 pt-3 border-t border-slate-100">
+            <label class="block text-[11px] font-medium text-slate-600 mb-1">清单默认备注：</label>
+            <input type="text" id="custom-remark" oninput="calculateAll()" value="定稿后付款次日送达（您也可指定推迟日期），请提供下地址及接货人联系方式。" class="w-full text-xs px-2.5 py-1.5 border border-slate-200 rounded-lg text-slate-600 focus:outline-hidden focus:border-indigo-500" />
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- 移动端常驻吸底快捷栏 -->
+  <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 py-3 flex items-center justify-between z-40 shadow-lg">
+    <div>
+      <div class="text-[10px] text-slate-600 font-medium">当前合计</div>
+      <div class="flex items-baseline gap-1.5">
+        <span class="text-xl font-black text-indigo-600" id="mobile-final-price">¥ 0</span>
+        <span class="text-xs text-slate-600 line-through hidden" id="mobile-original-price"></span>
+      </div>
+    </div>
+    <button onclick="copyQuotation()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs font-bold rounded-xl shadow-md transition flex items-center gap-1.5">
+      <span>一键复制报价单</span>
+    </button>
+  </div>
+
+  <!-- 轻提示 Toast -->
+  <div id="toast" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-900/90 text-white px-5 py-2.5 rounded-xl text-xs font-medium shadow-2xl opacity-0 pointer-events-none transition-all duration-300 z-50 flex items-center gap-2">
+    <span id="toast-icon">✓</span>
+    <span id="toast-msg">已复制</span>
+  </div>
+
+  <script>
+    /* ================= 数据状态与预设 ================= */
+    let currentRate = 1.0;
+    let currentDiscount = 1.0;
+    let bracketMode = false; // 是否需要板材支架
+
+    // 支架型号元数据
+    const BRACKET_DEFS = [
+      { id: 'b1', name: '35*35cm普通支架', basePrice: 25 },
+      { id: 'b2', name: '1.2m人形支架', basePrice: 18 },
+      { id: 'b3', name: '1.5m人形支架', basePrice: 22 },
+      { id: 'b4', name: '可调节角度支架', basePrice: 35 },
+      { id: 'b5', name: '大尺寸可调节角度支架', basePrice: 60 }
+    ];
+
+    // 卷材品类元数据
+    const ROLL_MATERIALS = [
+      // 室内类
+      { id: 'in_bj', name: '室内写真自带背胶', basePrice: 15, group: '室内' },
+      { id: 'in_pp', name: '室内写真无背胶PP', basePrice: 15, group: '室内' },
+      { id: 'in_dx', name: '室内灯箱片', basePrice: 20, group: '室内' },
+      { id: 'in_tm', name: '透明写真带背胶', basePrice: 30, group: '室内' },
+      { id: 'in_uv', name: '玻璃贴UV', basePrice: 40, group: '室内' },
+      // 户外类
+      { id: 'out_bj', name: '户外写真自带背胶', basePrice: 20, group: '户外' },
+      { id: 'out_pp', name: '户外写真无背胶PP', basePrice: 28, group: '户外' },
+      { id: 'out_ct_white', name: '白胶车贴', basePrice: 22, group: '户外', isCar: true },
+      { id: 'out_ct_black', name: '黑胶车贴', basePrice: 24, group: '户外', isCar: true },
+      { id: 'out_ct_tm', name: '透明车贴', basePrice: 25, group: '户外' },
+      { id: 'out_dt', name: '单透贴', basePrice: 39, group: '户外' },
+      { id: 'out_ct_super', name: '超透贴', basePrice: 50, group: '户外' },
+      { id: 'out_dx', name: '户外灯箱片', basePrice: 30, group: '户外' }
+    ];
+
+    // 四大板块物料列表
+    let plateList = [];
+    let bracketList = [];
+    let rollList = [];
+    let standList = [];
+    let fabricList = [];
+
+    /* ================= 辅助函数 ================= */
+    function getScaledPrice(basePrice) {
+      return Math.round(basePrice * currentRate);
+    }
+
+    function formatArea(areaVal) {
+      return parseFloat(areaVal.toFixed(4)).toString();
+    }
+
+    function showToast(msg, icon = '✓') {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-msg').innerText = msg;
+      document.getElementById('toast-icon').innerText = icon;
+      toast.classList.remove('opacity-0', 'pointer-events-none');
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'pointer-events-none');
+      }, 1800);
+    }
+
+    /* ================= 板块 1：板材写真逻辑 ================= */
+    function addPlateItem(preset = null) {
+      const item = preset || {
+        id: 'p_' + Date.now() + Math.random().toString(36).substr(2, 4),
+        width: 80,
+        height: 120,
+        count: 1,
+        isPVC: false,
+        pvcThickness: 3, // 3, 5, 9
+        craftSpecial: false, // 异形 +10
+        craftDouble: false, // 双面 +30
+        craftThick: false, // 加厚 +15 (KT专享)
+        outdoorType: 0 // 0:常规户内, 1:户外款(+5), 2:户外加强款(+12)
+      };
+      plateList.push(item);
+      renderPlateList();
+      calculateAll();
+    }
+
+    function removePlateItem(id) {
+      plateList = plateList.filter(p => p.id !== id);
+      renderPlateList();
+      calculateAll();
+    }
+
+    function renderPlateList() {
+      const container = document.getElementById('plates-container');
+      const section = document.getElementById('section-plates');
+      const badge = document.getElementById('plate-count-badge');
+      
+      badge.innerText = `${plateList.length}件`;
+      if (plateList.length === 0) {
+        section.classList.add('hidden');
+        container.innerHTML = '';
+        checkEmptyPlaceholder();
+        return;
+      }
+      section.classList.remove('hidden');
+
+      container.innerHTML = plateList.map((item, idx) => {
+        return `
+          <div class="p-3.5 bg-slate-50/70 border border-slate-200 rounded-xl space-y-3 relative group">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="w-5 h-5 rounded-md bg-indigo-100 text-indigo-700 text-xs font-bold flex items-center justify-center">${idx + 1}</span>
+                <span class="text-xs font-bold text-slate-700">${item.isPVC ? '雪弗板/PVC' : '常规KT板'}</span>
+              </div>
+              <button onclick="removePlateItem('${item.id}')" class="text-slate-600 hover:text-rose-600 text-xs transition">删除</button>
+            </div>
+
+            <!-- 尺寸与数量 -->
+            <div class="grid grid-cols-3 gap-2">
+              <div>
+                <label class="block text-[10px] text-slate-600 mb-0.5">宽 (cm)</label>
+                <input type="number" min="1" value="${item.width}" onchange="updatePlateProp('${item.id}', 'width', this.value)" class="w-full px-2 py-1 bg-white border border-slate-200 rounded-lg text-xs font-semibold focus:outline-hidden focus:border-indigo-500" />
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-600 mb-0.5">高 (cm)</label>
+                <input type="number" min="1" value="${item.height}" onchange="updatePlateProp('${item.id}', 'height', this.value)" class="w-full px-2 py-1 bg-white border border-slate-200 rounded-lg text-xs font-semibold focus:outline-hidden focus:border-indigo-500" />
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-600 mb-0.5">数量 (块)</label>
+                <input type="number" min="1" value="${item.count}" onchange="updatePlateProp('${item.id}', 'count', this.value)" class="w-full px-2 py-1 bg-white border border-slate-200 rounded-lg text-xs font-semibold focus:outline-hidden focus:border-indigo-500" />
+              </div>
+            </div>
+
+            <!-- 升级材质 (雪弗板) -->
+            <div class="p-2 bg-white rounded-lg border border-slate-100">
+              <div class="flex items-center justify-between">
+                <label class="flex items-center gap-1.5 text-xs text-slate-700 cursor-pointer select-none">
+                  <input type="checkbox" ${item.isPVC ? 'checked' : ''} onchange="togglePlatePVC('${item.id}', this.checked)" class="w-3.5 h-3.5 accent-indigo-600 rounded" />
+                  <span class="font-medium">升级为雪弗板/PVC</span>
+                </label>
+                ${item.isPVC ? `
+                  <div class="flex items-center gap-1 text-xs">
+                    <label class="flex items-center gap-1 cursor-pointer">
+                      <input type="radio" name="pvc_${item.id}" value="3" ${item.pvcThickness == 3 ? 'checked' : ''} onchange="updatePlateProp('${item.id}', 'pvcThickness', 3)" class="accent-indigo-600" />
+                      <span class="text-[11px] text-slate-600">3mm</span>
+                    </label>
+                    <label class="flex items-center gap-1 cursor-pointer">
+                      <input type="radio" name="pvc_${item.id}" value="5" ${item.pvcThickness == 5 ? 'checked' : ''} onchange="updatePlateProp('${item.id}', 'pvcThickness', 5)" class="accent-indigo-600" />
+                      <span class="text-[11px] text-slate-600">5mm</span>
+                    </label>
+                    <label class="flex items-center gap-1 cursor-pointer">
+                      <input type="radio" name="pvc_${item.id}" value="9" ${item.pvcThickness == 9 ? 'checked' : ''} onchange="updatePlateProp('${item.id}', 'pvcThickness', 9)" class="accent-indigo-600" />
+                      <span class="text-[11px] text-slate-600">9mm</span>
+                    </label>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+
+            <!-- 可选工艺复选 -->
+            <div class="flex flex-wrap gap-x-3 gap-y-1.5 text-xs text-slate-600 pt-1">
+              <label class="flex items-center gap-1 cursor-pointer select-none">
+                <input type="checkbox" ${item.craftSpecial ? 'checked' : ''} onchange="updatePlateProp('${item.id}', 'craftSpecial', this.checked)" class="accent-indigo-600" />
+                <span>异形(+10/㎡)</span>
+              </label>
+              <label class="flex items-center gap-1 cursor-pointer select-none">
+                <input type="checkbox" ${item.craftDouble ? 'checked' : ''} onchange="updatePlateProp('${item.id}', 'craftDouble', this.checked)" class="accent-indigo-600" />
+                <span>双面(+30/㎡)</span>
+              </label>
+              ${!item.isPVC ? `
+                <label class="flex items-center gap-1 cursor-pointer select-none">
+                  <input type="checkbox" ${item.craftThick ? 'checked' : ''} onchange="updatePlateProp('${item.id}', 'craftThick', this.checked)" class="accent-indigo-600" />
+                  <span>KT加厚(+15/㎡)</span>
+                </label>
+              ` : ''}
+              <!-- 户外款二选一互斥 -->
+              <label class="flex items-center gap-1 cursor-pointer select-none">
+                <input type="radio" name="outdoor_${item.id}" value="0" ${item.outdoorType == 0 ? 'checked' : ''} onchange="updatePlateProp('${item.id}', 'outdoorType', 0)" class="accent-indigo-600" />
+                <span>户内款</span>
+              </label>
+              <label class="flex items-center gap-1 cursor-pointer select-none">
+                <input type="radio" name="outdoor_${item.id}" value="1" ${item.outdoorType == 1 ? 'checked' : ''} onchange="updatePlateProp('${item.id}', 'outdoorType', 1)" class="accent-indigo-600" />
+                <span>户外款(+5/㎡)</span>
+              </label>
+              <label class="flex items-center gap-1 cursor-pointer select-none">
+                <input type="radio" name="outdoor_${item.id}" value="2" ${item.outdoorType == 2 ? 'checked' : ''} onchange="updatePlateProp('${item.id}', 'outdoorType', 2)" class="accent-indigo-600" />
+                <span>户外加强车贴(+12/㎡)</span>
+              </label>
+            </div>
+          </div>
+        `;
+      }).join('');
+      checkEmptyPlaceholder();
+    }
+
+    function updatePlateProp(id, prop, val) {
+      const item = plateList.find(p => p.id === id);
+      if (item) {
+        if (prop === 'width' || prop === 'height' || prop === 'count' || prop === 'pvcThickness' || prop === 'outdoorType') {
+          item[prop] = Math.max(1, Number(val) || 1);
+        } else {
+          item[prop] = val;
+        }
+        calculateAll();
+      }
+    }
+
+    function togglePlatePVC(id, checked) {
+      const item = plateList.find(p => p.id === id);
+      if (item) {
+        item.isPVC = checked;
+        if (checked) item.craftThick = false;
+        renderPlateList();
+        calculateAll();
+      }
+    }
+
+    /* ================= 支架控制与智能匹配逻辑 ================= */
+    function setBracketMode(enabled) {
+      bracketMode = enabled;
+      const btnNo = document.getElementById('bracket-mode-no');
+      const btnYes = document.getElementById('bracket-mode-yes');
+      const panel = document.getElementById('brackets-panel');
+      const autoBox = document.getElementById('auto-bracket-box');
+
+      if (enabled) {
+        btnYes.className = 'px-2.5 py-1 rounded-md transition font-bold bg-white text-indigo-600 shadow-xs';
+        btnNo.className = 'px-2.5 py-1 rounded-md transition font-medium text-slate-500 hover:text-slate-700';
+        panel.classList.remove('hidden');
+        autoBox.classList.remove('hidden');
+        if (bracketList.length === 0) {
+          addBracketItem('b1', 1);
+        }
+      } else {
+        btnNo.className = 'px-2.5 py-1 rounded-md transition font-bold bg-white text-slate-700 shadow-xs';
+        btnYes.className = 'px-2.5 py-1 rounded-md transition font-medium text-slate-500 hover:text-slate-700';
+        panel.classList.add('hidden');
+        autoBox.classList.add('hidden');
+      }
+      calculateAll();
+    }
+
+    function addBracketItem(defId = 'b1', count = 1) {
+      bracketList.push({
+        id: 'br_' + Date.now() + Math.random().toString(36).substr(2, 4),
+        modelId: defId,
+        count: count
+      });
+      renderBracketList();
+      calculateAll();
+    }
+
+    function removeBracketItem(id) {
+      bracketList = bracketList.filter(b => b.id !== id);
+      renderBracketList();
+      calculateAll();
+    }
+
+    function renderBracketList() {
+      const container = document.getElementById('brackets-container');
+      container.innerHTML = bracketList.map((item, idx) => {
+        return `
+          <div class="flex items-center gap-2 bg-white p-2 rounded-lg border border-slate-200">
+            <select onchange="updateBracketProp('${item.id}', 'modelId', this.value)" class="text-xs flex-1 bg-transparent border-none focus:outline-hidden font-medium text-slate-700">
+              ${BRACKET_DEFS.map(b => `<option value="${b.id}" ${b.id === item.modelId ? 'selected' : ''}>${b.name}</option>`).join('')}
+            </select>
+            <div class="flex items-center gap-1">
+              <span class="text-[10px] text-slate-600">数量:</span>
+              <input type="number" min="1" value="${item.count}" onchange="updateBracketProp('${item.id}', 'count', this.value)" class="w-14 px-1.5 py-0.5 border border-slate-200 rounded text-center text-xs font-semibold" />
+              <button onclick="removeBracketItem('${item.id}')" class="text-slate-600 hover:text-rose-500 px-1 text-xs">✕</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function updateBracketProp(id, prop, val) {
+      const item = bracketList.find(b => b.id === id);
+      if (item) {
+        item[prop] = prop === 'count' ? Math.max(1, Number(val) || 1) : val;
+        calculateAll();
+      }
+    }
+
+    // 智能自动匹配支架算法
+    function autoMatchBrackets() {
+      if (plateList.length === 0) {
+        showToast('请先添加板材产品', '⚠️');
+        return;
+      }
+      let b1Count = 0; // 35*35cm普通支架
+      let b5Count = 0; // 大尺寸可调节角度支架
+
+      plateList.forEach(p => {
+        const hM = p.height / 100;
+        const wM = p.width / 100;
+        const perCount = p.count;
+
+        if (hM < 1.2) {
+          // 尺寸低于1.2m一律无需支架
+          return;
+        }
+
+        // 数量由宽度决定：不大于1.2m为1套，超过后每1米1套 (Math.ceil)
+        let setsPerPlate = (wM <= 1.2) ? 1 : Math.ceil(wM);
+        let totalSets = setsPerPlate * perCount;
+
+        if (hM >= 1.2 && hM <= 3.0) {
+          b1Count += totalSets;
+        } else if (hM > 3.0) {
+          b5Count += totalSets;
+        }
+      });
+
+      bracketList = [];
+      if (b1Count > 0) bracketList.push({ id: 'br_auto1', modelId: 'b1', count: b1Count });
+      if (b5Count > 0) bracketList.push({ id: 'br_auto5', modelId: 'b5', count: b5Count });
+
+      if (bracketList.length === 0) {
+        showToast('板材高度均低于1.2米，无需支架', 'ℹ️');
+      } else {
+        showToast('已智能匹配并装配对应支架！');
+      }
+      renderBracketList();
+      calculateAll();
+    }
+
+    /* ================= 板块 2：卷材画面类逻辑 ================= */
+    function addRollItem() {
+      rollList.push({
+        id: 'r_' + Date.now() + Math.random().toString(36).substr(2, 4),
+        materialId: 'in_bj',
+        width: 100,
+        height: 200,
+        count: 1,
+        removable: false, // 白/黑胶车贴可移除 (+10)
+        laminate: 0 // 0:无, 1:磨砂膜(+20), 2:斜纹膜(+20)
+      });
+      renderRollList();
+      calculateAll();
+    }
+
+    function removeRollItem(id) {
+      rollList = rollList.filter(r => r.id !== id);
+      renderRollList();
+      calculateAll();
+    }
+
+    function renderRollList() {
+      const container = document.getElementById('rolls-container');
+      const section = document.getElementById('section-rolls');
+      const badge = document.getElementById('roll-count-badge');
+      
+      badge.innerText = `${rollList.length}件`;
+      if (rollList.length === 0) {
+        section.classList.add('hidden');
+        container.innerHTML = '';
+        checkEmptyPlaceholder();
+        return;
+      }
+      section.classList.remove('hidden');
+
+      container.innerHTML = rollList.map((item, idx) => {
+        const mat = ROLL_MATERIALS.find(m => m.id === item.materialId) || ROLL_MATERIALS[0];
+        return `
+          <div class="p-3.5 bg-slate-50/70 border border-slate-200 rounded-xl space-y-3 relative">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="w-5 h-5 rounded-md bg-emerald-100 text-emerald-700 text-xs font-bold flex items-center justify-center">${idx + 1}</span>
+                <span class="text-xs font-bold text-slate-700">${mat.name}</span>
+              </div>
+              <button onclick="removeRollItem('${item.id}')" class="text-slate-600 hover:text-rose-600 text-xs transition">删除</button>
+            </div>
+
+            <!-- 材料选择下拉 -->
+            <div>
+              <label class="block text-[10px] text-slate-600 mb-0.5">画面材质</label>
+              <select onchange="updateRollProp('${item.id}', 'materialId', this.value)" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-700 focus:outline-hidden focus:border-emerald-500">
+                <optgroup label="室内写真材质">
+                  ${ROLL_MATERIALS.filter(m => m.group === '室内').map(m => `<option value="${m.id}" ${m.id === item.materialId ? 'selected' : ''}>${m.name} (基准${m.basePrice}元/㎡)</option>`).join('')}
+                </optgroup>
+                <optgroup label="户外写真及车贴">
+                  ${ROLL_MATERIALS.filter(m => m.group === '户外').map(m => `<option value="${m.id}" ${m.id === item.materialId ? 'selected' : ''}>${m.name} (基准${m.basePrice}元/㎡)</option>`).join('')}
+                </optgroup>
+              </select>
+            </div>
+
+            <!-- 尺寸与数量 -->
+            <div class="grid grid-cols-3 gap-2">
+              <div>
+                <label class="block text-[10px] text-slate-600 mb-0.5">宽 (cm)</label>
+                <input type="number" min="1" value="${item.width}" onchange="updateRollProp('${item.id}', 'width', this.value)" class="w-full px-2 py-1 bg-white border border-slate-200 rounded-lg text-xs font-semibold focus:outline-hidden focus:border-emerald-500" />
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-600 mb-0.5">高 (cm)</label>
+                <input type="number" min="1" value="${item.height}" onchange="updateRollProp('${item.id}', 'height', this.value)" class="w-full px-2 py-1 bg-white border border-slate-200 rounded-lg text-xs font-semibold focus:outline-hidden focus:border-emerald-500" />
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-600 mb-0.5">数量 (张)</label>
+                <input type="number" min="1" value="${item.count}" onchange="updateRollProp('${item.id}', 'count', this.value)" class="w-full px-2 py-1 bg-white border border-slate-200 rounded-lg text-xs font-semibold focus:outline-hidden focus:border-emerald-500" />
+              </div>
+            </div>
+
+            <!-- 车贴专属附加工艺 -->
+            ${mat.isCar ? `
+              <div class="p-2 bg-white rounded-lg border border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs">
+                <label class="flex items-center gap-1 cursor-pointer select-none">
+                  <input type="checkbox" ${item.removable ? 'checked' : ''} onchange="updateRollProp('${item.id}', 'removable', this.checked)" class="accent-emerald-600" />
+                  <span class="text-slate-700">可移除背胶(+10/㎡)</span>
+                </label>
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] text-slate-600">特种覆膜:</span>
+                  <select onchange="updateRollProp('${item.id}', 'laminate', Number(this.value))" class="text-xs bg-slate-50 border border-slate-200 rounded px-1.5 py-0.5">
+                    <option value="0" ${item.laminate === 0 ? 'selected' : ''}>常规亮/哑膜(+0)</option>
+                    <option value="1" ${item.laminate === 1 ? 'selected' : ''}>磨砂膜(+20/㎡)</option>
+                    <option value="2" ${item.laminate === 2 ? 'selected' : ''}>斜纹膜(+20/㎡)</option>
+                  </select>
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+      checkEmptyPlaceholder();
+    }
+
+    function updateRollProp(id, prop, val) {
+      const item = rollList.find(r => r.id === id);
+      if (item) {
+        if (prop === 'width' || prop === 'height' || prop === 'count') {
+          item[prop] = Math.max(1, Number(val) || 1);
+        } else {
+          item[prop] = val;
+        }
+        if (prop === 'materialId') renderRollList();
+        calculateAll();
+      }
+    }
+
+    /* ================= 板块 3：海报展架套组逻辑 ================= */
+    function addStandItem() {
+      standList.push({
+        id: 's_' + Date.now() + Math.random().toString(36).substr(2, 4),
+        type: 'x', // 'x', 'door', 'rollup'
+        size: '60*160', // 尺寸选项
+        count: 1,
+        baseUpgrade: 'normal', // 门型: normal, water(+30), mold(+40); 易拉宝: steel(+0), alloy(+20), export(+60)
+        outdoorScreen: false // 户外款画面 +10
+      });
+      renderStandList();
+      calculateAll();
+    }
+
+    function removeStandItem(id) {
+      standList = standList.filter(s => s.id !== id);
+      renderStandList();
+      calculateAll();
+    }
+
+    function renderStandList() {
+      const container = document.getElementById('stands-container');
+      const section = document.getElementById('section-stands');
+      const badge = document.getElementById('stand-count-badge');
+
+      badge.innerText = `${standList.length}套`;
+      if (standList.length === 0) {
+        section.classList.add('hidden');
+        container.innerHTML = '';
+        checkEmptyPlaceholder();
+        return;
+      }
+      section.classList.remove('hidden');
+
+      container.innerHTML = standList.map((item, idx) => {
+        return `
+          <div class="p-3.5 bg-slate-50/70 border border-slate-200 rounded-xl space-y-3 relative">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="w-5 h-5 rounded-md bg-amber-100 text-amber-700 text-xs font-bold flex items-center justify-center">${idx + 1}</span>
+                <span class="text-xs font-bold text-slate-700">展架类型</span>
+              </div>
+              <button onclick="removeStandItem('${item.id}')" class="text-slate-600 hover:text-rose-600 text-xs transition">删除</button>
+            </div>
+
+            <!-- 展架类型与规格 -->
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-[10px] text-slate-600 mb-0.5">器材款式</label>
+                <select onchange="changeStandType('${item.id}', this.value)" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 focus:outline-hidden focus:border-amber-500">
+                  <option value="x" ${item.type === 'x' ? 'selected' : ''}>X展架套组</option>
+                  <option value="door" ${item.type === 'door' ? 'selected' : ''}>门型展架套组</option>
+                  <option value="rollup" ${item.type === 'rollup' ? 'selected' : ''}>易拉宝套组</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-[10px] text-slate-600 mb-0.5">规格尺寸</label>
+                <select onchange="updateStandProp('${item.id}', 'size', this.value)" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-700 focus:outline-hidden focus:border-amber-500">
+                  ${item.type === 'x' ? `
+                    <option value="60*160" ${item.size === '60*160' ? 'selected' : ''}>60*160cm (35元/套)</option>
+                    <option value="80*180" ${item.size === '80*180' ? 'selected' : ''}>80*180cm (45元/套)</option>
+                  ` : ''}
+                  ${item.type === 'door' ? `
+                    <option value="60*160" ${item.size === '60*160' ? 'selected' : ''}>60*160cm (60元/套)</option>
+                    <option value="80*180" ${item.size === '80*180' ? 'selected' : ''}>80*180cm (70元/套)</option>
+                  ` : ''}
+                  ${item.type === 'rollup' ? `
+                    <option value="80*200" ${item.size === '80*200' ? 'selected' : ''}>80*200cm</option>
+                  ` : ''}
+                </select>
+              </div>
+            </div>
+
+            <!-- 底座升级选项 -->
+            ${item.type === 'door' && item.size === '80*180' ? `
+              <div class="p-2 bg-white rounded-lg border border-slate-100 flex items-center justify-between text-xs">
+                <span class="text-slate-600 text-[11px]">底座升级:</span>
+                <div class="flex items-center gap-2">
+                  <label class="cursor-pointer"><input type="radio" name="base_${item.id}" value="normal" ${item.baseUpgrade === 'normal' ? 'checked' : ''} onchange="updateStandProp('${item.id}', 'baseUpgrade', 'normal')" class="accent-amber-600"> 标配铁板</label>
+                  <label class="cursor-pointer"><input type="radio" name="base_${item.id}" value="water" ${item.baseUpgrade === 'water' ? 'checked' : ''} onchange="updateStandProp('${item.id}', 'baseUpgrade', 'water')" class="accent-amber-600"> 注水型(+30)</label>
+                  <label class="cursor-pointer"><input type="radio" name="base_${item.id}" value="mold" ${item.baseUpgrade === 'mold' ? 'checked' : ''} onchange="updateStandProp('${item.id}', 'baseUpgrade', 'mold')" class="accent-amber-600"> 注塑型(+40)</label>
+                </div>
+              </div>
+            ` : ''}
+
+            ${item.type === 'rollup' ? `
+              <div class="p-2 bg-white rounded-lg border border-slate-100 flex items-center justify-between text-xs">
+                <span class="text-slate-600 text-[11px]">盒座材质:</span>
+                <div class="flex items-center gap-2">
+                  <label class="cursor-pointer"><input type="radio" name="base_${item.id}" value="steel" ${item.baseUpgrade === 'steel' || item.baseUpgrade === 'normal' ? 'checked' : ''} onchange="updateStandProp('${item.id}', 'baseUpgrade', 'steel')" class="accent-amber-600"> 塑钢加强(90元)</label>
+                  <label class="cursor-pointer"><input type="radio" name="base_${item.id}" value="alloy" ${item.baseUpgrade === 'alloy' ? 'checked' : ''} onchange="updateStandProp('${item.id}', 'baseUpgrade', 'alloy')" class="accent-amber-600"> 铝合金(+20)</label>
+                  <label class="cursor-pointer"><input type="radio" name="base_${item.id}" value="export" ${item.baseUpgrade === 'export' ? 'checked' : ''} onchange="updateStandProp('${item.id}', 'baseUpgrade', 'export')" class="accent-amber-600"> 出口品质(+60)</label>
+                </div>
+              </div>
+            ` : ''}
+
+            <!-- 户外款画面与数量 -->
+            <div class="flex items-center justify-between pt-1">
+              <label class="flex items-center gap-1.5 text-xs text-slate-700 cursor-pointer select-none">
+                <input type="checkbox" ${item.outdoorScreen ? 'checked' : ''} onchange="updateStandProp('${item.id}', 'outdoorScreen', this.checked)" class="w-3.5 h-3.5 accent-amber-600 rounded" />
+                <span>可选：升级户外画面 (+10元/套)</span>
+              </label>
+              <div class="flex items-center gap-1">
+                <span class="text-[10px] text-slate-600">数量:</span>
+                <input type="number" min="1" value="${item.count}" onchange="updateStandProp('${item.id}', 'count', this.value)" class="w-14 px-2 py-1 bg-white border border-slate-200 rounded text-center text-xs font-semibold focus:outline-hidden focus:border-amber-500" />
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      checkEmptyPlaceholder();
+    }
+
+    function changeStandType(id, typeVal) {
+      const item = standList.find(s => s.id === id);
+      if (item) {
+        item.type = typeVal;
+        if (typeVal === 'x' || typeVal === 'door') item.size = '60*160';
+        if (typeVal === 'rollup') {
+          item.size = '80*200';
+          item.baseUpgrade = 'steel';
+        } else {
+          item.baseUpgrade = 'normal';
+        }
+        renderStandList();
+        calculateAll();
+      }
+    }
+
+    function updateStandProp(id, prop, val) {
+      const item = standList.find(s => s.id === id);
+      if (item) {
+        item[prop] = prop === 'count' ? Math.max(1, Number(val) || 1) : val;
+        renderStandList();
+        calculateAll();
+      }
+    }
+
+    /* ================= 板块 4：锦旗横幅布艺类逻辑 ================= */
+    function addFabricItem() {
+      fabricList.push({
+        id: 'f_' + Date.now() + Math.random().toString(36).substr(2, 4),
+        type: 'banner', // 'spray', 'banner', 'flag', 'pennant'
+        // 喷绘布
+        spraySubtype: '550', // '550' (10/㎡), 'bw' (12/㎡)
+        width: 100,
+        height: 200,
+        count: 1,
+        // 横幅专享
+        bannerFixedSpan: '70', // '50','70','90','120','custom'
+        bannerLengthM: 5, // 长度（米）
+        // 锦旗专享
+        pennantSize: '70*110', // '60*90','70*110','80*120'
+        pennantVersion: 'normal', // 'normal', 'deluxe_red'(+20), 'deluxe_darkred'(+20), 'velvet'(+30)
+        pennantGold: false // 烫金 (+10) 默认常规发泡
+      });
+      renderFabricList();
+      calculateAll();
+    }
+
+    function removeFabricItem(id) {
+      fabricList = fabricList.filter(f => f.id !== id);
+      renderFabricList();
+      calculateAll();
+    }
+
+    function renderFabricList() {
+      const container = document.getElementById('fabrics-container');
+      const section = document.getElementById('section-fabrics');
+      const badge = document.getElementById('fabric-count-badge');
+
+      badge.innerText = `${fabricList.length}件`;
+      if (fabricList.length === 0) {
+        section.classList.add('hidden');
+        container.innerHTML = '';
+        checkEmptyPlaceholder();
+        return;
+      }
+      section.classList.remove('hidden');
+
+      container.innerHTML = fabricList.map((item, idx) => {
+        return `
+          <div class="p-3.5 bg-slate-50/70 border border-slate-200 rounded-xl space-y-3 relative">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="w-5 h-5 rounded-md bg-rose-100 text-rose-700 text-xs font-bold flex items-center justify-center">${idx + 1}</span>
+                <span class="text-xs font-bold text-slate-700">布艺产品类别</span>
+              </div>
+              <button onclick="removeFabricItem('${item.id}')" class="text-slate-600 hover:text-rose-600 text-xs transition">删除</button>
+            </div>
+
+            <!-- 产品类型 -->
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-[10px] text-slate-600 mb-0.5">品类</label>
+                <select onchange="updateFabricProp('${item.id}', 'type', this.value)" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 focus:outline-hidden focus:border-rose-500">
+                  <option value="spray" ${item.type === 'spray' ? 'selected' : ''}>喷绘布</option>
+                  <option value="banner" ${item.type === 'banner' ? 'selected' : ''}>条幅/横幅</option>
+                  <option value="flag" ${item.type === 'flag' ? 'selected' : ''}>旗帜布</option>
+                  <option value="pennant" ${item.type === 'pennant' ? 'selected' : ''}>定制锦旗</option>
+                </select>
+              </div>
+
+              <div>
+                ${item.type === 'spray' ? `
+                  <label class="block text-[10px] text-slate-600 mb-0.5">喷绘布材质</label>
+                  <select onchange="updateFabricProp('${item.id}', 'spraySubtype', this.value)" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-700">
+                    <option value="550" ${item.spraySubtype === '550' ? 'selected' : ''}>550加厚喷绘布 (10元/㎡)</option>
+                    <option value="bw" ${item.spraySubtype === 'bw' ? 'selected' : ''}>黑白布遮光 (12元/㎡)</option>
+                  </select>
+                ` : ''}
+                ${item.type === 'banner' ? `
+                  <label class="block text-[10px] text-slate-600 mb-0.5">横幅宽幅</label>
+                  <select onchange="updateFabricProp('${item.id}', 'bannerFixedSpan', this.value)" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-700">
+                    <option value="50" ${item.bannerFixedSpan === '50' ? 'selected' : ''}>50 cm 宽幅</option>
+                    <option value="70" ${item.bannerFixedSpan === '70' ? 'selected' : ''}>70 cm 宽幅</option>
+                    <option value="90" ${item.bannerFixedSpan === '90' ? 'selected' : ''}>90 cm 宽幅</option>
+                    <option value="120" ${item.bannerFixedSpan === '120' ? 'selected' : ''}>120 cm 宽幅</option>
+                    <option value="custom" ${item.bannerFixedSpan === 'custom' ? 'selected' : ''}>自定义宽幅</option>
+                  </select>
+                ` : ''}
+                ${item.type === 'pennant' ? `
+                  <label class="block text-[10px] text-slate-600 mb-0.5">锦旗尺寸</label>
+                  <select onchange="updateFabricProp('${item.id}', 'pennantSize', this.value)" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-700">
+                    <option value="60*90" ${item.pennantSize === '60*90' ? 'selected' : ''}>60*90cm (60元/套)</option>
+                    <option value="70*110" ${item.pennantSize === '70*110' ? 'selected' : ''}>70*110cm (80元/套)</option>
+                    <option value="80*120" ${item.pennantSize === '80*120' ? 'selected' : ''}>80*120cm (100元/套)</option>
+                  </select>
+                ` : ''}
+                ${item.type === 'flag' ? `
+                  <label class="block text-[10px] text-slate-600 mb-0.5">旗帜布说明</label>
+                  <div class="px-2 py-1.5 bg-slate-100 rounded text-xs text-slate-600">基准 10元/㎡ (1㎡起算)</div>
+                ` : ''}
+              </div>
+            </div>
+
+            <!-- 尺寸与参数输入 -->
+            ${item.type === 'spray' || item.type === 'flag' ? `
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <label class="block text-[10px] text-slate-600 mb-0.5">宽 (cm)</label>
+                  <input type="number" min="1" value="${item.width}" onchange="updateFabricProp('${item.id}', 'width', this.value)" class="w-full px-2 py-1 bg-white border border-slate-200 rounded text-xs font-semibold" />
+                </div>
+                <div>
+                  <label class="block text-[10px] text-slate-600 mb-0.5">高 (cm)</label>
+                  <input type="number" min="1" value="${item.height}" onchange="updateFabricProp('${item.id}', 'height', this.value)" class="w-full px-2 py-1 bg-white border border-slate-200 rounded text-xs font-semibold" />
+                </div>
+                <div>
+                  <label class="block text-[10px] text-slate-600 mb-0.5">数量</label>
+                  <input type="number" min="1" value="${item.count}" onchange="updateFabricProp('${item.id}', 'count', this.value)" class="w-full px-2 py-1 bg-white border border-slate-200 rounded text-xs font-semibold" />
+                </div>
+              </div>
+              ${item.type === 'spray' && item.width > 320 && item.height > 320 ? `
+                <div class="text-[11px] text-amber-600 bg-amber-50 px-2 py-1 rounded">⚠️ 宽和高同时大于3.2米，自动触发超宽拼接加价 (+2元/㎡)</div>
+              ` : ''}
+            ` : ''}
+
+            ${item.type === 'banner' ? `
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <label class="block text-[10px] text-slate-600 mb-0.5">宽幅 (cm)</label>
+                  <input type="number" min="1" value="${item.bannerFixedSpan === 'custom' ? item.width : item.bannerFixedSpan}" ${item.bannerFixedSpan !== 'custom' ? 'disabled' : ''} onchange="updateFabricProp('${item.id}', 'width', this.value)" class="w-full px-2 py-1 bg-white border border-slate-200 rounded text-xs font-semibold disabled:bg-slate-100" />
+                </div>
+                <div>
+                  <label class="block text-[10px] text-slate-600 mb-0.5">横幅长度 (米)</label>
+                  <input type="number" min="0.1" step="0.5" value="${item.bannerLengthM}" onchange="updateFabricProp('${item.id}', 'bannerLengthM', this.value)" class="w-full px-2 py-1 bg-white border border-slate-200 rounded text-xs font-semibold" />
+                </div>
+                <div>
+                  <label class="block text-[10px] text-slate-600 mb-0.5">条数</label>
+                  <input type="number" min="1" value="${item.count}" onchange="updateFabricProp('${item.id}', 'count', this.value)" class="w-full px-2 py-1 bg-white border border-slate-200 rounded text-xs font-semibold" />
+                </div>
+              </div>
+            ` : ''}
+
+            ${item.type === 'pennant' ? `
+              <div class="p-2 bg-white rounded-lg border border-slate-100 space-y-2">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-slate-600 text-[11px]">面料版本:</span>
+                  <select onchange="updateFabricProp('${item.id}', 'pennantVersion', this.value)" class="text-xs bg-slate-50 border border-slate-200 rounded px-2 py-1">
+                    <option value="normal" ${item.pennantVersion === 'normal' ? 'selected' : ''}>常规版 (+0)</option>
+                    <option value="deluxe_red" ${item.pennantVersion === 'deluxe_red' ? 'selected' : ''}>豪华版(大红) (+20)</option>
+                    <option value="deluxe_darkred" ${item.pennantVersion === 'deluxe_darkred' ? 'selected' : ''}>豪华版(枣红) (+20)</option>
+                    <option value="velvet" ${item.pennantVersion === 'velvet' ? 'selected' : ''}>金丝绒版 (+30)</option>
+                  </select>
+                </div>
+                <div class="flex items-center justify-between text-xs pt-1 border-t border-slate-100">
+                  <label class="flex items-center gap-1 cursor-pointer select-none">
+                    <input type="checkbox" ${item.pennantGold ? 'checked' : ''} onchange="updateFabricProp('${item.id}', 'pennantGold', this.checked)" class="accent-rose-600" />
+                    <span>升级烫金工艺 (+10元/套)</span>
+                  </label>
+                  <div class="flex items-center gap-1">
+                    <span class="text-[10px] text-slate-600">套数:</span>
+                    <input type="number" min="1" value="${item.count}" onchange="updateFabricProp('${item.id}', 'count', this.value)" class="w-12 px-1.5 py-0.5 border border-slate-200 rounded text-center text-xs font-semibold" />
+                  </div>
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+      checkEmptyPlaceholder();
+    }
+
+    function updateFabricProp(id, prop, val) {
+      const item = fabricList.find(f => f.id === id);
+      if (item) {
+        if (prop === 'type') {
+          item.type = val;
+          renderFabricList();
+          calculateAll();
+          return;
+        }
+        if (prop === 'bannerFixedSpan') {
+          item.bannerFixedSpan = val;
+          if (val !== 'custom') item.width = Number(val);
+          renderFabricList();
+          calculateAll();
+          return;
+        }
+        if (prop === 'width' || prop === 'height' || prop === 'count' || prop === 'bannerLengthM') {
+          item[prop] = Math.max(0.1, Number(val) || 1);
+        } else {
+          item[prop] = val;
+        }
+        renderFabricList();
+        calculateAll();
+      }
+    }
+
+    function checkEmptyPlaceholder() {
+      const hasAny = plateList.length > 0 || rollList.length > 0 || standList.length > 0 || fabricList.length > 0;
+      document.getElementById('empty-tips-card').classList.toggle('hidden', hasAny);
+    }
+
+    /* ================= 算价核心与微信报价生成 ================= */
+    function calculateAll() {
+      let grandTotal = 0;
+      let totalItemsCount = 0;
+      let textLines = [];
+
+      textLines.push('【 广告印刷产品快速报价单 】');
+      textLines.push('--------------------------------');
+
+      /* ----- 1. 板材写真与支架核算 ----- */
+      if (plateList.length > 0) {
+        textLines.push('【板材写真类】');
+        
+        // 按照材质与工艺组合进行聚合哈希成组 (支持同材质同工艺合并1㎡起算)
+        const groups = {};
+        plateList.forEach(p => {
+          let baseU = 30; // KT默认30
+          let matLabel = 'KT板';
+          if (p.isPVC) {
+            matLabel = `雪弗板/PVC(${p.pvcThickness}mm)`;
+            if (p.pvcThickness === 3) baseU += 15;
+            else if (p.pvcThickness === 5) baseU += 40;
+            else if (p.pvcThickness === 9) baseU += 60;
+          } else if (p.craftThick) {
+            baseU += 15;
+            matLabel += '加厚';
+          }
+          if (p.craftSpecial) baseU += 10;
+          if (p.craftDouble) baseU += 30;
+          if (p.outdoorType === 1) baseU += 5;
+          if (p.outdoorType === 2) baseU += 12;
+
+          const unitPrice = getScaledPrice(baseU);
+          const craftKey = `${matLabel}_${p.craftSpecial}_${p.craftDouble}_${p.craftThick}_${p.outdoorType}_${unitPrice}`;
+
+          if (!groups[craftKey]) {
+            groups[craftKey] = {
+              matLabel,
+              unitPrice,
+              items: [],
+              sumArea: 0,
+              hasSpecial: p.craftSpecial,
+              hasDouble: p.craftDouble,
+              outdoorType: p.outdoorType
+            };
+          }
+          const itemArea = (p.width * p.height / 10000) * p.count;
+          groups[craftKey].items.push(p);
+          groups[craftKey].sumArea += itemArea;
+          totalItemsCount += p.count;
+        });
+
+        // 分组核算金额与微信文本
+        Object.values(groups).forEach(g => {
+          let isMin1M = g.sumArea < 1.0;
+          let billArea = Math.max(1.0, g.sumArea);
+          let groupSubtotal = Math.round(billArea * g.unitPrice);
+
+          // 判定小尺寸裁切费：20x20cm以下，且叠加面积>=1㎡，每块加1元
+          let smallPlateFee = 0;
+          if (g.sumArea >= 1.0) {
+            g.items.forEach(p => {
+              if (p.width <= 20 && p.height <= 20) {
+                smallPlateFee += p.count * 1;
+              }
+            });
+          }
+          groupSubtotal += smallPlateFee;
+          grandTotal += groupSubtotal;
+
+          // 构造微信文本
+          g.items.forEach(p => {
+            let crafts = [];
+            if (p.craftSpecial) crafts.push('异形');
+            if (p.craftDouble) crafts.push('双面');
+            if (p.craftThick && !p.isPVC) crafts.push('加厚');
+            if (p.outdoorType === 1) crafts.push('户外款');
+            if (p.outdoorType === 2) crafts.push('车贴画面');
+            let craftStr = crafts.length ? ` [${crafts.join('+')}]` : '';
+            let singleArea = formatArea((p.width * p.height / 10000) * p.count);
+            textLines.push(`• ${g.matLabel}${craftStr}：${p.width}×${p.height}cm × ${p.count}块 (${singleArea}㎡)`);
+          });
+
+          let noteArr = [];
+          if (isMin1M) noteArr.push('不足1㎡按1㎡起算');
+          if (smallPlateFee > 0) noteArr.push(`含微小板裁切费¥${smallPlateFee}`);
+          let noteStr = noteArr.length ? ` (${noteArr.join('，')})` : '';
+
+          textLines.push(`  单价：¥${g.unitPrice}/㎡ | 小计：¥${groupSubtotal}${noteStr}`);
+        });
+
+        // 支架明细 (若启用需要支架)
+        if (bracketMode && bracketList.length > 0) {
+          textLines.push('  [配套支架明细]');
+          bracketList.forEach(b => {
+            const def = BRACKET_DEFS.find(d => d.id === b.modelId) || BRACKET_DEFS[0];
+            const uPrice = getScaledPrice(def.basePrice);
+            const sub = uPrice * b.count;
+            grandTotal += sub;
+            totalItemsCount += b.count;
+            textLines.push(`  • ${def.name}：单价 ¥${uPrice}/套 × ${b.count}套 = ¥${sub}`);
+          });
+        }
+        textLines.push('');
+      }
+
+      /* ----- 2. 卷材画面类核算 ----- */
+      if (rollList.length > 0) {
+        textLines.push('【卷材画面类】');
+        
+        // 卷材同材料同工艺按1㎡合并起算
+        const rollGroups = {};
+        rollList.forEach(r => {
+          const mat = ROLL_MATERIALS.find(m => m.id === r.materialId) || ROLL_MATERIALS[0];
+          let baseU = mat.basePrice;
+          let craftTags = [];
+          if (mat.isCar) {
+            if (r.removable) { baseU += 10; craftTags.push('可移除'); }
+            if (r.laminate === 1) { baseU += 20; craftTags.push('磨砂膜'); }
+            if (r.laminate === 2) { baseU += 20; craftTags.push('斜纹膜'); }
+          }
+          const unitPrice = getScaledPrice(baseU);
+          const key = `${mat.id}_${craftTags.join('_')}_${unitPrice}`;
+
+          if (!rollGroups[key]) {
+            rollGroups[key] = {
+              matName: mat.name,
+              craftDesc: craftTags.length ? `[${craftTags.join('+')}]` : '',
+              unitPrice,
+              items: [],
+              sumArea: 0
+            };
+          }
+          const a = (r.width * r.height / 10000) * r.count;
+          rollGroups[key].items.push(r);
+          rollGroups[key].sumArea += a;
+          totalItemsCount += r.count;
+        });
+
+        Object.values(rollGroups).forEach(g => {
+          let isMin1M = g.sumArea < 1.0;
+          let billArea = Math.max(1.0, g.sumArea);
+          let subtotal = Math.round(billArea * g.unitPrice);
+          grandTotal += subtotal;
+
+          g.items.forEach(r => {
+            let singleArea = formatArea((r.width * r.height / 10000) * r.count);
+            textLines.push(`• ${g.matName}${g.craftDesc}：${r.width}×${r.height}cm × ${r.count}张 (${singleArea}㎡)`);
+          });
+          let note = isMin1M ? ' (不足1㎡按1㎡起算)' : '';
+          textLines.push(`  单价：¥${g.unitPrice}/㎡ | 小计：¥${subtotal}${note}`);
+        });
+        textLines.push('');
+      }
+
+      /* ----- 3. 海报展架套组核算 ----- */
+      if (standList.length > 0) {
+        textLines.push('【海报展架套组】');
+        standList.forEach(s => {
+          let baseU = 35;
+          let nameStr = 'X展架';
+          if (s.type === 'x') {
+            nameStr = 'X展架套组';
+            baseU = s.size === '80*180' ? 45 : 35;
+          } else if (s.type === 'door') {
+            nameStr = '门型展架套组';
+            baseU = s.size === '80*180' ? 70 : 60;
+            if (s.size === '80*180') {
+              if (s.baseUpgrade === 'water') { baseU += 30; nameStr += '(注水款)'; }
+              if (s.baseUpgrade === 'mold') { baseU += 40; nameStr += '(注塑款)'; }
+            }
+          } else if (s.type === 'rollup') {
+            nameStr = '易拉宝套组';
+            baseU = 90;
+            if (s.baseUpgrade === 'alloy') { baseU += 20; nameStr += '(铝合金款)'; }
+            else if (s.baseUpgrade === 'export') { baseU += 60; nameStr += '(出口品质款)'; }
+            else { nameStr += '(塑钢加强款)'; }
+          }
+          if (s.outdoorScreen) {
+            baseU += 10;
+            nameStr += '[户外画面]';
+          }
+
+          const unitPrice = getScaledPrice(baseU);
+          const subtotal = unitPrice * s.count;
+          grandTotal += subtotal;
+          totalItemsCount += s.count;
+
+          textLines.push(`• ${nameStr} (${s.size}cm)`);
+          textLines.push(`  单价：¥${unitPrice}/套 × ${s.count}套 = ¥${subtotal}`);
+        });
+        textLines.push('');
+      }
+
+      /* ----- 4. 锦旗横幅布艺类核算 ----- */
+      if (fabricList.length > 0) {
+        textLines.push('【锦旗横幅布艺类】');
+        fabricList.forEach(f => {
+          if (f.type === 'spray') {
+            let baseU = f.spraySubtype === 'bw' ? 12 : 10;
+            let isOverSize = (f.width > 320 && f.height > 320);
+            if (isOverSize) baseU += 2;
+            const unitPrice = getScaledPrice(baseU);
+            const realArea = (f.width * f.height / 10000) * f.count;
+            const subtotal = Math.round(realArea * unitPrice);
+            grandTotal += subtotal;
+            totalItemsCount += f.count;
+            const overNote = isOverSize ? ' (超宽加价)' : '';
+            textLines.push(`• ${f.spraySubtype === 'bw' ? '黑白喷绘布' : '550喷绘布'}：${f.width}×${f.height}cm × ${f.count}条 (${formatArea(realArea)}㎡)`);
+            textLines.push(`  单价：¥${unitPrice}/㎡ | 小计：¥${subtotal}${overNote}`);
+          } else if (f.type === 'banner') {
+            const spanCm = (f.bannerFixedSpan === 'custom') ? f.width : Number(f.bannerFixedSpan);
+            const unitPrice = getScaledPrice(10);
+            const areaPerItem = (spanCm / 100) * f.bannerLengthM;
+            const sumArea = areaPerItem * f.count;
+            const billArea = Math.max(1.0, sumArea);
+            const subtotal = Math.round(billArea * unitPrice);
+            grandTotal += subtotal;
+            totalItemsCount += f.count;
+            const note = sumArea < 1.0 ? ' (不足1㎡按1㎡起算)' : '';
+            textLines.push(`• 定制横幅(${spanCm}cm宽幅)：长${f.bannerLengthM}m × ${f.count}条 (${formatArea(sumArea)}㎡)`);
+            textLines.push(`  单价：¥${unitPrice}/㎡ | 小计：¥${subtotal}${note}`);
+          } else if (f.type === 'flag') {
+            const unitPrice = getScaledPrice(10);
+            const sumArea = (f.width * f.height / 10000) * f.count;
+            const billArea = Math.max(1.0, sumArea);
+            const subtotal = Math.round(billArea * unitPrice);
+            grandTotal += subtotal;
+            totalItemsCount += f.count;
+            const note = sumArea < 1.0 ? ' (不足1㎡按1㎡起算)' : '';
+            textLines.push(`• 旗帜布定制：${f.width}×${f.height}cm × ${f.count}面 (${formatArea(sumArea)}㎡)`);
+            textLines.push(`  单价：¥${unitPrice}/㎡ | 小计：¥${subtotal}${note}`);
+          } else if (f.type === 'pennant') {
+            let baseU = 60;
+            if (f.pennantSize === '70*110') baseU = 80;
+            if (f.pennantSize === '80*120') baseU = 100;
+            if (f.pennantVersion === 'deluxe_red' || f.pennantVersion === 'deluxe_darkred') baseU += 20;
+            if (f.pennantVersion === 'velvet') baseU += 30;
+            if (f.pennantGold) baseU += 10;
+
+            const unitPrice = getScaledPrice(baseU);
+            const subtotal = unitPrice * f.count;
+            grandTotal += subtotal;
+            totalItemsCount += f.count;
+
+            let verName = '常规款';
+            if (f.pennantVersion === 'deluxe_red') verName = '大红豪华款';
+            if (f.pennantVersion === 'deluxe_darkred') verName = '枣红豪华款';
+            if (f.pennantVersion === 'velvet') verName = '金丝绒高档款';
+            let craftName = f.pennantGold ? '[烫金]' : '[发泡]';
+
+            textLines.push(`• 定制锦旗(${f.pennantSize}cm)：${verName} ${craftName}`);
+            textLines.push(`  单价：¥${unitPrice}/套 × ${f.count}套 = ¥${subtotal}`);
+          }
+        });
+        textLines.push('');
+      }
+
+      /* ----- 5. 阶梯满额大额优惠提醒逻辑 ----- */
+      handleDiscountThreshold(grandTotal);
+
+      // 折扣后实际应付计算
+      const finalPrice = Math.round(grandTotal * currentDiscount);
+
+      // 清单尾部结算修饰
+      textLines.push('================================');
+      if (currentDiscount < 1.0) {
+        textLines.push(`原价合计：¥ ${grandTotal} 元`);
+        textLines.push(`专享折扣：${(currentDiscount * 10).toFixed(1)} 折`);
+        textLines.push(`【 最终优惠实付：¥ ${finalPrice} 元 】`);
+      } else {
+        textLines.push(`【 结 算 合 计 ：¥ ${grandTotal} 元 】`);
+      }
+      textLines.push('================================');
+      
+      const customRemark = document.getElementById('custom-remark').value.trim();
+      if (customRemark) {
+        textLines.push(`备注：${customRemark}`);
+      }
+
+      // 同步 DOM 显示
+      updateDashboard(grandTotal, finalPrice, totalItemsCount, textLines.join('\n'));
+    }
+
+    // 阶梯满额提示处理
+    function handleDiscountThreshold(total) {
+      const banner = document.getElementById('discount-banner');
+      const title = document.getElementById('discount-tip-title');
+      const thresholds = [5000, 3000, 2000, 1000, 500];
+      const match = thresholds.find(t => total >= t);
+
+      if (match) {
+        banner.classList.remove('hidden');
+        title.innerText = `💡 订单金额已满 ¥${match} 元门槛`;
+      } else {
+        banner.classList.add('hidden');
+        currentDiscount = 1.0; // 未达门槛自动重置折扣
+        refreshDiscountButtons();
+      }
+    }
+
+    function setDiscount(val) {
+      currentDiscount = val;
+      refreshDiscountButtons();
+      calculateAll();
+    }
+
+    function refreshDiscountButtons() {
+      const btns = [
+        { id: 'disc-btn-10', val: 1.0 },
+        { id: 'disc-btn-95', val: 0.95 },
+        { id: 'disc-btn-90', val: 0.90 },
+        { id: 'disc-btn-85', val: 0.85 },
+        { id: 'disc-btn-80', val: 0.80 }
+      ];
+      btns.forEach(b => {
+        const el = document.getElementById(b.id);
+        if (el) {
+          if (Math.abs(currentDiscount - b.val) < 0.001) {
+            el.className = 'py-1 rounded text-xs font-bold border border-amber-500 bg-amber-500 text-white shadow-xs';
+          } else {
+            el.className = 'py-1 rounded text-xs font-medium border border-amber-300 bg-white text-slate-700 hover:bg-amber-100 transition';
+          }
+        }
+      });
+    }
+
+    function updateDashboard(originalTotal, finalTotal, count, quoteText) {
+      // 桌面看板
+      document.getElementById('preview-final-price').innerText = `¥ ${finalTotal}`;
+      document.getElementById('preview-total-count').innerText = `已选 ${count} 件明细`;
+      const origEl = document.getElementById('preview-original-price');
+      if (currentDiscount < 1.0) {
+        origEl.innerText = `¥ ${originalTotal}`;
+        origEl.classList.remove('hidden');
+      } else {
+        origEl.classList.add('hidden');
+      }
+
+      // 移动端底栏
+      document.getElementById('mobile-final-price').innerText = `¥ ${finalTotal}`;
+      const mobOrigEl = document.getElementById('mobile-original-price');
+      if (currentDiscount < 1.0) {
+        mobOrigEl.innerText = `¥ ${originalTotal}`;
+        mobOrigEl.classList.remove('hidden');
+      } else {
+        mobOrigEl.classList.add('hidden');
+      }
+
+      // 微信报价文本展示
+      const hasAny = plateList.length > 0 || rollList.length > 0 || standList.length > 0 || fabricList.length > 0;
+      const previewBox = document.getElementById('quotation-preview');
+      previewBox.innerText = hasAny ? quoteText : '当前暂无报价信息，请在左侧添加产品后自动生成。';
+    }
+
+    /* ================= 单价倍率交互 ================= */
+    function onRateSliderChange(val) {
+      currentRate = parseFloat(val);
+      document.getElementById('rate-number').value = currentRate.toFixed(1);
+      document.getElementById('rate-display').innerText = `× ${currentRate.toFixed(1)}`;
+      calculateAll();
+    }
+
+    function onRateNumberChange(val) {
+      let num = parseFloat(val);
+      if (isNaN(num)) num = 1.0;
+      num = Math.max(0.8, Math.min(3.0, num));
+      num = Math.round(num * 10) / 10;
+      currentRate = num;
+      document.getElementById('rate-slider').value = currentRate.toFixed(1);
+      document.getElementById('rate-number').value = currentRate.toFixed(1);
+      document.getElementById('rate-display').innerText = `× ${currentRate.toFixed(1)}`;
+      calculateAll();
+    }
+
+    /* ================= 复制报价到剪贴板 ================= */
+    function copyQuotation() {
+      const text = document.getElementById('quotation-preview').innerText;
+      if (!text || text.includes('当前暂无报价信息')) {
+        showToast('请先添加产品再复制', '⚠️');
+        return;
+      }
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('报价已成功复制，可直接粘贴到微信！');
+      }).catch(() => {
+        // 兼容降级
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        showToast('报价已复制！');
+      });
+    }
+
+    /* ================= 清空重置 ================= */
+    function resetAllData() {
+      if (!confirm('确认清空当前所有已录入的产品与报价吗？')) return;
+      plateList = [];
+      bracketList = [];
+      rollList = [];
+      standList = [];
+      fabricList = [];
+      bracketMode = false;
+      currentRate = 1.0;
+      currentDiscount = 1.0;
+
+      document.getElementById('rate-slider').value = '1.0';
+      document.getElementById('rate-number').value = '1.0';
+      document.getElementById('rate-display').innerText = '× 1.0';
+
+      setBracketMode(false);
+      renderPlateList();
+      renderRollList();
+      renderStandList();
+      renderFabricList();
+      calculateAll();
+      showToast('已重置所有数据');
+    }
+
+    // 初始化运行
+    window.addEventListener('DOMContentLoaded', () => {
+      renderPlateList();
+      renderRollList();
+      renderStandList();
+      renderFabricList();
+      calculateAll();
+    });
+  </script>
+</body>
+</html>
