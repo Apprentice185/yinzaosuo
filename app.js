@@ -40,12 +40,44 @@ productModal.addEventListener('click', event => { if (event.target === productMo
 document.querySelector('#optionQuote').addEventListener('click', () => { const selections = [...document.querySelectorAll('#optionGrid select')].map(select => `${activeProduct.options[select.dataset.optionIndex].name}：${select.value}`).join('；'); closeProduct(); openQuote(`${activeProduct.name}（${selections}）`); });
 sceneModal.addEventListener('click', event => { if (event.target.id === 'sceneDetail') { sceneModal.classList.remove('open'); } });
 const quoteModal = document.querySelector('#quoteModal');
-function openQuote(product = '') { quoteModal.classList.add('open'); document.body.style.overflow = 'hidden'; if (product) document.querySelector('[name="message"]').value = `我想了解：${product}`; }
+function openQuote(product = '') { quoteModal.classList.add('open'); document.body.style.overflow = 'hidden'; quoteStatus.hidden = true; quoteStatus.textContent = ''; quoteStatus.classList.remove('is-error'); if (product) document.querySelector('[name="message"]').value = `我想了解：${product}`; }
 function closeQuote() { quoteModal.classList.remove('open'); document.body.style.overflow = ''; }
 document.querySelectorAll('[data-open-quote]').forEach(button => button.addEventListener('click', () => openQuote()));
 document.querySelector('[data-close-quote]').addEventListener('click', closeQuote);
 quoteModal.addEventListener('click', event => { if (event.target === quoteModal) closeQuote(); });
-document.querySelector('#quoteForm').addEventListener('submit', event => { event.preventDefault(); closeQuote(); document.querySelector('#toast').classList.add('show'); event.target.reset(); setTimeout(() => document.querySelector('#toast').classList.remove('show'), 3500); });
+const quoteForm = document.querySelector('#quoteForm');
+const quoteStatus = document.querySelector('#quoteStatus');
+quoteForm.addEventListener('submit', async event => {
+  event.preventDefault();
+  quoteStatus.hidden = false;
+  quoteStatus.classList.remove('is-error');
+  const endpoint = quoteForm.getAttribute('action') || '';
+  if (endpoint.includes('REPLACE_WITH_FORM_ID')) {
+    quoteStatus.textContent = '在线表单尚未配置，请通过微信二维码或邮箱直接联系我们。';
+    quoteStatus.classList.add('is-error');
+    return;
+  }
+  const submitButton = quoteForm.querySelector('[type="submit"]');
+  submitButton.disabled = true;
+  submitButton.textContent = '正在提交…';
+  try {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      body: new FormData(quoteForm),
+      headers: { Accept: 'application/json' }
+    });
+    if (!response.ok) throw new Error(`Form submission failed (${response.status})`);
+    quoteStatus.textContent = '提交成功！我们会在一个工作日内联系你，也可以扫码添加微信。';
+    quoteForm.reset();
+  } catch (error) {
+    console.error('Quote form submission failed:', error);
+    quoteStatus.textContent = '暂时无法提交，请稍后重试，或通过旁边的微信二维码和邮箱直接联系我们。';
+    quoteStatus.classList.add('is-error');
+  } finally {
+    submitButton.disabled = false;
+    submitButton.innerHTML = '提交咨询 <span>↗</span>';
+  }
+});
 const searchPanel = document.querySelector('#searchPanel');
 document.querySelector('#searchToggle').addEventListener('click', () => { searchPanel.classList.add('open'); document.querySelector('#searchInput').focus(); });
 document.querySelector('#closeSearch').addEventListener('click', () => searchPanel.classList.remove('open'));

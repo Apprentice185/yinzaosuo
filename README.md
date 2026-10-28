@@ -6,7 +6,9 @@
 
 仓库地址：https://github.com/Apprentice185/yinzaosuo
 
-默认官网地址：https://apprentice185.github.io/yinzaosuo/
+官网地址：https://yinzaosuo.com/
+
+自定义域名在 GitHub Pages 中通过仓库根目录的 `CNAME` 文件配置。域名 DNS 需要指向 GitHub Pages，且首次生效可能需要等待 DNS 与 HTTPS 证书配置完成。
 
 仓库中的 GitHub Actions 会在 `main` 分支有新提交时自动部署网站。第一次使用时，请在仓库 `Settings -> Pages` 中将 Source 设置为 `GitHub Actions`。
 
@@ -31,18 +33,67 @@
 - 后台发布会写入统一的数据版本号；已经打开的首页、产品详情、模板、知识库和资讯页会自动刷新，之后打开的页面也会读取最新数据。
 - 修改首页文案、文章和页脚内容直接编辑 `index.html`。
 - 视觉变量与响应式样式集中在 `styles.css`。
-- 当前报价表单为前端演示，会弹出提交成功提示；接入生产环境时替换 `app.js` 里的表单提交逻辑即可连接企业微信、邮件或后端接口。
 
-## 适合继续接入
+## 在线询价表单配置
 
-1. 商品详情页与规格价格计算。
-2. 图片上传、文件检查和订单状态。
-3. 微信支付 / 支付宝 / 对公转账。
-4. CMS 后台管理商品价格、文章、知识库和资料下载。
+- 官网继续使用 GitHub Pages 静态托管，询价表单通过 Formspree 转发，无需自建服务器。
+- 在 Formspree 创建表单后，将表单提供的 endpoint ID 填入 `index.html` 的 `quoteForm` `action`，把 `REPLACE_WITH_FORM_ID` 替换为真实 ID。
+- 发布后用线上 HTTPS 页面提交测试。未配置时页面会明确提示尚未启用，并展示微信二维码与邮箱；提交失败时会保留已填写内容并提示备用联系方式。
+- Formspree 会接收客户提交的姓名、联系方式和项目需求。正式启用前请检查服务商的隐私条款，并在需要时补充适用的隐私告知。
+
+## 新增商品和文章
+
+直接编辑 `site-data.js` 中对应数组，复制同类项目并修改字段即可。`id` 必须唯一且保持稳定；详情页目前使用该 ID 作为查询参数。`slug` 可作为未来改用友好 URL 的标识。图片请保存为项目内文件，并在数据中填写相对路径；不要把图片 Base64 粘贴进数据或文章 HTML。
+
+商品数据模板：
+
+```json
+{
+  "id": "P009",
+  "slug": "P009",
+  "category": "包装与周边",
+  "name": "品牌手提袋",
+  "desc": "适合活动与门店使用的定制手提袋。",
+  "intro": "可按品牌视觉定制尺寸、纸张与提绳。",
+  "price": "¥起",
+  "tag": "人气推荐",
+  "thumb": "assets/images/products/P009-thumb.webp",
+  "sceneImage": "assets/images/products/P009-scene.webp",
+  "options": [
+    { "name": "尺寸", "values": ["小号", "中号", "大号"] }
+  ],
+  "seoTitle": "品牌手提袋定制｜印造所",
+  "seoDescription": "了解品牌手提袋的尺寸、材质与定制方式。"
+}
+```
+
+文章数据模板（知识文章和品牌资讯分别加入 `knowledge`、`articles` 数组）：
+
+```json
+{
+  "id": "A003",
+  "slug": "A003",
+  "title": "品牌物料如何统一视觉",
+  "category": "品牌案例",
+  "date": "2026-10-28",
+  "excerpt": "用简短文字概括文章内容，便于列表展示和搜索摘要。",
+  "cover": "assets/images/articles/A003-cover.webp",
+  "tags": ["品牌物料", "印刷"],
+  "content": "<p>文章正文 HTML。</p>",
+  "seoTitle": "品牌物料如何统一视觉｜印造所",
+  "seoDescription": "补充适合搜索结果展示的文章摘要。"
+}
+```
+
+文章详情和商品详情会读取 `seoTitle`、`seoDescription` 更新页面标题、描述和 canonical 地址。图片可统一放在 `assets/images/` 下，并使用清晰的文件名与合适尺寸；仓库当前已有的内嵌图片已迁移到 `assets/images/content/`。
+
+## SEO 与站点地图
+
+公开页面已添加页面描述、Open Graph 基础标签和 canonical 地址；详情页会按内容更新标题、描述及 canonical。`sitemap.xml` 列出官网静态页面、商品详情和文章详情地址。新增或删除商品、文章后，请同步更新 sitemap 中对应 URL。
 
 ## 当前后台说明
 
-当前 `admin.html` 是无需安装环境即可使用的本地 CMS 原型，发布内容后会保存到当前浏览器的 `localStorage`，同一浏览器打开前台会立即看到更新。图片既可以拖拽上传，也可以填写项目内相对路径，例如 `素材/M013/缩略图.jpg`。拖拽上传的图片会以本地数据保存，图片过大时建议使用项目内相对路径。
+当前 `admin.html` 是无需安装环境即可使用的本地 CMS 原型，发布内容后会保存到当前浏览器的 `localStorage`，同一浏览器打开前台会立即看到更新。图片可以填写项目内相对路径，例如 `assets/images/products/P009-thumb.webp`。后台拖拽上传会暂存为浏览器内图片数据；如需发布，请将图片文件放入仓库，再将字段改为相对路径，避免导出的 `site-data.js` 再次膨胀。
 
 ### 发布后台修改
 
