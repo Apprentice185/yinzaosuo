@@ -51,27 +51,21 @@ quoteForm.addEventListener('submit', async event => {
   event.preventDefault();
   quoteStatus.hidden = false;
   quoteStatus.classList.remove('is-error');
-  const endpoint = quoteForm.getAttribute('action') || '';
-  if (endpoint.includes('REPLACE_WITH_FORM_ID')) {
-    quoteStatus.textContent = '在线表单尚未配置，请通过微信二维码或邮箱直接联系我们。';
-    quoteStatus.classList.add('is-error');
-    return;
-  }
   const submitButton = quoteForm.querySelector('[type="submit"]');
   submitButton.disabled = true;
   submitButton.textContent = '正在提交…';
   try {
-    const response = await fetch(endpoint, {
+    const response = await fetch(quoteForm.action, {
       method: 'POST',
       body: new FormData(quoteForm),
       headers: { Accept: 'application/json' }
     });
     if (!response.ok) throw new Error(`Form submission failed (${response.status})`);
-    quoteStatus.textContent = '提交成功！我们会在一个工作日内联系你，也可以扫码添加微信。';
+    quoteStatus.textContent = '咨询已收到，我们会尽快与您联系。';
     quoteForm.reset();
   } catch (error) {
     console.error('Quote form submission failed:', error);
-    quoteStatus.textContent = '暂时无法提交，请稍后重试，或通过旁边的微信二维码和邮箱直接联系我们。';
+    quoteStatus.textContent = '提交失败，请检查网络后重试，或通过微信二维码和邮箱直接联系我们。';
     quoteStatus.classList.add('is-error');
   } finally {
     submitButton.disabled = false;

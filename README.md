@@ -37,7 +37,7 @@
 ## 在线询价表单配置
 
 - 官网继续使用 GitHub Pages 静态托管，询价表单通过 Formspree 转发，无需自建服务器。
-- 在 Formspree 创建表单后，将表单提供的 endpoint ID 填入 `index.html` 的 `quoteForm` `action`，把 `REPLACE_WITH_FORM_ID` 替换为真实 ID。
+- Formspree endpoint 已配置在 `index.html` 的 `quoteForm` `action`。在 Formspree 后台确认该表单已启用，并将收件邮箱验证为你的目标邮箱；发布后提交测试询价，确认表单记录和邮件通知均正常。
 - 发布后用线上 HTTPS 页面提交测试。未配置时页面会明确提示尚未启用，并展示微信二维码与邮箱；提交失败时会保留已填写内容并提示备用联系方式。
 - Formspree 会接收客户提交的姓名、联系方式和项目需求。正式启用前请检查服务商的隐私条款，并在需要时补充适用的隐私告知。
 
