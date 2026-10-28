@@ -91,6 +91,12 @@
 
 公开页面已添加页面描述、Open Graph 基础标签和 canonical 地址；详情页会按内容更新标题、描述及 canonical。`sitemap.xml` 列出官网静态页面、商品详情和文章详情地址。新增或删除商品、文章后，请同步更新 sitemap 中对应 URL。
 
+## 首页精工材质档案库
+
+- 首页双语产品档案位于 `assets/js/products-data.js`，分别维护 `zh` 和 `en` 两套分类与产品；每个产品包含背景图、简介、材质和工艺标签。
+- 分类切换、参数抽屉和 CN / EN 无刷新切换逻辑位于 `assets/js/product-catalog.js`，瑞士风格布局位于 `assets/css/product-catalog.css`。
+- 新增产品时，在中英文相同分类下各新增一条产品记录，并为两种语言补齐 `name`、`desc`、`materials`、`crafts` 和 `image`；分类 ID 保持一致。
+
 ## 当前后台说明
 
 当前 `admin.html` 是无需安装环境即可使用的本地 CMS 原型，发布内容后会保存到当前浏览器的 `localStorage`，同一浏览器打开前台会立即看到更新。图片可以填写项目内相对路径，例如 `assets/images/products/P009-thumb.webp`。后台拖拽上传会暂存为浏览器内图片数据；如需发布，请将图片文件放入仓库，再将字段改为相对路径，避免导出的 `site-data.js` 再次膨胀。
