@@ -1,19 +1,15 @@
 {
-  "id": "PA002",
-  "title": "标签 / 不干胶",
-  "title_en": "Adhesive Labels & Stickers",
-  "category": "commercial",
-  "image": "",
-  "desc": "高粘度、防水防撕及特种工业包装贴签",
-  "desc_en": "Industrial-grade waterproof, tear-resistant, and high-adhesion roll/sheet labels.",
+  "category_num": "01",
+  "show_in_archive": true,
   "materials": [
     "常规: 白底铜板面不干胶、丰华不干胶、书写纸不干胶、8丝光白PVC不干胶、牛皮面黄底水胶",
     "高端: 5丝透明不干胶、厚底PP合成纸不干胶、哑银不干胶(不印白)、艾利不干胶(强粘)、蜂窝箱贴胶"
   ],
-  "materials_en": [
-    "Standard: Semi-Gloss Coated Paper, Uncoated Woodfree, 80μm Bright White PVC, Kraft with Water Glue",
-    "High-End: 50μm Ultra-Clear Adhesive, Heavyweight PP Synthetic Paper, Matte Silver PET, Avery Fasson Heavy-Duty, Honeycomb Box Adhesive"
-  ],
+  "sort_order": 102,
+  "title_en": "Adhesive Labels & Stickers",
+  "category_title_en": "Commercial Print",
+  "desc": "高粘度、防水防撕及特种工业包装贴签",
+  "category_desc": "品牌视觉落地与商务事务物料，提供标准及特种工艺解决方案",
   "crafts": [
     "圆角",
     "打孔",
@@ -28,11 +24,15 @@
     "Perforation",
     "Custom Die-Cut"
   ],
-  "sort_order": 102,
-  "show_in_archive": true,
-  "category_title": "商务印制类",
-  "category_title_en": "Commercial Print",
-  "category_desc": "品牌视觉落地与商务事务物料，提供标准及特种工艺解决方案",
   "category_desc_en": "Brand identity assets & enterprise print collaterals with bespoke finishes.",
-  "category_num": "01"
+  "desc_en": "Industrial-grade waterproof, tear-resistant, and high-adhesion roll/sheet labels.",
+  "category_title": "商务印制类",
+  "title": "标签 / 不干胶",
+  "id": "PA002",
+  "image": "assets/images/products/pa002.jpg",
+  "materials_en": [
+    "Standard: Semi-Gloss Coated Paper, Uncoated Woodfree, 80μm Bright White PVC, Kraft with Water Glue",
+    "High-End: 50μm Ultra-Clear Adhesive, Heavyweight PP Synthetic Paper, Matte Silver PET, Avery Fasson Heavy-Duty, Honeycomb Box Adhesive"
+  ],
+  "category": "commercial"
 }
