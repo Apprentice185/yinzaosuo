@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="80" viewBox="0 0 320 80" role="img" aria-labelledby="title">
+  <title id="title">印造所 Print Atelier</title>
+  <rect x="4" y="8" width="64" height="64" fill="#111"/>
+  <text x="36" y="55" fill="#fff" font-family="sans-serif" font-size="38" text-anchor="middle">印</text>
+  <text x="84" y="43" fill="#111" font-family="sans-serif" font-size="28" font-weight="600">印造所</text>
+  <text x="86" y="63" fill="#666" font-family="sans-serif" font-size="10" letter-spacing="2">PRINT ATELIER</text>
+</svg>

@@ -1,0 +1,53 @@
+backend:
+  name: github
+  repo: Apprentice185/yinzaosuo
+  branch: main
+
+media_folder: "assets/images/products"
+public_folder: "assets/images/products"
+site_url: "https://yinzaosuo.com"
+display_url: "https://yinzaosuo.com"
+logo_url: "https://yinzaosuo.com/assets/images/logo.svg"
+
+collections:
+  - name: "products"
+    label: "产品与材质"
+    folder: "content/products"
+    create: true
+    format: "json"
+    extension: "json"
+    fields:
+      - { label: "ID", name: "id", widget: "string" }
+      - { label: "中文品名", name: "title", widget: "string" }
+      - { label: "英文品名", name: "title_en", widget: "string" }
+      - label: "产品分类"
+        name: "category"
+        widget: "select"
+        options:
+          - { label: "商务印制", value: "commercial" }
+          - { label: "包装定制", value: "packaging" }
+          - { label: "广告加工", value: "exhibition" }
+      - { label: "产品图片", name: "image", widget: "image" }
+      - { label: "中文简介", name: "desc", widget: "text" }
+      - { label: "英文简介", name: "desc_en", widget: "text" }
+      - label: "材质"
+        name: "materials"
+        widget: "list"
+      - label: "工艺标签"
+        name: "crafts"
+        widget: "list"
+      - { label: "日期", name: "date", widget: "datetime", date_format: "YYYY-MM-DD", time_format: false }
+
+  - name: "knowledge"
+    label: "印刷知识与案例"
+    folder: "content/knowledge"
+    create: true
+    format: "yaml-frontmatter"
+    extension: "md"
+    fields:
+      - { label: "中文标题", name: "title", widget: "string" }
+      - { label: "英文标题", name: "title_en", widget: "string" }
+      - { label: "发布日期", name: "date", widget: "datetime", date_format: "YYYY-MM-DD", time_format: false }
+      - { label: "封面图", name: "thumbnail", widget: "image" }
+      - { label: "SEO 摘要", name: "description", widget: "text" }
+      - { label: "正文", name: "body", widget: "markdown" }

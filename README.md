@@ -117,6 +117,12 @@
 
 当前 `admin.html` 是无需安装环境即可使用的本地 CMS 原型。编辑后点击“保存到本浏览器”只写入本机 `localStorage`；点击“导出 site-data.js”下载内容数据文件，也不会自动上传或部署。后台不再要求保存 GitHub Token。拖拽上传图片会暂存为浏览器内图片数据，不适合作为线上图片文件。
 
+## Decap CMS（初始配置）
+
+- 新的可视化后台入口为 `/admin/`，配置文件为 `admin/config.yml`。产品与材质记录会保存为 `content/products/*.json`，知识与案例会保存为 `content/knowledge/*.md`，上传图片进入 `assets/images/products/`。
+- GitHub backend 需要先配置可用的 GitHub OAuth 认证服务；仅添加 `backend: github` 配置并不能完成登录。Decap CMS 官方 GitHub backend 文档说明该认证依赖服务端，启用前需配置 OAuth provider/auth service。
+- 当前网站前端仍从 `site-data.js`、`assets/js/products-data.js` 读取内容，`sitemap.xml` 也仍需手动维护。因此，这份 CMS 配置目前只是编辑入口与内容格式的初始规划；新建的 JSON/Markdown 尚不会自动显示在公开页面，也不会自动更新 sitemap。要实现发布闭环，还需将前端改为读取这些文件，并增加 sitemap 自动生成/校验流程。
+
 ### 发布后台修改
 
 1. 在 `admin.html` 编辑内容并保存到本浏览器；这个保存只是草稿。
