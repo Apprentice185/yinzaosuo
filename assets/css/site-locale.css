@@ -1,0 +1,31 @@
+.language-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 0;
+  color: #888;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  white-space: nowrap;
+}
+
+.language-switch span.active {
+  color: #111;
+}
+
+.language-switch i {
+  color: #bbb;
+  font-style: normal;
+}
+
+.language-switch:focus-visible {
+  outline: 2px solid #555;
+  outline-offset: 3px;
+}
+
+@media (max-width: 800px) {
+  .nav-actions {
+    gap: 12px;
+  }
+}

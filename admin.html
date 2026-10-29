@@ -27,21 +27,13 @@
       <div class="article-only-fields"><label>发布日期<input name="date" placeholder="2026.09.19"></label><div class="upload-field"><span>文章缩略图 / 封面图</span><div class="drop-zone" data-field="cover">拖入封面图，或点击选择<input type="file" accept="image/*"></div><input name="cover" class="path-input" placeholder="也可填写图片路径"></div></div>
       <div class="rich-editor-wrap"><div class="rich-toolbar"><button type="button" data-command="formatBlock" data-value="p">正文</button><button type="button" data-command="formatBlock" data-value="h2">小标题</button><select id="fontSizeSelect" aria-label="字号"><option value="3">字号</option><option value="2">小号</option><option value="4">大号</option><option value="5">特大</option></select><button type="button" data-command="bold">加粗</button><button type="button" data-command="justifyLeft">左对齐</button><button type="button" data-command="justifyCenter">居中</button><button type="button" id="insertImage">插入图片</button><button type="button" id="insertVideo">视频外链</button><span class="image-tools">图片：<button type="button" data-image-size="small">小</button><button type="button" data-image-size="medium">中</button><button type="button" data-image-size="large">大</button><button type="button" data-image-align="left">左</button><button type="button" data-image-align="center">中</button><button type="button" data-image-align="right">右</button></span></div><div id="richEditor" class="rich-editor" contenteditable="true" data-placeholder="直接在这里写文章。可以选中文字后调整格式，也可以插入图片或粘贴视频链接。"></div><input type="file" id="articleImageInput" accept="image/*" hidden></div>
       <textarea name="content" id="contentStore" hidden></textarea>
-      <!-- GitHub 自动同步模块开始 -->
       <div class="github-sync-card" style="margin-top: 20px; padding: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
-        <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 12px;">
-          <label style="font-size: 13px; font-weight: 600; color: #475569; white-space: nowrap;">GitHub Token:</label>
-          <input type="password" id="ghTokenInput" placeholder="输入 ghp_ 开头的 Personal Access Token" style="flex: 1; padding: 7px 10px; font-size: 13px; border: 1px solid #cbd5e1; border-radius: 6px; background: #fff;">
-          <button type="button" id="saveTokenBtn" class="button button-light" style="padding: 7px 14px; font-size: 13px;">记住密钥</button>
-        </div>
+        <p>保存仅写入当前浏览器。导出后请将 site-data.js 和图片文件加入仓库并提交，GitHub Pages 才会更新。</p>
         <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-          <button class="button button-dark" type="submit">保存到本浏览器 <span>↗</span></button>
-          <button type="button" id="syncGithubBtn" class="button" style="background: #16a34a; color: #fff; border: none; font-weight: 600;">🚀 保存并同步到 GitHub <span>↑</span></button>
-          <button class="button button-light" type="button" id="exportData">导出线上数据 <span>↓</span></button>
-          <span id="syncStatus" style="font-size: 13px; font-weight: 500;"></span>
+          <button class="button button-dark" type="submit">保存到本浏览器 <span>&#8599;</span></button>
+          <button class="button button-light" type="button" id="exportData">导出 site-data.js <span>&#8595;</span></button>
         </div>
       </div>
-      <!-- GitHub 自动同步模块结束 -->
     </form>
   </section>
 </main><div class="toast" id="adminToast">已保存，前台数据已更新</div><script src="site-data.js"></script><script src="admin.js"></script>

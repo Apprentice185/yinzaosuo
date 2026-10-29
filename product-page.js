@@ -1,29 +1,76 @@
-const storedData = JSON.parse(localStorage.getItem('printData') || 'null');
-const data = storedData ? { ...printData, ...storedData, products: storedData.products || printData.products } : printData;
-const pageDataVersion = localStorage.getItem('printDataVersion') || '';
-function reloadWhenPublished() { if ((localStorage.getItem('printDataVersion') || '') !== pageDataVersion) window.location.reload(); }
-window.addEventListener('storage', event => { if (event.key === 'printData' || event.key === 'printDataVersion' || event.key === 'contentCategories') reloadWhenPublished(); });
-window.addEventListener('pageshow', reloadWhenPublished);
-const id = new URLSearchParams(location.search).get('id');
-const product = data.products.find(item => item.id === id) || data.products[0];
-document.title = product.seoTitle || `${product.name}｜印造所`;
-const productCanonical = document.querySelector('link[rel="canonical"]');
-const productUrl = new URL(`product.html?id=${encodeURIComponent(product.id)}`, 'https://yinzaosuo.com/');
-if (productCanonical) productCanonical.href = productUrl.href;
-const productOgUrl = document.querySelector('meta[property="og:url"]');
-if (productOgUrl) productOgUrl.content = productUrl.href;
-const productDescription = document.querySelector('meta[name="description"]');
-if (productDescription) productDescription.content = product.seoDescription || product.intro || product.desc || product.name;
-const productOgTitle = document.querySelector('meta[property="og:title"]');
-if (productOgTitle) productOgTitle.content = document.title;
-const productOgDescription = document.querySelector('meta[property="og:description"]');
-if (productOgDescription) productOgDescription.content = product.seoDescription || product.intro || product.desc || product.name;
-document.querySelector('#productCategory').textContent = `${product.category} · ${product.id}`;
-document.querySelector('#productName').textContent = product.name;
-document.querySelector('#productIntro').textContent = product.intro || product.desc;
-document.querySelector('#productPrice').textContent = `${product.price}｜基础制作参考`;
-const image = document.querySelector('#productImage');
-image.style.backgroundImage = product.thumb ? `url("${product.thumb}")` : '';
-if (!product.thumb) image.innerHTML = `<span>${product.category}<br><strong>${product.name}</strong></span>`;
-document.querySelector('#detailOptions').innerHTML = (product.options || []).map((option, index) => `<label>${option.name}<select data-option-index="${index}">${option.values.map(value => `<option>${value}</option>`).join('')}</select></label>`).join('');
-document.querySelector('#productQuote').addEventListener('click', () => { const selections = [...document.querySelectorAll('#detailOptions select')].map(select => `${product.options[select.dataset.optionIndex].name}：${select.value}`).join('；'); localStorage.setItem('pendingQuote', `${product.name}（${selections}）`); window.location.href = 'index.html#quoteModal'; });
+const storedProductData = JSON.parse(localStorage.getItem('printData') || 'null');
+const productData = storedProductData
+  ? { ...printData, ...storedProductData, products: storedProductData.products || printData.products }
+  : printData;
+const productId = new URLSearchParams(location.search).get('id');
+const product = productData.products.find(item => item.id === productId) || productData.products[0];
+const language = () => localStorage.getItem('site_lang') || 'zh';
+const productText = field => window.contentText('products', product.id, field, product[field] || product.desc || '');
+
+function optionLabel(name) {
+  return window.I18N[language()].optionLabels[name] || name;
+}
+
+function optionValue(value) {
+  const translated = window.I18N[language()].optionValues[value] || value;
+  if (language() !== 'en') return translated;
+  return translated
+    .replace(/(\d+)\s*张/g, '$1 sheets')
+    .replace(/(\d+)\s*本/g, '$1 copies')
+    .replace(/(\d+)\s*个/g, '$1 units')
+    .replace(/(\d+)\s*克/g, '$1 gsm')
+    .replace(/(\d+)\s*mm/g, '$1 mm')
+    .replace(/(\d+)\s*cm/g, '$1 cm')
+    .replace(/(\d+)g\b/g, '$1 gsm');
+}
+
+function referencePrice() {
+  if (language() !== 'en') return `${product.price}｜${window.t('price_reference')}`;
+  const amount = product.price.replace(/^¥\s*/, '').replace(/\s*起$/, '');
+  return `${window.t('template_price_from')} ¥${amount} · ${window.t('price_reference')}`;
+}
+
+function renderProductDetails() {
+  const currentValues = [...document.querySelectorAll('#detailOptions select')].map(select => select.selectedIndex);
+  const title = `${productText('name')} | Print Atelier`;
+  const description = language() === 'en'
+    ? productText('intro')
+    : product.seoDescription || product.intro || product.desc || product.name;
+  document.title = language() === 'en' ? title : product.seoTitle || `${product.name}｜印造所`;
+  document.querySelector('meta[name="description"]').content = description;
+  document.querySelector('meta[property="og:title"]').content = document.title;
+  document.querySelector('meta[property="og:description"]').content = description;
+
+  const url = new URL(`product.html?id=${encodeURIComponent(product.id)}`, 'https://yinzaosuo.com/');
+  document.querySelector('link[rel="canonical"]').href = url.href;
+  document.querySelector('meta[property="og:url"]').content = url.href;
+  document.querySelector('#productCategory').textContent = `${productText('category')} · ${product.id}`;
+  document.querySelector('#productName').textContent = productText('name');
+  document.querySelector('#productIntro').textContent = productText('intro') || product.desc;
+  document.querySelector('#productPrice').textContent = referencePrice();
+
+  const image = document.querySelector('#productImage');
+  image.style.backgroundImage = product.thumb ? `url("${product.thumb}")` : '';
+  image.innerHTML = product.thumb ? '' : `<span>${window.t('image_pending')}<br><strong>${productText('name')}</strong></span>`;
+
+  const options = product.options || [];
+  document.querySelector('#detailOptions').innerHTML = options.map((option, index) =>
+    `<label>${optionLabel(option.name)}<select data-option-index="${index}">${option.values.map(value => `<option>${optionValue(value)}</option>`).join('')}</select></label>`
+  ).join('');
+  document.querySelectorAll('#detailOptions select').forEach((select, index) => {
+    select.selectedIndex = currentValues[index] || 0;
+  });
+}
+
+document.querySelector('#productQuote').addEventListener('click', () => {
+  const selections = [...document.querySelectorAll('#detailOptions select')].map(select => {
+    const option = product.options[select.dataset.optionIndex];
+    return `${optionLabel(option.name)}: ${select.value}`;
+  }).join('; ');
+  const productName = productText('name');
+  localStorage.setItem('pendingQuote', window.t('quote_product_format').replace('{product}', `${productName} (${selections})`));
+  window.location.href = 'index.html#quoteModal';
+});
+
+window.registerLanguageRenderer(renderProductDetails);
+renderProductDetails();

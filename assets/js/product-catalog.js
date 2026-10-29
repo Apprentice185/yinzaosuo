@@ -4,37 +4,12 @@
   const productGrid = document.querySelector('#productGrid');
   const count = document.querySelector('#productCategoryCount');
   const description = document.querySelector('#productCategoryDescription');
-  const languageToggle = document.querySelector('#languageToggle');
-  const title = document.querySelector('[data-catalog-title]');
-  const intro = document.querySelector('[data-catalog-description]');
   if (!catalog || !tabList || !productGrid) return;
 
-  const copy = {
-    zh: {
-      title: '精工材质档案库',
-      description: '从纸张、包装到空间呈现，逐项了解材质选择与加工能力。',
-      categoryTitles: { commercial: '商务印制', packaging: '包装定制', exhibition: '广告加工' },
-      materials: '可选材质',
-      crafts: '加工工艺',
-      parameters: '参数抽屉',
-      close: '收起参数',
-      itemCount: '项产品'
-    },
-    en: {
-      title: 'Material & Craft Archive',
-      description: 'Explore print stocks, packaging structures, and display capabilities.',
-      categoryTitles: { commercial: 'Commercial', packaging: 'Packaging', exhibition: 'Exhibition' },
-      materials: 'Materials',
-      crafts: 'Crafts',
-      parameters: 'Specifications',
-      close: 'Close specs',
-      itemCount: 'products'
-    }
-  };
   const categories = catalog.zh.categories;
   const params = new URLSearchParams(location.search);
   const requestedCategory = params.get('category');
-  let language = localStorage.getItem('productCatalogLanguage') === 'en' ? 'en' : 'zh';
+  let language = localStorage.getItem('site_lang') || 'zh';
   let activeCategory = categories.some(category => category.id === requestedCategory)
     ? requestedCategory
     : categories.some(category => category.id === sessionStorage.getItem('productCatalogCategory'))
@@ -63,14 +38,23 @@
     return group;
   }
 
-  function makeCard(item, index, total, languageCopy) {
+  function makeCard(item, index, total) {
     const card = document.createElement('article');
     card.className = 'archive-card';
+    card.dataset.productId = item.id;
     card.tabIndex = 0;
     card.setAttribute('role', 'group');
     const visual = document.createElement('div');
     visual.className = 'archive-visual';
-    visual.style.setProperty('--product-image', `url("${item.image}")`);
+    if (item.image) {
+      visual.style.setProperty('--product-image', `url("${item.image}")`);
+    } else {
+      visual.classList.add('archive-visual-placeholder');
+      const placeholder = document.createElement('span');
+      placeholder.className = 'archive-image-placeholder';
+      placeholder.textContent = window.t('archive_image_pending');
+      visual.append(placeholder);
+    }
 
     const indexLabel = document.createElement('span');
     indexLabel.className = 'archive-index';
@@ -78,10 +62,10 @@
 
     const drawer = document.createElement('div');
     drawer.className = 'archive-parameter-drawer';
-    drawer.setAttribute('aria-label', languageCopy.parameters);
+    drawer.setAttribute('aria-label', window.t('archive_specs'));
     drawer.append(
-      makeGroup(languageCopy.materials, item.materials, 'archive-materials-full', Number.MAX_SAFE_INTEGER),
-      makeGroup(languageCopy.crafts, item.crafts, 'archive-crafts-full', Number.MAX_SAFE_INTEGER)
+      makeGroup(window.t('archive_materials'), item.materials, 'archive-materials-full', Number.MAX_SAFE_INTEGER),
+      makeGroup(window.t('archive_crafts'), item.crafts, 'archive-crafts-full', Number.MAX_SAFE_INTEGER)
     );
     visual.append(indexLabel, drawer);
 
@@ -98,18 +82,18 @@
     button.className = 'archive-parameter-button';
     button.type = 'button';
     button.setAttribute('aria-expanded', 'false');
-    button.textContent = languageCopy.parameters;
+    button.textContent = window.t('archive_specs');
     button.addEventListener('click', () => {
       const expanded = card.classList.toggle('is-expanded');
       button.setAttribute('aria-expanded', String(expanded));
-      button.textContent = expanded ? languageCopy.close : languageCopy.parameters;
+      button.textContent = expanded ? window.t('archive_close') : window.t('archive_specs');
     });
-    content.append(name, summary, makeGroup(languageCopy.materials, item.materials, 'archive-materials', 2), makeGroup(languageCopy.crafts, item.crafts, 'archive-crafts', 3), button);
+    content.append(name, summary, makeGroup(window.t('archive_materials'), item.materials, 'archive-materials', 2), makeGroup(window.t('archive_crafts'), item.crafts, 'archive-crafts', 3), button);
     card.append(visual, content);
     return card;
   }
 
-  function renderTabs(locale, languageCopy) {
+  function renderTabs(locale) {
     tabList.replaceChildren();
     locale.categories.forEach(category => {
       const button = document.createElement('button');
@@ -125,7 +109,7 @@
       number.textContent = category.num;
       const label = document.createElement('span');
       label.className = 'product-category-label';
-      label.textContent = languageCopy.categoryTitles[category.id] || category.title;
+      label.textContent = category.title;
       button.append(number, label);
       button.addEventListener('click', () => selectCategory(category.id, true));
       button.addEventListener('keydown', event => {
@@ -141,20 +125,14 @@
 
   function render() {
     const locale = catalog[language];
-    const languageCopy = copy[language];
     const category = locale.categories.find(item => item.id === activeCategory);
     if (!category) return;
-    tabList.setAttribute('aria-label', language === 'en' ? 'Product categories' : '产品分类');
+    tabList.setAttribute('aria-label', window.t('archive_tabs_label'));
     productGrid.setAttribute('aria-labelledby', `product-tab-${activeCategory}`);
-    document.documentElement.lang = language === 'en' ? 'en' : 'zh-CN';
-    title.textContent = languageCopy.title;
-    intro.textContent = languageCopy.description;
     description.textContent = category.desc;
-    count.textContent = `${String(category.items.length).padStart(2, '0')} ${languageCopy.itemCount}`;
-    renderTabs(locale, languageCopy);
-    productGrid.replaceChildren(...category.items.map((item, index) => makeCard(item, index, category.items.length, languageCopy)));
-    languageToggle.querySelectorAll('span').forEach(span => span.classList.toggle('active', span.textContent === (language === 'zh' ? 'CN' : 'EN')));
-    languageToggle.setAttribute('aria-label', language === 'zh' ? 'Switch to English' : '切换到中文');
+    count.textContent = `${String(category.items.length).padStart(2, '0')} ${window.t('archive_count_suffix')}`;
+    renderTabs(locale);
+    productGrid.replaceChildren(...category.items.map((item, index) => makeCard(item, index, category.items.length)));
   }
 
   function selectCategory(categoryId, focusTab = false) {
@@ -164,11 +142,9 @@
     if (focusTab) document.querySelector(`#product-tab-${categoryId}`).focus();
   }
 
-  languageToggle.addEventListener('click', () => {
-    language = language === 'zh' ? 'en' : 'zh';
-    localStorage.setItem('productCatalogLanguage', language);
+  window.renderProductCatalog = lang => {
+    language = lang === 'en' ? 'en' : 'zh';
     render();
-  });
-
-  render();
+  };
+  window.renderProductCatalog(language);
 })();
