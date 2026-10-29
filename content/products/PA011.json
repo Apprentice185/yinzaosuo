@@ -1,17 +1,14 @@
 {
-  "id": "PA011",
-  "title": "商业发光字工程",
-  "title_en": "Illuminated Channel Letters",
-  "category": "exhibition",
-  "image": "",
-  "desc": "店铺招牌、建筑外立面与室内形象墙字模",
-  "desc_en": "Bespoke 3D dimensional lettering and commercial shopfront signboards.",
+  "category_num": "03",
+  "show_in_archive": true,
   "materials": [
     "不锈钢、亚克力、高亮度LED模组、柔性霓虹管"
   ],
-  "materials_en": [
-    "Fabricated Stainless Steel, Cast Acrylic, High-Output LED Modules, Flexible Neon"
-  ],
+  "sort_order": 304,
+  "title_en": "Illuminated Channel Letters",
+  "category_title_en": "Exhibition & Signage",
+  "desc": "店铺招牌、建筑外立面与室内形象墙字模",
+  "category_desc": "商业美陈、展示道具、标识标牌与立体发光字全案制作",
   "crafts": [
     "无边字",
     "不锈钢发光字",
@@ -31,11 +28,14 @@
     "Acrylic Lightboxes",
     "Custom LED Neon"
   ],
-  "sort_order": 304,
-  "show_in_archive": true,
-  "category_title": "广告加工制作类",
-  "category_title_en": "Exhibition & Signage",
-  "category_desc": "商业美陈、展示道具、标识标牌与立体发光字全案制作",
   "category_desc_en": "Event retail displays, CNC boards, luminous architectural lettering, and signage systems.",
-  "category_num": "03"
+  "desc_en": "Bespoke 3D dimensional lettering and commercial shopfront signboards.",
+  "category_title": "广告加工制作类",
+  "title": "商业发光字工程",
+  "id": "PA011",
+  "image": "assets/images/products/pa011.png",
+  "materials_en": [
+    "Fabricated Stainless Steel, Cast Acrylic, High-Output LED Modules, Flexible Neon"
+  ],
+  "category": "exhibition"
 }
