@@ -110,6 +110,12 @@ function safeUrl(url) {
   return /^(https?:|\/|\.\/|\.\.\/|#)/i.test(value) ? value : '';
 }
 
+function safeMediaUrl(url) {
+  const value = String(url || '').trim();
+  if (!value || /^[a-z][a-z\d+.-]*:/i.test(value) && !/^https?:\/\//i.test(value)) return '';
+  return value;
+}
+
 function renderMarkdown(markdown) {
   const body = String(markdown || '').trim();
   if (!body) return '';
@@ -183,7 +189,7 @@ function normalizeProduct(product) {
     id: String(product.id),
     title: product.title || product.name || '',
     title_en: product.title_en || product.name_en || product.title || product.name || '',
-    image: product.image || product.thumb || '',
+    image: typeof product.image === 'string' ? product.image : product.thumb || '',
     desc: product.desc || product.intro || '',
     desc_en: product.desc_en || product.intro_en || product.desc || product.intro || '',
     intro: product.intro || product.desc || '',
@@ -197,6 +203,29 @@ function normalizeProduct(product) {
     sort_order: Number.isFinite(Number(product.sort_order)) ? Number(product.sort_order) : 10,
     show_in_archive: product.show_in_archive !== false
   };
+}
+
+function deduplicateProducts(products) {
+  const unique = new Map();
+  for (const { file, product } of products) {
+    const current = unique.get(product.id);
+    if (!current) {
+      unique.set(product.id, { file, product });
+      continue;
+    }
+
+    const currentHasImage = Boolean(current.product.image);
+    const candidateHasImage = Boolean(product.image);
+    const currentHasCanonicalPath = path.basename(current.file, '.json') === product.id;
+    const candidateHasCanonicalPath = path.basename(file, '.json') === product.id;
+    if (
+      (candidateHasImage && !currentHasImage) ||
+      (candidateHasImage === currentHasImage && candidateHasCanonicalPath && !currentHasCanonicalPath)
+    ) {
+      unique.set(product.id, { file, product });
+    }
+  }
+  return [...unique.values()].map(entry => entry.product);
 }
 
 function normalizeTemplate(template) {
@@ -348,9 +377,25 @@ function buildSitemap(data) {
 }
 
 function main() {
-  const products = filesIn('products', '.json')
-    .map(file => normalizeProduct(JSON.parse(fs.readFileSync(file, 'utf8'))))
+  const products = deduplicateProducts(filesIn('products', '.json')
+    .map(file => ({
+      file,
+      product: normalizeProduct(JSON.parse(fs.readFileSync(file, 'utf8')))
+    })))
     .sort((a, b) => a.sort_order - b.sort_order || a.id.localeCompare(b.id));
+  const settingsFile = path.join(contentRoot, 'settings', 'home.json');
+  const homeSettings = fs.existsSync(settingsFile)
+    ? JSON.parse(fs.readFileSync(settingsFile, 'utf8'))
+    : {};
+  const heroImage = String(homeSettings.hero_image || '').trim();
+  if (heroImage && !safeMediaUrl(heroImage)) throw new Error(`Unsupported homepage hero image URL: ${heroImage}`);
+  const siteSettings = {
+    home: {
+      hero_image: heroImage,
+      hero_image_alt: homeSettings.hero_image_alt || '',
+      hero_image_alt_en: homeSettings.hero_image_alt_en || ''
+    }
+  };
   const templates = filesIn('templates', '.json')
     .map(file => normalizeTemplate(JSON.parse(fs.readFileSync(file, 'utf8'))));
   const solutions = readMarkdownCollection('solutions').map(item => normalizeArticle(item, 'solutions'));
@@ -360,6 +405,7 @@ function main() {
     .sort((a, b) => a.sort_order - b.sort_order || a.id.localeCompare(b.id));
   const data = {
     products,
+    siteSettings,
     catalog: buildCatalog(products),
     solutions,
     knowledge,

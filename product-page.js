@@ -62,9 +62,27 @@ function renderProductDetails() {
   document.querySelector('#productIntro').textContent = productText('intro') || product.desc;
   document.querySelector('#productPrice').textContent = referencePrice();
 
-  const image = document.querySelector('#productImage');
-  image.style.backgroundImage = product.thumb ? `url("${product.thumb}")` : '';
-  image.innerHTML = product.thumb ? '' : `<span>${window.t('image_pending')}<br><strong>${productText('name')}</strong></span>`;
+  const imageContainer = document.querySelector('#productImage');
+  imageContainer.replaceChildren();
+  const imageSource = product.image || product.thumb;
+  if (imageSource) {
+    try {
+      const imageUrl = new URL(imageSource, `${window.location.origin}/`);
+      if (!['http:', 'https:'].includes(imageUrl.protocol)) throw new Error('Unsupported image URL protocol');
+      const image = document.createElement('img');
+      image.src = imageUrl.href;
+      image.alt = productText('name');
+      image.decoding = 'async';
+      imageContainer.append(image);
+    } catch (error) {
+      console.error(`Invalid image URL for product ${product.id}:`, error);
+    }
+  }
+  if (!imageContainer.childElementCount) {
+    const placeholder = document.createElement('span');
+    placeholder.textContent = `${window.t('image_pending')} · ${productText('name')}`;
+    imageContainer.append(placeholder);
+  }
 
   const options = product.options || [];
   document.querySelector('#detailOptions').innerHTML = options.map((option, index) =>

@@ -158,3 +158,14 @@ collections:
       - { label: "设计图", name: "designImage", widget: "image", required: false }
       - { label: "尺寸图", name: "sizeImage", widget: "image", required: false }
       - { label: "场景图", name: "sceneImage", widget: "image", required: false }
+
+  - name: "site_settings"
+    label: "网站设置"
+    files:
+      - name: "home"
+        label: "首页 Banner"
+        file: "content/settings/home.json"
+        fields:
+          - { label: "首页主视觉图", name: "hero_image", widget: "image" }
+          - { label: "图片替代文本（中文）", name: "hero_image_alt", widget: "string" }
+          - { label: "图片替代文本（英文）", name: "hero_image_alt_en", widget: "string" }
