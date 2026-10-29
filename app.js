@@ -26,6 +26,15 @@ const pageDataVersion = localStorage.getItem('printDataVersion') || '';
 const products = siteData.products || [];
 const language = () => localStorage.getItem('site_lang') || 'zh';
 const productText = (product, field) => window.contentText('products', product.id, field, product[field] || product.desc || '');
+const resolveContentImage = value => {
+  if (typeof value !== 'string' || !value.trim()) return '';
+  try {
+    const url = new URL(value.trim(), `${window.location.origin}/`);
+    return ['http:', 'https:'].includes(url.protocol) ? url.href : '';
+  } catch {
+    return '';
+  }
+};
 
 function reloadWhenPublished() {
   if ((localStorage.getItem('printDataVersion') || '') !== pageDataVersion) window.location.reload();
@@ -44,11 +53,65 @@ function renderHomeContent() {
   }
   const homeArticleGrid = document.querySelector('#homeArticleGrid');
   if (homeArticleGrid) {
-    homeArticleGrid.innerHTML = (siteData.articles || []).slice(0, 3).map((item, index) => {
+    const cards = (siteData.articles || []).slice(0, 3).map((item, index) => {
       const title = window.contentText('articles', item.id, 'title', item.title);
       const category = window.contentText('articles', item.id, 'category', item.category);
-      return `<article class="${index === 0 ? 'article-feature' : ''}"><a href="article.html?type=articles&id=${encodeURIComponent(item.id)}" class="article-image home-article-image ${item.cover ? 'has-cover' : ''}" ${item.cover ? `style="background-image:url('${item.cover}')"` : ''}><span>${category}</span></a><div class="article-meta">${category} · ${item.date || ''}</div><h3>${title}</h3><a href="article.html?type=articles&id=${encodeURIComponent(item.id)}" class="arrow-link">${window.t('read_article')} →</a></article>`;
-    }).join('');
+      const href = `article.html?type=articles&id=${encodeURIComponent(item.id)}`;
+      const coverUrl = resolveContentImage(item.cover || item.thumbnail || item.thumb || item.image);
+      const fallbackCover = !coverUrl;
+      const coverSource = coverUrl || resolveContentImage('assets/images/products/pa003.jpg');
+      const card = document.createElement('article');
+      card.className = 'home-article-card';
+      const cover = document.createElement('a');
+      cover.className = `home-article-cover${coverSource ? '' : ' is-placeholder'}`;
+      cover.href = href;
+      cover.setAttribute('aria-label', title);
+      if (coverSource) {
+        const image = document.createElement('img');
+        image.src = coverSource;
+        image.alt = fallbackCover ? window.t('home_article_cover_alt') : title;
+        image.loading = 'lazy';
+        image.decoding = 'async';
+        cover.append(image);
+      }
+      const categoryTag = document.createElement('span');
+      categoryTag.className = 'home-article-category';
+      categoryTag.textContent = category;
+      const arrow = document.createElement('span');
+      arrow.className = 'home-article-cover-arrow';
+      arrow.setAttribute('aria-hidden', 'true');
+      arrow.textContent = '↗';
+      cover.append(categoryTag, arrow);
+
+      const meta = document.createElement('div');
+      meta.className = 'home-article-meta';
+      const date = document.createElement('time');
+      date.textContent = item.date || '';
+      if (item.date && !Number.isNaN(Date.parse(item.date))) date.dateTime = new Date(item.date).toISOString();
+      const indexLabel = document.createElement('span');
+      indexLabel.textContent = `№ ${String(index + 1).padStart(2, '0')}`;
+      meta.append(date, indexLabel);
+
+      const heading = document.createElement('h3');
+      const titleLink = document.createElement('a');
+      titleLink.href = href;
+      titleLink.textContent = title;
+      heading.append(titleLink);
+
+      const readLink = document.createElement('a');
+      readLink.className = 'home-article-read';
+      readLink.href = href;
+      readLink.append(document.createTextNode(window.t('read_article')));
+      const readArrow = document.createElement('span');
+      readArrow.setAttribute('aria-hidden', 'true');
+      readArrow.textContent = '↗';
+      readLink.append(readArrow);
+      card.append(cover, meta, heading, readLink);
+      return card;
+    });
+    homeArticleGrid.replaceChildren(...cards);
+    homeArticleGrid.classList.toggle('is-two-column', cards.length === 2);
+    homeArticleGrid.classList.toggle('is-one-column', cards.length === 1);
   }
 }
 

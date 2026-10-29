@@ -66,9 +66,22 @@
       visual.append(image);
     } else {
       visual.classList.add('archive-visual-placeholder');
-      const placeholder = document.createElement('span');
+      const placeholder = document.createElement('div');
       placeholder.className = 'archive-image-placeholder';
-      placeholder.textContent = window.t('archive_image_pending');
+      placeholder.setAttribute('aria-hidden', 'true');
+      const prototype = document.createElement('span');
+      prototype.className = 'archive-placeholder-label';
+      prototype.textContent = window.t('archive_placeholder_prototype');
+      const frame = document.createElement('span');
+      frame.className = 'archive-placeholder-frame';
+      frame.setAttribute('aria-hidden', 'true');
+      const pending = document.createElement('span');
+      pending.className = 'archive-placeholder-label archive-placeholder-pending';
+      pending.textContent = window.t('archive_placeholder_pending');
+      const dimensions = document.createElement('span');
+      dimensions.className = 'archive-placeholder-dimensions';
+      dimensions.textContent = '— × — mm';
+      placeholder.append(prototype, frame, pending, dimensions);
       visual.append(placeholder);
     }
 
