@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>超能图片极速批量压缩裁切器</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- JSZip CDN for 1-Click ZIP Packaging -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(99, 102, 241, 0.4);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(99, 102, 241, 0.8);
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
+
+  <!-- Header -->
+  <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/20 text-white text-lg">
+          <i class="fa-solid fa-bolt-lightning"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-lg leading-tight tracking-tight text-white flex items-center gap-2">
+            极速批量图片压缩与裁切器
+            <span class="text-xs px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-medium">纯本地离线</span>
+          </h1>
+          <p class="text-xs text-slate-400">零上传保护隐私 • 高品质双三次采样 • 极限体积压缩率</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 text-xs text-slate-400">
+        <span class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-800/80 border border-slate-700/60">
+          <i class="fa-solid fa-microchip text-emerald-400"></i> 多线程引擎已就绪
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex-1 w-full grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- Left Controls Panel -->
+    <div class="lg:col-span-4 space-y-5">
+
+      <!-- Parameters Card -->
+      <section class="bg-slate-900/70 border border-slate-800 rounded-2xl p-5 shadow-xl backdrop-blur relative overflow-hidden">
+        <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+          <h2 class="font-semibold text-slate-200 flex items-center gap-2">
+            <i class="fa-solid fa-sliders text-indigo-400"></i> 输出规格配置
+          </h2>
+          <button id="resetParamsBtn" class="text-xs text-slate-400 hover:text-indigo-400 transition">
+            <i class="fa-solid fa-arrow-rotate-left mr-1"></i>恢复默认
+          </button>
+        </div>
+
+        <div class="space-y-4">
+          <!-- Target Dimensions -->
+          <div>
+            <div class="flex justify-between items-center mb-1.5">
+              <label class="text-xs font-medium text-slate-300">目标尺寸 (宽 × 高 px)</label>
+              <div class="flex items-center gap-1">
+                <button id="swapDimBtn" title="交换宽高" class="text-xs px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">
+                  <i class="fa-solid fa-arrows-rotate mr-1"></i>横竖交换
+                </button>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div class="relative">
+                <span class="absolute left-2.5 top-2.5 text-xs text-slate-500 font-mono">W:</span>
+                <input id="targetWidth" type="number" min="10" max="10000" value="800" class="w-full bg-slate-950/80 border border-slate-700 focus:border-indigo-500 rounded-lg pl-8 pr-2 py-2 text-sm text-slate-100 font-mono focus:outline-none transition">
+              </div>
+              <div class="relative">
+                <span class="absolute left-2.5 top-2.5 text-xs text-slate-500 font-mono">H:</span>
+                <input id="targetHeight" type="number" min="10" max="10000" value="960" class="w-full bg-slate-950/80 border border-slate-700 focus:border-indigo-500 rounded-lg pl-8 pr-2 py-2 text-sm text-slate-100 font-mono focus:outline-none transition">
+              </div>
+            </div>
+            <!-- Presets -->
+            <div class="flex flex-wrap gap-1.5 mt-2">
+              <button class="preset-btn text-[11px] px-2 py-0.5 rounded bg-slate-800/80 hover:bg-indigo-600/30 hover:border-indigo-500/50 text-slate-300 border border-slate-700/60 transition" data-w="800" data-h="960">电商图 (800×960)</button>
+              <button class="preset-btn text-[11px] px-2 py-0.5 rounded bg-slate-800/80 hover:bg-indigo-600/30 hover:border-indigo-500/50 text-slate-300 border border-slate-700/60 transition" data-w="1080" data-h="1080">正方形 (1080×1080)</button>
+              <button class="preset-btn text-[11px] px-2 py-0.5 rounded bg-slate-800/80 hover:bg-indigo-600/30 hover:border-indigo-500/50 text-slate-300 border border-slate-700/60 transition" data-w="1920" data-h="1080">高清屏 (1920×1080)</button>
+              <button class="preset-btn text-[11px] px-2 py-0.5 rounded bg-slate-800/80 hover:bg-indigo-600/30 hover:border-indigo-500/50 text-slate-300 border border-slate-700/60 transition" data-w="1200" data-h="628">社交推文 (1200×628)</button>
+            </div>
+          </div>
+
+          <!-- Resize Mode (Crop vs Pad) -->
+          <div>
+            <label class="text-xs font-medium text-slate-300 block mb-1.5">比例适配模式 (二选一)</label>
+            <div class="grid grid-cols-2 gap-2">
+              <label class="cursor-pointer relative flex items-center p-2.5 rounded-xl border border-slate-700 bg-slate-950/60 hover:border-slate-600 transition select-none">
+                <input type="radio" name="resizeMode" value="crop" checked class="peer sr-only">
+                <div class="peer-checked:border-indigo-500 peer-checked:bg-indigo-500/10 absolute inset-0 rounded-xl border-2 pointer-events-none transition"></div>
+                <div class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center mr-2.5 shrink-0">
+                  <i class="fa-solid fa-crop-simple"></i>
+                </div>
+                <div>
+                  <div class="text-xs font-semibold text-slate-200">裁切 (Crop)</div>
+                  <div class="text-[10px] text-slate-400">填满画面，多余裁去</div>
+                </div>
+              </label>
+
+              <label class="cursor-pointer relative flex items-center p-2.5 rounded-xl border border-slate-700 bg-slate-950/60 hover:border-slate-600 transition select-none">
+                <input type="radio" name="resizeMode" value="pad" class="peer sr-only">
+                <div class="peer-checked:border-indigo-500 peer-checked:bg-indigo-500/10 absolute inset-0 rounded-xl border-2 pointer-events-none transition"></div>
+                <div class="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center mr-2.5 shrink-0">
+                  <i class="fa-solid fa-table-cells"></i>
+                </div>
+                <div>
+                  <div class="text-xs font-semibold text-slate-200">填白 (Pad)</div>
+                  <div class="text-[10px] text-slate-400">完整缩放，空余留白</div>
+                </div>
+              </label>
+            </div>
+
+            <!-- Pad background color selector -->
+            <div id="padColorRow" class="hidden mt-2.5 p-2 rounded-lg bg-slate-950/50 border border-slate-800 flex items-center justify-between text-xs">
+              <span class="text-slate-400">填白填充颜色：</span>
+              <div class="flex items-center gap-2">
+                <input type="color" id="padColorPicker" value="#ffffff" class="w-6 h-6 rounded cursor-pointer border-0 bg-transparent">
+                <select id="padColorPresets" class="bg-slate-900 border border-slate-700 text-slate-200 rounded px-2 py-1 text-xs">
+                  <option value="#ffffff">纯白 (#FFFFFF)</option>
+                  <option value="#000000">纯黑 (#000000)</option>
+                  <option value="transparent">透明 (仅限PNG/WEBP)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Small File Rule (Skip) -->
+          <div class="bg-slate-950/50 p-3 rounded-xl border border-slate-800">
+            <div class="flex items-start gap-2.5">
+              <input id="skipSmaller" type="checkbox" checked class="mt-0.5 rounded border-slate-700 text-indigo-600 focus:ring-indigo-500 w-4 h-4 bg-slate-900 cursor-pointer">
+              <label for="skipSmaller" class="text-xs text-slate-300 cursor-pointer leading-tight">
+                <span class="font-semibold block text-slate-200">自动跳过小图 (小于目标尺寸)</span>
+                当原图宽和高均小于设定的宽高时，保持原状跳过处理，杜绝放大糊图。
+              </label>
+            </div>
+            <div class="mt-2 ml-6">
+              <select id="skipCondition" class="text-xs bg-slate-900 border border-slate-800 text-slate-300 rounded px-2 py-1 w-full">
+                <option value="both">宽和高均小于目标尺寸时跳过 (推荐)</option>
+                <option value="any">宽或高任一小于目标尺寸时跳过</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Output Format -->
+          <div>
+            <label class="text-xs font-medium text-slate-300 block mb-1.5">输出格式</label>
+            <div class="grid grid-cols-3 gap-2">
+              <label class="cursor-pointer">
+                <input type="radio" name="outputFormat" value="image/webp" checked class="peer sr-only">
+                <div class="p-2 text-center rounded-xl border border-slate-700 bg-slate-950/60 peer-checked:border-indigo-500 peer-checked:bg-indigo-500/15 peer-checked:text-indigo-300 hover:border-slate-600 transition">
+                  <div class="text-xs font-bold">WEBP</div>
+                  <div class="text-[10px] text-emerald-400">超高压缩率★</div>
+                </div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" name="outputFormat" value="image/jpeg" class="peer sr-only">
+                <div class="p-2 text-center rounded-xl border border-slate-700 bg-slate-950/60 peer-checked:border-indigo-500 peer-checked:bg-indigo-500/15 peer-checked:text-indigo-300 hover:border-slate-600 transition">
+                  <div class="text-xs font-bold">JPG / JPEG</div>
+                  <div class="text-[10px] text-slate-400">兼容性极佳</div>
+                </div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" name="outputFormat" value="image/png" class="peer sr-only">
+                <div class="p-2 text-center rounded-xl border border-slate-700 bg-slate-950/60 peer-checked:border-indigo-500 peer-checked:bg-indigo-500/15 peer-checked:text-indigo-300 hover:border-slate-600 transition">
+                  <div class="text-xs font-bold">PNG</div>
+                  <div class="text-[10px] text-slate-400">支持真透明</div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Quality Slider & Advanced Engine -->
+          <div class="p-3 bg-slate-950/50 rounded-xl border border-slate-800 space-y-3">
+            <div class="flex justify-between items-center text-xs">
+              <span class="text-slate-300 font-medium">压缩质量 (Quality)</span>
+              <span id="qualityVal" class="text-indigo-400 font-mono font-bold bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">75%</span>
+            </div>
+            <input id="qualityRange" type="range" min="10" max="100" value="75" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+            
+            <div class="flex items-center justify-between pt-1 border-t border-slate-800/80">
+              <div class="flex items-center gap-1.5">
+                <input id="ultraCompressToggle" type="checkbox" checked class="rounded border-slate-700 text-indigo-600 focus:ring-indigo-500 w-3.5 h-3.5 bg-slate-900 cursor-pointer">
+                <label for="ultraCompressToggle" class="text-xs text-slate-300 cursor-pointer select-none">
+                  深度极限压缩算法
+                </label>
+              </div>
+              <span class="text-[10px] text-amber-400/90 font-mono"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i>双三次平滑抗锯齿</span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Action Panel -->
+      <section class="bg-slate-900/70 border border-slate-800 rounded-2xl p-5 shadow-xl backdrop-blur space-y-3">
+        <button id="startProcessBtn" disabled class="w-full py-3.5 px-4 rounded-xl font-semibold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-indigo-600/30 transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-play"></i>
+          <span>开始批量压缩转换</span>
+        </button>
+
+        <div class="grid grid-cols-2 gap-2">
+          <button id="downloadZipBtn" disabled class="w-full py-2.5 px-3 rounded-xl font-medium text-xs text-white bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center justify-center gap-1.5 shadow-md shadow-emerald-700/20">
+            <i class="fa-solid fa-file-zipper"></i>
+            <span>打包下载 ZIP</span>
+          </button>
+
+          <button id="clearAllBtn" disabled class="w-full py-2.5 px-3 rounded-xl font-medium text-xs text-slate-300 bg-slate-800 hover:bg-rose-950/40 hover:text-rose-400 hover:border-rose-800/50 border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-trash-can"></i>
+            <span>清空列表</span>
+          </button>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Right Workspace Panel -->
+    <div class="lg:col-span-8 flex flex-col space-y-4">
+
+      <!-- Upload Zone -->
+      <section id="dropZone" class="border-2 border-dashed border-slate-700 hover:border-indigo-500/80 bg-slate-900/40 hover:bg-slate-900/80 transition-all duration-200 rounded-2xl p-6 sm:p-8 text-center cursor-pointer relative group">
+        <input type="file" id="fileInput" multiple accept="image/*" class="hidden">
+        <input type="file" id="folderInput" webkitdirectory directory multiple class="hidden">
+
+        <div class="max-w-md mx-auto space-y-3 pointer-events-none">
+          <div class="w-16 h-16 mx-auto rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center text-2xl group-hover:scale-110 group-hover:bg-indigo-500/20 transition-transform">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-semibold text-slate-100">点击或将图片 / 文件夹拖曳至此处</h3>
+            <p class="text-xs text-slate-400 mt-1">支持全选文件夹 (自动深度读取子目录所有图片)，支持 PNG、JPG、WEBP、BMP、AVIF 等</p>
+          </div>
+        </div>
+
+        <!-- Buttons to trigger pickers -->
+        <div class="mt-4 flex flex-wrap items-center justify-center gap-3">
+          <button type="button" onclick="document.getElementById('fileInput').click()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white shadow-md shadow-indigo-600/20 transition flex items-center gap-1.5">
+            <i class="fa-solid fa-images"></i> 选择多张图片
+          </button>
+          <button type="button" onclick="document.getElementById('folderInput').click()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold text-slate-200 transition flex items-center gap-1.5">
+            <i class="fa-solid fa-folder-open text-amber-400"></i> 选择整个文件夹 (含子目录)
+          </button>
+        </div>
+      </section>
+
+      <!-- Processing Progress Bar -->
+      <section id="progressContainer" class="hidden bg-slate-900/80 border border-slate-800 rounded-xl p-4 space-y-2">
+        <div class="flex justify-between items-center text-xs">
+          <div class="flex items-center gap-2">
+            <span class="inline-block w-2.5 h-2.5 rounded-full bg-indigo-500 animate-ping"></span>
+            <span id="progressStatusText" class="font-medium text-slate-200">正在批处理图片...</span>
+          </div>
+          <span id="progressPercentage" class="font-mono text-indigo-400 font-bold">0%</span>
+        </div>
+        <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+          <div id="progressBar" class="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full transition-all duration-150" style="width: 0%"></div>
+        </div>
+      </section>
+
+      <!-- Summary Stats Bar -->
+      <div id="statsBar" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div class="bg-slate-900/60 border border-slate-800/80 rounded-xl p-3">
+          <div class="text-[11px] text-slate-400">已载入图片</div>
+          <div id="statTotal" class="text-xl font-bold font-mono text-slate-100 mt-0.5">0</div>
+        </div>
+        <div class="bg-slate-900/60 border border-slate-800/80 rounded-xl p-3">
+          <div class="text-[11px] text-slate-400">已处理完成</div>
+          <div id="statSuccess" class="text-xl font-bold font-mono text-emerald-400 mt-0.5">0</div>
+        </div>
+        <div class="bg-slate-900/60 border border-slate-800/80 rounded-xl p-3">
+          <div class="text-[11px] text-slate-400">因尺寸跳过</div>
+          <div id="statSkipped" class="text-xl font-bold font-mono text-amber-400 mt-0.5">0</div>
+        </div>
+        <div class="bg-slate-900/60 border border-slate-800/80 rounded-xl p-3">
+          <div class="text-[11px] text-slate-400">累计节省体积</div>
+          <div id="statSaved" class="text-xl font-bold font-mono text-indigo-400 mt-0.5">0 KB (0%)</div>
+        </div>
+      </div>
+
+      <!-- File List & Results Table -->
+      <section class="bg-slate-900/70 border border-slate-800 rounded-2xl flex-1 flex flex-col overflow-hidden shadow-xl min-h-[360px]">
+        <div class="p-3.5 border-b border-slate-800 bg-slate-900/90 flex flex-wrap items-center justify-between gap-2">
+          <h3 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+            <i class="fa-solid fa-list-check text-indigo-400"></i> 图片列表与任务队列
+          </h3>
+          <div class="flex items-center gap-2 text-xs">
+            <span class="text-slate-400">过滤状态:</span>
+            <select id="filterStatus" class="bg-slate-950 border border-slate-800 rounded px-2 py-1 text-slate-300">
+              <option value="all">全部显示</option>
+              <option value="done">已完成</option>
+              <option value="skipped">已跳过</option>
+              <option value="pending">待处理</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Table Container -->
+        <div class="flex-1 overflow-x-auto overflow-y-auto max-h-[500px]">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead class="bg-slate-950/80 text-slate-400 sticky top-0 z-10 uppercase tracking-wider text-[11px] border-b border-slate-800">
+              <tr>
+                <th class="py-2.5 px-3">预览</th>
+                <th class="py-2.5 px-3">文件路径 / 名称</th>
+                <th class="py-2.5 px-3">原始信息</th>
+                <th class="py-2.5 px-3">输出信息</th>
+                <th class="py-2.5 px-3">压缩比率</th>
+                <th class="py-2.5 px-3">状态</th>
+                <th class="py-2.5 px-3 text-right">操作</th>
+              </tr>
+            </thead>
+            <tbody id="filesTableBody" class="divide-y divide-slate-800/60 font-sans">
+              <!-- Empty state -->
+              <tr id="emptyTableRow">
+                <td colspan="7" class="text-center py-16 text-slate-500">
+                  <div class="max-w-xs mx-auto space-y-2">
+                    <i class="fa-regular fa-image text-4xl opacity-30"></i>
+                    <p class="text-xs">暂无待处理图片，请点击上方区域添加单张图片或选择文件夹</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- Interactive Comparison Modal -->
+  <div id="previewModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+      <div class="p-4 border-b border-slate-800 flex justify-between items-center">
+        <h3 id="modalTitle" class="text-sm font-semibold text-slate-100 truncate">图片对比预览</h3>
+        <button id="closeModalBtn" class="text-slate-400 hover:text-white text-lg p-1">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="p-4 overflow-auto flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 items-center justify-center bg-slate-950/60">
+        <div class="flex flex-col items-center">
+          <span class="text-xs text-slate-400 mb-2 font-mono">原图 <span id="modalOrigMeta"></span></span>
+          <div class="max-h-[380px] max-w-full flex items-center justify-center overflow-hidden rounded-lg border border-slate-800 bg-slate-900/50 p-1">
+            <img id="modalOrigImg" src="" alt="原图" class="max-h-[360px] object-contain rounded">
+          </div>
+        </div>
+        <div class="flex flex-col items-center">
+          <span class="text-xs text-indigo-400 mb-2 font-mono">压缩输出 <span id="modalCompMeta"></span></span>
+          <div class="max-h-[380px] max-w-full flex items-center justify-center overflow-hidden rounded-lg border border-indigo-500/30 bg-slate-900/50 p-1">
+            <img id="modalCompImg" src="" alt="压缩图" class="max-h-[360px] object-contain rounded">
+          </div>
+        </div>
+      </div>
+      <div class="p-3.5 border-t border-slate-800 bg-slate-900/90 flex justify-end gap-2">
+        <button id="modalDownloadBtn" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white flex items-center gap-1.5">
+          <i class="fa-solid fa-download"></i> 下载压缩版
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- In-app Notification Toast -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-16 opacity-0 transition-all duration-300 pointer-events-none px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2 text-xs font-medium border"></div>
+
+  <!-- JavaScript Core -->
+  <script>
+    // State storage
+    const state = {
+      items: [], // Array of FileItem: { id, file, relativePath, origSize, origW, origH, status, processedBlob, processedW, processedH, processedSize, duration, error }
+      isProcessing: false,
+      padColor: '#ffffff'
+    };
+
+    // DOM Elements
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const folderInput = document.getElementById('folderInput');
+    const filesTableBody = document.getElementById('filesTableBody');
+    const emptyTableRow = document.getElementById('emptyTableRow');
+    const targetWidthInput = document.getElementById('targetWidth');
+    const targetHeightInput = document.getElementById('targetHeight');
+    const swapDimBtn = document.getElementById('swapDimBtn');
+    const resetParamsBtn = document.getElementById('resetParamsBtn');
+    const skipSmallerCheckbox = document.getElementById('skipSmaller');
+    const skipConditionSelect = document.getElementById('skipCondition');
+    const qualityRange = document.getElementById('qualityRange');
+    const qualityVal = document.getElementById('qualityVal');
+    const ultraCompressToggle = document.getElementById('ultraCompressToggle');
+    const startProcessBtn = document.getElementById('startProcessBtn');
+    const downloadZipBtn = document.getElementById('downloadZipBtn');
+    const clearAllBtn = document.getElementById('clearAllBtn');
+    const padColorRow = document.getElementById('padColorRow');
+    const padColorPicker = document.getElementById('padColorPicker');
+    const padColorPresets = document.getElementById('padColorPresets');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.getElementById('progressBar');
+    const progressPercentage = document.getElementById('progressPercentage');
+    const progressStatusText = document.getElementById('progressStatusText');
+    const filterStatus = document.getElementById('filterStatus');
+
+    // Stats elements
+    const statTotal = document.getElementById('statTotal');
+    const statSuccess = document.getElementById('statSuccess');
+    const statSkipped = document.getElementById('statSkipped');
+    const statSaved = document.getElementById('statSaved');
+
+    // Modal elements
+    const previewModal = document.getElementById('previewModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const modalOrigImg = document.getElementById('modalOrigImg');
+    const modalCompImg = document.getElementById('modalCompImg');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalOrigMeta = document.getElementById('modalOrigMeta');
+    const modalCompMeta = document.getElementById('modalCompMeta');
+    const modalDownloadBtn = document.getElementById('modalDownloadBtn');
+    let currentModalItem = null;
+
+    // Toast notification function
+    function showToast(message, type = 'info') {
+      const toast = document.getElementById('toast');
+      toast.innerText = message;
+      if (type === 'success') {
+        toast.className = 'fixed bottom-6 right-6 z-50 px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2 text-xs font-medium border bg-emerald-950/90 text-emerald-200 border-emerald-800 transition-all duration-300';
+      } else if (type === 'error') {
+        toast.className = 'fixed bottom-6 right-6 z-50 px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2 text-xs font-medium border bg-rose-950/90 text-rose-200 border-rose-800 transition-all duration-300';
+      } else {
+        toast.className = 'fixed bottom-6 right-6 z-50 px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2 text-xs font-medium border bg-slate-900/90 text-slate-100 border-slate-700 transition-all duration-300';
+      }
+      toast.style.transform = 'translateY(0)';
+      toast.style.opacity = '1';
+      setTimeout(() => {
+        toast.style.transform = 'translateY(16px)';
+        toast.style.opacity = '0';
+      }, 3000);
+    }
+
+    // Format Bytes
+    function formatBytes(bytes, decimals = 1) {
+      if (bytes === 0 || !bytes) return '0 B';
+      const k = 1024;
+      const dm = decimals < 0 ? 0 : decimals;
+      const sizes = ['B', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+    }
+
+    // Listen to resize mode changes to toggle pad color row
+    document.querySelectorAll('input[name="resizeMode"]').forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        if (e.target.value === 'pad') {
+          padColorRow.classList.remove('hidden');
+        } else {
+          padColorRow.classList.add('hidden');
+        }
+      });
+    });
+
+    padColorPresets.addEventListener('change', (e) => {
+      if (e.target.value !== 'transparent') {
+        padColorPicker.value = e.target.value;
+        state.padColor = e.target.value;
+      } else {
+        state.padColor = 'transparent';
+      }
+    });
+
+    padColorPicker.addEventListener('input', (e) => {
+      state.padColor = e.target.value;
+    });
+
+    // Preset buttons
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        targetWidthInput.value = btn.getAttribute('data-w');
+        targetHeightInput.value = btn.getAttribute('data-h');
+      });
+    });
+
+    // Swap Dimensions
+    swapDimBtn.addEventListener('click', () => {
+      const temp = targetWidthInput.value;
+      targetWidthInput.value = targetHeightInput.value;
+      targetHeightInput.value = temp;
+    });
+
+    // Reset default parameters
+    resetParamsBtn.addEventListener('click', () => {
+      targetWidthInput.value = 800;
+      targetHeightInput.value = 960;
+      document.querySelector('input[name="resizeMode"][value="crop"]').checked = true;
+      padColorRow.classList.add('hidden');
+      document.querySelector('input[name="outputFormat"][value="image/webp"]').checked = true;
+      qualityRange.value = 75;
+      qualityVal.innerText = '75%';
+      skipSmallerCheckbox.checked = true;
+      skipConditionSelect.value = 'both';
+      ultraCompressToggle.checked = true;
+      showToast('已重置为默认配置参数', 'info');
+    });
+
+    // Quality slider sync
+    qualityRange.addEventListener('input', (e) => {
+      qualityVal.innerText = e.target.value + '%';
+    });
+
+    // Filter table items
+    filterStatus.addEventListener('change', renderTable);
+
+    // --- File Ingestion ---
+    fileInput.addEventListener('change', (e) => {
+      handleFiles(Array.from(e.target.files));
+      fileInput.value = '';
+    });
+
+    folderInput.addEventListener('change', (e) => {
+      handleFiles(Array.from(e.target.files));
+      folderInput.value = '';
+    });
+
+    // Drag and Drop
+    ['dragenter', 'dragover'].forEach(name => {
+      dropZone.addEventListener(name, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.add('border-indigo-500', 'bg-slate-900/90');
+      });
+    });
+
+    ['dragleave', 'drop'].forEach(name => {
+      dropZone.addEventListener(name, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.remove('border-indigo-500', 'bg-slate-900/90');
+      });
+    });
+
+    dropZone.addEventListener('drop', async (e) => {
+      const items = e.dataTransfer.items;
+      if (items && items.length > 0) {
+        const fileList = [];
+        const queue = [];
+        for (let i = 0; i < items.length; i++) {
+          const entry = items[i].webkitGetAsEntry ? items[i].webkitGetAsEntry() : null;
+          if (entry) {
+            queue.push(traverseEntry(entry, ''));
+          } else if (items[i].kind === 'file') {
+            const f = items[i].getAsFile();
+            if (f && f.type.startsWith('image/')) fileList.push({ file: f, path: f.name });
+          }
+        }
+        if (queue.length > 0) {
+          const nested = await Promise.all(queue);
+          nested.flat().forEach(item => fileList.push(item));
+        }
+        handleFilesWithPaths(fileList);
+      } else if (e.dataTransfer.files.length > 0) {
+        handleFiles(Array.from(e.dataTransfer.files));
+      }
+    });
+
+    // Recursive directory traversal for Drag & Drop Folder
+    function traverseEntry(entry, path) {
+      return new Promise((resolve) => {
+        if (entry.isFile) {
+          entry.file((file) => {
+            if (file.type.startsWith('image/') || /\.(png|jpe?g|webp|bmp|avif|tiff|gif)$/i.test(file.name)) {
+              resolve([{ file, path: path + file.name }]);
+            } else {
+              resolve([]);
+            }
+          }, () => resolve([]));
+        } else if (entry.isDirectory) {
+          const dirReader = entry.createReader();
+          const subEntries = [];
+          const readEntries = () => {
+            dirReader.readEntries(async (entries) => {
+              if (entries.length === 0) {
+                const subResults = await Promise.all(
+                  subEntries.map(e => traverseEntry(e, path + entry.name + '/'))
+                );
+                resolve(subResults.flat());
+              } else {
+                subEntries.push(...entries);
+                readEntries();
+              }
+            }, () => resolve([]));
+          };
+          readEntries();
+        } else {
+          resolve([]);
+        }
+      });
+    }
+
+    function handleFiles(files) {
+      const imageFiles = files
+        .filter(f => f.type.startsWith('image/') || /\.(png|jpe?g|webp|bmp|avif|tiff|gif)$/i.test(f.name))
+        .map(f => ({
+          file: f,
+          path: f.webkitRelativePath || f.name
+        }));
+      handleFilesWithPaths(imageFiles);
+    }
+
+    async function handleFilesWithPaths(list) {
+      if (list.length === 0) {
+        showToast('未检测到有效的图片文件', 'error');
+        return;
+      }
+
+      let addedCount = 0;
+      for (const item of list) {
+        // Prevent exact duplicates
+        const exists = state.items.some(x => x.relativePath === item.path && x.origSize === item.file.size);
+        if (exists) continue;
+
+        const id = 'img_' + Math.random().toString(36).substring(2, 11);
+        const fileItem = {
+          id,
+          file: item.file,
+          relativePath: item.path,
+          origSize: item.file.size,
+          origW: null,
+          origH: null,
+          origThumbUrl: null,
+          status: 'pending', // 'pending' | 'processing' | 'done' | 'skipped' | 'error'
+          processedBlob: null,
+          processedUrl: null,
+          processedW: null,
+          processedH: null,
+          processedSize: 0,
+          error: null
+        };
+        state.items.push(fileItem);
+        addedCount++;
+        // Pre-read dimensions & thumbnail asynchronously
+        inspectDimensions(fileItem);
+      }
+
+      updateControlsState();
+      renderTable();
+      updateStats();
+      showToast(`成功导入 ${addedCount} 张图片`, 'success');
+    }
+
+    // Inspect image natural dimensions
+    function inspectDimensions(item) {
+      return new Promise((resolve) => {
+        const url = URL.createObjectURL(item.file);
+        item.origThumbUrl = url;
+        const img = new Image();
+        img.onload = () => {
+          item.origW = img.naturalWidth;
+          item.origH = img.naturalHeight;
+          renderRow(item.id);
+          resolve();
+        };
+        img.onerror = () => {
+          item.origW = 0;
+          item.origH = 0;
+          resolve();
+        };
+        img.src = url;
+      });
+    }
+
+    function updateControlsState() {
+      const hasItems = state.items.length > 0;
+      startProcessBtn.disabled = !hasItems || state.isProcessing;
+      clearAllBtn.disabled = !hasItems || state.isProcessing;
+      const hasFinished = state.items.some(i => i.status === 'done');
+      downloadZipBtn.disabled = !hasFinished || state.isProcessing;
+    }
+
+    function updateStats() {
+      statTotal.innerText = state.items.length;
+      const successItems = state.items.filter(i => i.status === 'done');
+      const skippedItems = state.items.filter(i => i.status === 'skipped');
+      statSuccess.innerText = successItems.length;
+      statSkipped.innerText = skippedItems.length;
+
+      let origTotalBytes = 0;
+      let compTotalBytes = 0;
+      successItems.forEach(i => {
+        origTotalBytes += i.origSize;
+        compTotalBytes += i.processedSize;
+      });
+
+      if (origTotalBytes > 0 && successItems.length > 0) {
+        const savedBytes = Math.max(0, origTotalBytes - compTotalBytes);
+        const percent = ((savedBytes / origTotalBytes) * 100).toFixed(1);
+        statSaved.innerText = `${formatBytes(savedBytes)} (-${percent}%)`;
+      } else {
+        statSaved.innerText = '0 KB (0%)';
+      }
+    }
+
+    // Clear all
+    clearAllBtn.addEventListener('click', () => {
+      if (state.isProcessing) return;
+      state.items.forEach(i => {
+        if (i.origThumbUrl) URL.revokeObjectURL(i.origThumbUrl);
+        if (i.processedUrl) URL.revokeObjectURL(i.processedUrl);
+      });
+      state.items = [];
+      renderTable();
+      updateStats();
+      updateControlsState();
+      progressContainer.classList.add('hidden');
+      showToast('已清空所有待处理图片', 'info');
+    });
+
+    // Render table
+    function renderTable() {
+      const currentFilter = filterStatus.value;
+      const filtered = state.items.filter(i => {
+        if (currentFilter === 'all') return true;
+        return i.status === currentFilter;
+      });
+
+      if (state.items.length === 0) {
+        filesTableBody.innerHTML = '';
+        filesTableBody.appendChild(emptyTableRow);
+        return;
+      }
+
+      filesTableBody.innerHTML = '';
+
+      if (filtered.length === 0) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td colspan="7" class="text-center py-10 text-slate-500">此筛选状态下无任何图片</td>`;
+        filesTableBody.appendChild(tr);
+        return;
+      }
+
+      filtered.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.id = `row-${item.id}`;
+        tr.className = 'hover:bg-slate-800/40 transition group';
+        tr.innerHTML = getRowInnerHTML(item);
+        filesTableBody.appendChild(tr);
+      });
+    }
+
+    function renderRow(id) {
+      const tr = document.getElementById(`row-${id}`);
+      if (!tr) return;
+      const item = state.items.find(i => i.id === id);
+      if (!item) return;
+      tr.innerHTML = getRowInnerHTML(item);
+    }
+
+    function getRowInnerHTML(item) {
+      // Dimensions string
+      const origDimStr = item.origW ? `${item.origW} × ${item.origH}` : '读取中...';
+      const origSizeStr = formatBytes(item.origSize);
+
+      let statusBadge = '';
+      if (item.status === 'pending') {
+        statusBadge = '<span class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">待处理</span>';
+      } else if (item.status === 'processing') {
+        statusBadge = '<span class="px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center gap-1 w-max"><i class="fa-solid fa-spinner animate-spin"></i> 编码中</span>';
+      } else if (item.status === 'done') {
+        statusBadge = '<span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1 w-max"><i class="fa-solid fa-check"></i> 成功</span>';
+      } else if (item.status === 'skipped') {
+        statusBadge = '<span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center gap-1 w-max" title="原图尺寸小于目标尺寸，已自动跳过"><i class="fa-solid fa-forward"></i> 已跳过</span>';
+      } else if (item.status === 'error') {
+        statusBadge = '<span class="px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center gap-1 w-max" title="' + (item.error || '失败') + '"><i class="fa-solid fa-circle-exclamation"></i> 出错</span>';
+      }
+
+      let outDimStr = '-';
+      let outSizeStr = '-';
+      let ratioStr = '-';
+
+      if (item.status === 'done') {
+        outDimStr = `${item.processedW} × ${item.processedH}`;
+        outSizeStr = formatBytes(item.processedSize);
+        const percent = ((item.processedSize - item.origSize) / item.origSize * 100).toFixed(1);
+        if (parseFloat(percent) < 0) {
+          ratioStr = `<span class="text-emerald-400 font-bold font-mono">${percent}%</span>`;
+        } else {
+          ratioStr = `<span class="text-amber-400 font-bold font-mono">+${percent}%</span>`;
+        }
+      } else if (item.status === 'skipped') {
+        outDimStr = origDimStr;
+        outSizeStr = origSizeStr;
+        ratioStr = '<span class="text-slate-500">不压缩</span>';
+      }
+
+      // Thumb preview
+      const thumbSrc = item.origThumbUrl || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"/>';
+
+      let actionButtons = `
+        <button onclick="removeItem('${item.id}')" title="移除" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      `;
+
+      if (item.status === 'done') {
+        actionButtons = `
+          <button onclick="openModal('${item.id}')" title="对比预览" class="p-1.5 rounded-lg text-slate-300 hover:text-indigo-400 hover:bg-slate-800 transition">
+            <i class="fa-regular fa-eye"></i>
+          </button>
+          <button onclick="downloadSingle('${item.id}')" title="单张下载" class="p-1.5 rounded-lg text-slate-300 hover:text-emerald-400 hover:bg-slate-800 transition">
+            <i class="fa-solid fa-download"></i>
+          </button>
+          ${actionButtons}
+        `;
+      }
+
+      return `
+        <td class="py-2.5 px-3">
+          <div class="w-10 h-10 rounded-lg bg-slate-950 border border-slate-800 overflow-hidden flex items-center justify-center cursor-pointer group-hover:border-slate-700" onclick="${item.status === 'done' ? `openModal('${item.id}')` : ''}">
+            <img src="${thumbSrc}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/40x40/1e293b/94a3b8?text=IMG'">
+          </div>
+        </td>
+        <td class="py-2.5 px-3 max-w-[220px]">
+          <div class="truncate font-medium text-slate-200" title="${item.relativePath}">${item.file.name}</div>
+          <div class="truncate text-[10px] text-slate-500" title="${item.relativePath}">${item.relativePath}</div>
+        </td>
+        <td class="py-2.5 px-3 font-mono text-[11px]">
+          <div class="text-slate-300">${origDimStr}</div>
+          <div class="text-slate-500">${origSizeStr}</div>
+        </td>
+        <td class="py-2.5 px-3 font-mono text-[11px]">
+          <div class="text-slate-200 font-medium">${outDimStr}</div>
+          <div class="text-indigo-400">${outSizeStr}</div>
+        </td>
+        <td class="py-2.5 px-3">
+          ${ratioStr}
+        </td>
+        <td class="py-2.5 px-3">
+          ${statusBadge}
+        </td>
+        <td class="py-2.5 px-3 text-right whitespace-nowrap">
+          <div class="flex items-center justify-end gap-1">
+            ${actionButtons}
+          </div>
+        </td>
+      `;
+    }
+
+    window.removeItem = function(id) {
+      if (state.isProcessing) return;
+      const idx = state.items.findIndex(i => i.id === id);
+      if (idx !== -1) {
+        const item = state.items[idx];
+        if (item.origThumbUrl) URL.revokeObjectURL(item.origThumbUrl);
+        if (item.processedUrl) URL.revokeObjectURL(item.processedUrl);
+        state.items.splice(idx, 1);
+        renderTable();
+        updateStats();
+        updateControlsState();
+      }
+    };
+
+    window.downloadSingle = function(id) {
+      const item = state.items.find(i => i.id === id);
+      if (!item || !item.processedBlob) return;
+      const targetExt = getOutputExtension();
+      const baseName = item.file.name.replace(/\.[^/.]+$/, "");
+      const finalName = `${baseName}_compressed.${targetExt}`;
+
+      const link = document.createElement('a');
+      link.href = item.processedUrl;
+      link.download = finalName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
+
+    function getOutputFormat() {
+      const formatRadio = document.querySelector('input[name="outputFormat"]:checked');
+      return formatRadio ? formatRadio.value : 'image/webp';
+    }
+
+    function getOutputExtension() {
+      const fmt = getOutputFormat();
+      if (fmt === 'image/webp') return 'webp';
+      if (fmt === 'image/jpeg') return 'jpg';
+      if (fmt === 'image/png') return 'png';
+      return 'webp';
+    }
+
+    // --- High-Performance Bicubic Image Resizer & Compression Engine ---
+    // Multi-step downsampling to eliminate aliasing and optimize perceptual sharpness
+    function processImageFile(fileItem, config) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        const objectUrl = URL.createObjectURL(fileItem.file);
+
+        img.onload = async () => {
+          URL.revokeObjectURL(objectUrl);
+          const srcW = img.naturalWidth;
+          const srcH = img.naturalHeight;
+          fileItem.origW = srcW;
+          fileItem.origH = srcH;
+
+          const targetW = config.targetW;
+          const targetH = config.targetH;
+
+          // Check Skip Condition: If input image is smaller than target
+          let shouldSkip = false;
+          if (config.skipSmaller) {
+            if (config.skipCondition === 'both') {
+              if (srcW < targetW && srcH < targetH) shouldSkip = true;
+            } else if (config.skipCondition === 'any') {
+              if (srcW < targetW || srcH < targetH) shouldSkip = true;
+            }
+          }
+
+          if (shouldSkip) {
+            fileItem.status = 'skipped';
+            fileItem.processedBlob = fileItem.file; // Preserve original
+            fileItem.processedSize = fileItem.origSize;
+            fileItem.processedW = srcW;
+            fileItem.processedH = srcH;
+            resolve();
+            return;
+          }
+
+          // Offscreen / Main canvas setup
+          const canvas = document.createElement('canvas');
+          canvas.width = targetW;
+          canvas.height = targetH;
+          const ctx = canvas.getContext('2d', { alpha: config.format !== 'image/jpeg', willReadFrequently: false });
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+
+          // Background Fill for Pad mode or for non-transparent JPGs
+          if (config.format === 'image/jpeg' || (config.mode === 'pad' && config.padColor !== 'transparent')) {
+            ctx.fillStyle = (config.mode === 'pad' && config.padColor !== 'transparent') 
+              ? config.padColor 
+              : '#ffffff';
+            ctx.fillRect(0, 0, targetW, targetH);
+          } else {
+            ctx.clearRect(0, 0, targetW, targetH);
+          }
+
+          // Calculate Geometry: Cover (Crop) vs Contain (Pad)
+          let destX = 0, destY = 0, destW = targetW, destH = targetH;
+          const srcRatio = srcW / srcH;
+          const targetRatio = targetW / targetH;
+
+          if (config.mode === 'crop') {
+            // COVER mode: scale to cover entire bounding box and crop excess centered
+            let renderW, renderH;
+            if (srcRatio > targetRatio) {
+              renderH = targetH;
+              renderW = targetH * srcRatio;
+            } else {
+              renderW = targetW;
+              renderH = targetW / srcRatio;
+            }
+            destX = (targetW - renderW) / 2;
+            destY = (targetH - renderH) / 2;
+            destW = renderW;
+            destH = renderH;
+          } else {
+            // CONTAIN / PAD mode: scale to fit within bounding box, remainder padded
+            let renderW, renderH;
+            if (srcRatio > targetRatio) {
+              renderW = targetW;
+              renderH = targetW / srcRatio;
+            } else {
+              renderH = targetH;
+              renderW = targetH * srcRatio;
+            }
+            destX = (targetW - renderW) / 2;
+            destY = (targetH - renderH) / 2;
+            destW = renderW;
+            destH = renderH;
+          }
+
+          // Ultra-crisp downsampling: If downscaling by more than 2x, perform step-down halving
+          // to avoid shimmering / moiré effect before final blit
+          let currentSource = img;
+          let curW = srcW;
+          let curH = srcH;
+
+          if (config.ultraCompress && (curW > destW * 2 || curH > destH * 2)) {
+            while (curW * 0.5 > destW && curH * 0.5 > destH) {
+              const halfCanvas = document.createElement('canvas');
+              curW = Math.round(curW * 0.5);
+              curH = Math.round(curH * 0.5);
+              halfCanvas.width = curW;
+              halfCanvas.height = curH;
+              const halfCtx = halfCanvas.getContext('2d');
+              halfCtx.imageSmoothingEnabled = true;
+              halfCtx.imageSmoothingQuality = 'high';
+              halfCtx.drawImage(currentSource, 0, 0, curW, curH);
+              currentSource = halfCanvas;
+            }
+          }
+
+          // Final draw onto target canvas
+          ctx.drawImage(currentSource, destX, destY, destW, destH);
+
+          // Blob Encoding with Quality Control
+          const quality = config.quality / 100;
+
+          canvas.toBlob(async (blob) => {
+            if (!blob) {
+              fileItem.status = 'error';
+              fileItem.error = '编码失败';
+              reject(new Error('编码失败'));
+              return;
+            }
+
+            fileItem.processedBlob = blob;
+            fileItem.processedSize = blob.size;
+            fileItem.processedW = targetW;
+            fileItem.processedH = targetH;
+            fileItem.processedUrl = URL.createObjectURL(blob);
+            fileItem.status = 'done';
+            resolve();
+          }, config.format, quality);
+
+        };
+
+        img.onerror = () => {
+          URL.revokeObjectURL(objectUrl);
+          fileItem.status = 'error';
+          fileItem.error = '无法解析图像';
+          reject(new Error('无法解析图像'));
+        };
+
+        img.src = objectUrl;
+      });
+    }
+
+    // --- Batch Execution Queue ---
+    startProcessBtn.addEventListener('click', async () => {
+      if (state.isProcessing || state.items.length === 0) return;
+
+      const targetW = parseInt(targetWidthInput.value, 10);
+      const targetH = parseInt(targetHeightInput.value, 10);
+
+      if (isNaN(targetW) || targetW <= 0 || isNaN(targetH) || targetH <= 0) {
+        showToast('请输入有效的宽和高尺寸', 'error');
+        return;
+      }
+
+      state.isProcessing = true;
+      updateControlsState();
+      progressContainer.classList.remove('hidden');
+      progressBar.style.width = '0%';
+      progressPercentage.innerText = '0%';
+
+      const mode = document.querySelector('input[name="resizeMode"]:checked').value;
+      const format = getOutputFormat();
+      const quality = parseInt(qualityRange.value, 10);
+      const skipSmaller = skipSmallerCheckbox.checked;
+      const skipCondition = skipConditionSelect.value;
+      const ultraCompress = ultraCompressToggle.checked;
+
+      const config = {
+        targetW,
+        targetH,
+        mode,
+        padColor: state.padColor,
+        format,
+        quality,
+        skipSmaller,
+        skipCondition,
+        ultraCompress
+      };
+
+      const total = state.items.length;
+      let completed = 0;
+
+      // Concurrency pool (process up to 4 images simultaneously for maximum throughput)
+      const concurrency = 4;
+      let activeIndex = 0;
+
+      async function worker() {
+        while (activeIndex < total) {
+          const index = activeIndex++;
+          const item = state.items[index];
+          item.status = 'processing';
+          renderRow(item.id);
+
+          try {
+            await processImageFile(item, config);
+          } catch (err) {
+            item.status = 'error';
+            item.error = err.message || '处理失败';
+          }
+
+          completed++;
+          const pct = Math.round((completed / total) * 100);
+          progressBar.style.width = `${pct}%`;
+          progressPercentage.innerText = `${pct}%`;
+          progressStatusText.innerText = `正在处理: ${completed} / ${total} (${item.file.name})`;
+          renderRow(item.id);
+          updateStats();
+        }
+      }
+
+      const workers = [];
+      for (let i = 0; i < Math.min(concurrency, total); i++) {
+        workers.push(worker());
+      }
+
+      await Promise.all(workers);
+
+      state.isProcessing = false;
+      progressStatusText.innerText = '所有任务批处理完成！';
+      progressBar.style.width = '100%';
+      progressPercentage.innerText = '100%';
+      updateControlsState();
+      updateStats();
+      showToast('所有图片已处理完成，可一键导出 ZIP！', 'success');
+    });
+
+    // --- ZIP Batch Packaging ---
+    downloadZipBtn.addEventListener('click', async () => {
+      const finishedItems = state.items.filter(i => i.status === 'done' || i.status === 'skipped');
+      if (finishedItems.length === 0) return;
+
+      const zip = new JSZip();
+      const targetExt = getOutputExtension();
+
+      showToast('正在打包 ZIP，请稍候...', 'info');
+      downloadZipBtn.disabled = true;
+      downloadZipBtn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> 打包中...';
+
+      // Keep relative subfolder directory structure
+      finishedItems.forEach(item => {
+        let relative = item.relativePath || item.file.name;
+        // Normalize path separators
+        relative = relative.replace(/\\/g, '/');
+
+        if (item.status === 'done') {
+          // Replace extension with chosen format
+          const lastDot = relative.lastIndexOf('.');
+          const newPath = (lastDot !== -1 ? relative.substring(0, lastDot) : relative) + '.' + targetExt;
+          zip.file(newPath, item.processedBlob);
+        } else {
+          // Skipped item: preserve original file & extension
+          zip.file(relative, item.file);
+        }
+      });
+
+      try {
+        const content = await zip.generateAsync({
+          type: 'blob',
+          compression: 'DEFLATE',
+          compressionOptions: { level: 6 }
+        });
+
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(content);
+        link.download = `compressed_images_${Date.now()}.zip`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
+
+        showToast('ZIP 压缩包下载已启动！', 'success');
+      } catch (err) {
+        showToast('打包失败: ' + err.message, 'error');
+      } finally {
+        downloadZipBtn.disabled = false;
+        downloadZipBtn.innerHTML = '<i class="fa-solid fa-file-zipper"></i> 打包下载 ZIP';
+      }
+    });
+
+    // --- Preview Modal Logic ---
+    window.openModal = function(id) {
+      const item = state.items.find(i => i.id === id);
+      if (!item) return;
+      currentModalItem = item;
+
+      modalTitle.innerText = item.file.name;
+      modalOrigImg.src = item.origThumbUrl;
+      modalCompImg.src = item.processedUrl || item.origThumbUrl;
+
+      modalOrigMeta.innerText = `(${item.origW || '?'}×${item.origH || '?'}, ${formatBytes(item.origSize)})`;
+      modalCompMeta.innerText = `(${item.processedW || '?'}×${item.processedH || '?'}, ${formatBytes(item.processedSize)})`;
+
+      previewModal.classList.remove('hidden');
+      previewModal.classList.add('flex');
+    };
+
+    closeModalBtn.addEventListener('click', () => {
+      previewModal.classList.add('hidden');
+      previewModal.classList.remove('flex');
+    });
+
+    previewModal.addEventListener('click', (e) => {
+      if (e.target === previewModal) {
+        previewModal.classList.add('hidden');
+        previewModal.classList.remove('flex');
+      }
+    });
+
+    modalDownloadBtn.addEventListener('click', () => {
+      if (currentModalItem) {
+        downloadSingle(currentModalItem.id);
+      }
+    });
+  </script>
+</body>
+</html>
