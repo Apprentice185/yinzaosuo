@@ -247,7 +247,7 @@ function normalizeArticle(item, collection) {
 }
 
 function buildCatalog(products) {
-  const visible = products.filter(product => product.show_in_archive && categoryDefaults[product.category]);
+  const visible = products.filter(product => (product.show_in_archive || product.image) && categoryDefaults[product.category]);
   const catalog = { zh: { categories: [] }, en: { categories: [] } };
   for (const [categoryId, defaults] of Object.entries(categoryDefaults)) {
     const categoryProducts = visible

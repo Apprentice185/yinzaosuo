@@ -38,16 +38,32 @@
     return group;
   }
 
+  function resolveImageUrl(image) {
+    const value = typeof image === 'string' ? image.trim() : '';
+    if (!value) return '';
+    try {
+      const url = new URL(value, `${window.location.origin}/`);
+      return ['http:', 'https:'].includes(url.protocol) ? url.href : '';
+    } catch {
+      return '';
+    }
+  }
+
   function makeCard(item, index, total) {
-    const card = document.createElement('article');
+    const card = document.createElement('a');
     card.className = 'archive-card';
+    card.href = `product.html?id=${encodeURIComponent(item.id)}`;
     card.dataset.productId = item.id;
-    card.tabIndex = 0;
-    card.setAttribute('role', 'group');
     const visual = document.createElement('div');
     visual.className = 'archive-visual';
-    if (item.image) {
-      visual.style.setProperty('--product-image', `url("${item.image}")`);
+    const imageUrl = resolveImageUrl(item.image);
+    if (imageUrl) {
+      const image = document.createElement('img');
+      image.src = imageUrl;
+      image.alt = item.name;
+      image.loading = 'lazy';
+      image.decoding = 'async';
+      visual.append(image);
     } else {
       visual.classList.add('archive-visual-placeholder');
       const placeholder = document.createElement('span');
@@ -59,15 +75,7 @@
     const indexLabel = document.createElement('span');
     indexLabel.className = 'archive-index';
     indexLabel.textContent = `${String(index + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;
-
-    const drawer = document.createElement('div');
-    drawer.className = 'archive-parameter-drawer';
-    drawer.setAttribute('aria-label', window.t('archive_specs'));
-    drawer.append(
-      makeGroup(window.t('archive_materials'), item.materials, 'archive-materials-full', Number.MAX_SAFE_INTEGER),
-      makeGroup(window.t('archive_crafts'), item.crafts, 'archive-crafts-full', Number.MAX_SAFE_INTEGER)
-    );
-    visual.append(indexLabel, drawer);
+    visual.append(indexLabel);
 
     const content = document.createElement('div');
     content.className = 'archive-card-content';
@@ -78,17 +86,7 @@
     const summary = document.createElement('p');
     summary.className = 'archive-card-summary';
     summary.textContent = item.desc;
-    const button = document.createElement('button');
-    button.className = 'archive-parameter-button';
-    button.type = 'button';
-    button.setAttribute('aria-expanded', 'false');
-    button.textContent = window.t('archive_specs');
-    button.addEventListener('click', () => {
-      const expanded = card.classList.toggle('is-expanded');
-      button.setAttribute('aria-expanded', String(expanded));
-      button.textContent = expanded ? window.t('archive_close') : window.t('archive_specs');
-    });
-    content.append(name, summary, makeGroup(window.t('archive_materials'), item.materials, 'archive-materials', 2), makeGroup(window.t('archive_crafts'), item.crafts, 'archive-crafts', 3), button);
+    content.append(name, summary, makeGroup(window.t('archive_materials'), item.materials, 'archive-materials', 2), makeGroup(window.t('archive_crafts'), item.crafts, 'archive-crafts', 3));
     card.append(visual, content);
     return card;
   }
