@@ -65,6 +65,7 @@ function renderProductDetails() {
   const imageContainer = document.querySelector('#productImage');
   imageContainer.replaceChildren();
   const imageSource = product.image || product.thumb;
+  imageContainer.classList.remove('is-placeholder');
   if (imageSource) {
     try {
       const imageUrl = new URL(imageSource, `${window.location.origin}/`);
@@ -79,9 +80,17 @@ function renderProductDetails() {
     }
   }
   if (!imageContainer.childElementCount) {
-    const placeholder = document.createElement('span');
-    placeholder.textContent = `${window.t('image_pending')} · ${productText('name')}`;
-    imageContainer.append(placeholder);
+    imageContainer.classList.add('is-placeholder');
+    const label = document.createElement('span');
+    label.className = 'placeholder-label';
+    label.textContent = `${window.t('image_pending')} · ${productText('name')}`;
+    const spec = document.createElement('small');
+    spec.className = 'placeholder-spec';
+    spec.textContent = 'PROTOTYPE / SPEC PENDING';
+    const dimensions = document.createElement('small');
+    dimensions.className = 'placeholder-dimensions';
+    dimensions.textContent = '— × — mm';
+    imageContainer.append(label, spec, dimensions);
   }
 
   const options = product.options || [];

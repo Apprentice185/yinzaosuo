@@ -122,6 +122,7 @@ function openScene(id) {
   const name = productText(product, 'name');
   const visual = document.querySelector('#sceneVisual');
   visual.style.backgroundImage = product.sceneImage ? `url("${product.sceneImage}")` : '';
+  visual.classList.toggle('is-placeholder', !product.sceneImage);
   visual.innerHTML = product.sceneImage ? '' : `<span>${productText(product, 'category')}<br><strong>${name}</strong></span>`;
   document.querySelector('#sceneTitle').textContent = name;
   document.querySelector('#sceneDesc').textContent = productText(product, 'intro');

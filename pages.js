@@ -40,7 +40,7 @@ function renderContent(type) {
   const items = data[type].filter(item => filterState[type] === '全部' || item.category === filterState[type]);
   target.innerHTML = items.map((item, index) => {
     const category = text(type, item, 'category');
-    return `<article class="long-card"><div class="long-card-visual visual-${index % 4}" ${item.cover ? `style="background-image:url('${item.cover}')"` : ''}>${item.cover ? '' : `<span>${category}</span>`}</div><div class="article-meta">${category} · ${item.date || window.t('date_source')}</div><h2>${text(type, item, 'title')}</h2><p>${text(type, item, 'excerpt')}</p><a class="text-link" href="${articleUrl(type, item.id)}">${window.t('read_article')} <span>↗</span></a></article>`;
+    return `<article class="long-card"><div class="long-card-visual visual-${index % 4}${item.cover ? ' has-image' : ' is-placeholder'}" ${item.cover ? `style="background-image:url('${item.cover}')"` : ''}>${item.cover ? '' : `<span>${category}</span>`}</div><div class="article-meta">${category} · ${item.date || window.t('date_source')}</div><h2>${text(type, item, 'title')}</h2><p>${text(type, item, 'excerpt')}</p><a class="text-link" href="${articleUrl(type, item.id)}">${window.t('read_article')} <span>↗</span></a></article>`;
   }).join('');
 }
 
@@ -50,7 +50,7 @@ function renderSolutions() {
   target.innerHTML = data.solutions.map((item, index) => {
     const category = window.contentText('solutions', item.id, 'category', item.tag || '');
     const summary = window.contentText('solutions', item.id, 'excerpt', item.summary || '');
-    return `<article class="long-card"><div class="long-card-visual visual-${index % 4}" ${item.cover ? `style="background-image:url('${item.cover}')"` : ''}>${item.cover ? '' : `<span>${category}</span>`}</div><div class="article-meta">${category} · ${item.date || window.t('date_source')}</div><h2>${window.contentText('solutions', item.id, 'title', item.title)}</h2><p>${summary}</p><a class="text-link" href="${articleUrl('solutions', item.id)}">${window.t('read_article')} <span>↗</span></a></article>`;
+    return `<article class="long-card"><div class="long-card-visual visual-${index % 4}${item.cover ? ' has-image' : ' is-placeholder'}" ${item.cover ? `style="background-image:url('${item.cover}')"` : ''}>${item.cover ? '' : `<span>${category}</span>`}</div><div class="article-meta">${category} · ${item.date || window.t('date_source')}</div><h2>${window.contentText('solutions', item.id, 'title', item.title)}</h2><p>${summary}</p><a class="text-link" href="${articleUrl('solutions', item.id)}">${window.t('read_article')} <span>↗</span></a></article>`;
   }).join('');
 }
 
@@ -108,7 +108,7 @@ function renderTemplateFilters() {
 }
 
 function imageOrPlaceholder(url, className, label) {
-  return url ? `<img class="${className}" src="${url}" alt="">` : `<div class="${className} image-placeholder">${label}</div>`;
+  return url ? `<img class="${className}" src="${url}" alt="">` : `<div class="${className} image-placeholder"><span class="placeholder-label">${label}</span><span class="placeholder-frame" aria-hidden="true"></span><small class="placeholder-spec">PROTOTYPE / SPEC PENDING</small><small class="placeholder-dimensions">— × — mm</small></div>`;
 }
 
 function renderTemplates() {
@@ -136,7 +136,7 @@ function openTemplate(id) {
   const galleryItems = [item.designImage, item.sizeImage, item.sceneImage];
   gallery.innerHTML = galleryItems.map((url, index) => url
     ? `<img class="detail-image ${index === 0 ? 'active' : ''}" src="${url}" alt="${title}">`
-    : `<div class="detail-image image-placeholder ${index === 0 ? 'active' : ''}">${window.t('image_detail_pending').replace('{n}', index + 1)}</div>`).join('');
+    : `<div class="detail-image image-placeholder ${index === 0 ? 'active' : ''}"><span class="placeholder-label">${window.t('image_detail_pending').replace('{n}', index + 1)}</span><span class="placeholder-frame" aria-hidden="true"></span><small class="placeholder-spec">PROTOTYPE / SPEC PENDING</small><small class="placeholder-dimensions">— × — mm</small></div>`).join('');
   document.querySelector('#detailTitle').textContent = title;
   document.querySelector('#detailMeta').textContent = language() === 'en'
     ? `${item.id} · ${category} · ${window.t('template_style')}: ${style} · ${templateSize(item)}`
