@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://yinzaosuo.com/</loc></url>
+  <url><loc>https://yinzaosuo.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
   <url><loc>https://yinzaosuo.com/article.html?type=articles&amp;id=A1789759200263</loc></url>
   <url><loc>https://yinzaosuo.com/article.html?type=articles&amp;id=A1789760440914</loc></url>
   <url><loc>https://yinzaosuo.com/article.html?type=knowledge&amp;id=K1789757037537</loc></url>
   <url><loc>https://yinzaosuo.com/article.html?type=solutions&amp;id=S001</loc></url>
+  <url><loc>https://yinzaosuo.com/calc.html</loc></url>
   <url><loc>https://yinzaosuo.com/journal.html</loc></url>
   <url><loc>https://yinzaosuo.com/knowledge.html</loc></url>
-  <url><loc>https://yinzaosuo.com/products.html</loc></url>
   <url><loc>https://yinzaosuo.com/product.html?id=P001</loc></url>
   <url><loc>https://yinzaosuo.com/product.html?id=P002</loc></url>
   <url><loc>https://yinzaosuo.com/product.html?id=P003</loc></url>
@@ -28,6 +28,7 @@
   <url><loc>https://yinzaosuo.com/product.html?id=PA010</loc></url>
   <url><loc>https://yinzaosuo.com/product.html?id=PA011</loc></url>
   <url><loc>https://yinzaosuo.com/product.html?id=PA012</loc></url>
+  <url><loc>https://yinzaosuo.com/products.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://yinzaosuo.com/solutions.html</loc></url>
-  <url><loc>https://yinzaosuo.com/templates.html</loc></url>
+  <url><loc>https://yinzaosuo.com/templates.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
 </urlset>

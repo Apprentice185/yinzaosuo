@@ -347,7 +347,12 @@ function buildTranslations(products, knowledge, news, templates, solutions) {
 
 function buildSitemap(data) {
   const routes = new Set(['/']);
-  const nonIndexablePages = new Set(['index.html', 'article.html', 'product.html']);
+  const nonIndexablePages = new Set(['admin.html', 'index.html', 'article.html', 'product.html']);
+  const excludedPages = new Set(['admin.html']);
+  for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
+    if (!entry.isFile() || !/\.html?$/i.test(entry.name) || excludedPages.has(entry.name)) continue;
+    if (!nonIndexablePages.has(entry.name)) routes.add(`/${entry.name}`);
+  }
   const queue = ['index.html'];
   const visited = new Set();
   while (queue.length) {
@@ -365,14 +370,27 @@ function buildSitemap(data) {
       if (!/\.html?$/i.test(target)) continue;
       const resolved = path.resolve(path.dirname(file), target);
       if (!resolved.startsWith(`${root}${path.sep}`)) continue;
-      queue.push(path.relative(root, resolved));
+      const relativeTarget = path.relative(root, resolved);
+      if (relativeTarget.split(path.sep).some(segment => segment.toLowerCase() === 'admin')) continue;
+      queue.push(relativeTarget);
     }
   }
   for (const product of data.products) routes.add(`/product.html?id=${encodeURIComponent(product.id)}`);
   for (const item of data.knowledge) routes.add(`/article.html?type=knowledge&id=${encodeURIComponent(item.id)}`);
   for (const item of data.news) routes.add(`/article.html?type=articles&id=${encodeURIComponent(item.id)}`);
   for (const item of data.solutions) routes.add(`/article.html?type=solutions&id=${encodeURIComponent(item.id)}`);
-  const urls = [...routes].sort().map(route => `  <url><loc>${escapeHtml(`${siteUrl}${route}`)}</loc></url>`);
+  const metadata = {
+    '/': { changefreq: 'weekly', priority: '1.0' },
+    '/templates.html': { changefreq: 'weekly', priority: '0.8' },
+    '/products.html': { changefreq: 'weekly', priority: '0.8' }
+  };
+  const urls = [...routes].sort().map(route => {
+    const details = metadata[route];
+    const tags = details
+      ? `<changefreq>${details.changefreq}</changefreq><priority>${details.priority}</priority>`
+      : '';
+    return `  <url><loc>${escapeHtml(`${siteUrl}${route}`)}</loc>${tags}</url>`;
+  });
   fs.writeFileSync(path.join(root, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>\n`);
 }
 
