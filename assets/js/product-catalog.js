@@ -4,7 +4,8 @@
   const productGrid = document.querySelector('#productGrid');
   const count = document.querySelector('#productCategoryCount');
   const description = document.querySelector('#productCategoryDescription');
-  if (!catalog || !tabList || !productGrid) return;
+  const allCategories = document.querySelector('#allProductCategories');
+  if (!catalog || ((!tabList || !productGrid) && !allCategories)) return;
 
   const categories = catalog.zh.categories;
   const params = new URLSearchParams(location.search);
@@ -138,12 +139,36 @@
     const locale = catalog[language];
     const category = locale.categories.find(item => item.id === activeCategory);
     if (!category) return;
+    const visibleItems = category.items.length >= 3 && category.items.length % 3 !== 0
+      ? category.items.slice(0, Math.floor(category.items.length / 3) * 3)
+      : category.items;
     tabList.setAttribute('aria-label', window.t('archive_tabs_label'));
     productGrid.setAttribute('aria-labelledby', `product-tab-${activeCategory}`);
     description.textContent = category.desc;
-    count.textContent = `${String(category.items.length).padStart(2, '0')} ${window.t('archive_count_suffix')}`;
+    count.textContent = `${String(visibleItems.length).padStart(2, '0')} ${window.t('archive_count_suffix')}`;
     renderTabs(locale);
-    productGrid.replaceChildren(...category.items.map((item, index) => makeCard(item, index, category.items.length)));
+    productGrid.replaceChildren(...visibleItems.map((item, index) => makeCard(item, index, visibleItems.length)));
+  }
+
+  function renderAll(locale) {
+    allCategories.replaceChildren(...locale.categories.map(category => {
+      activeCategory = category.id;
+      const section = document.createElement('section');
+      section.className = 'all-products-category';
+      const header = document.createElement('div');
+      header.className = 'all-products-category-heading';
+      const title = document.createElement('h2');
+      title.textContent = category.title;
+      const description = document.createElement('p');
+      description.textContent = category.desc;
+      header.append(title, description);
+      const grid = document.createElement('div');
+      grid.className = 'product-archive-grid';
+      grid.setAttribute('aria-label', category.title);
+      grid.append(...category.items.map((item, index) => makeCard(item, index, category.items.length)));
+      section.append(header, grid);
+      return section;
+    }));
   }
 
   function selectCategory(categoryId, focusTab = false) {
@@ -155,7 +180,8 @@
 
   window.renderProductCatalog = lang => {
     language = lang === 'en' ? 'en' : 'zh';
-    render();
+    if (allCategories) renderAll(catalog[language]);
+    else render();
   };
   window.renderProductCatalog(language);
 })();
