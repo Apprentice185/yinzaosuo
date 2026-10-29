@@ -1,0 +1,7 @@
+{
+  "name": "yinzaosuo-static-site",
+  "private": true,
+  "scripts": {
+    "cms": "npx decap-server"
+  }
+}

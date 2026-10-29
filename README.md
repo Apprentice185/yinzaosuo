@@ -120,7 +120,8 @@
 ## Decap CMS（初始配置）
 
 - 新的可视化后台入口为 `/admin/`，配置文件为 `admin/config.yml`。产品与材质记录会保存为 `content/products/*.json`，知识与案例会保存为 `content/knowledge/*.md`，上传图片进入 `assets/images/products/`。
-- GitHub backend 需要先配置可用的 GitHub OAuth 认证服务；仅添加 `backend: github` 配置并不能完成登录。Decap CMS 官方 GitHub backend 文档说明该认证依赖服务端，启用前需配置 OAuth provider/auth service。
+- 配置已启用 `local_backend: true`。本地开发时，先在一个终端运行 `npm run cms` 启动 Decap 本地代理（默认监听 `localhost:8081`），再在另一个终端从仓库根目录运行 `python -m http.server 8000`，并打开 `http://localhost:8000/admin/`。CMS 会通过本地代理直接写入当前工作区文件，无需 GitHub 登录；首次运行 `npx` 可能需要联网下载 `decap-server`。
+- 本地代理只用于开发，不会部署到 GitHub Pages。在线 GitHub backend 仍需要配置可用的 GitHub OAuth 认证服务；仅添加 `backend: github` 配置并不能完成在线登录。
 - 当前网站前端仍从 `site-data.js`、`assets/js/products-data.js` 读取内容，`sitemap.xml` 也仍需手动维护。因此，这份 CMS 配置目前只是编辑入口与内容格式的初始规划；新建的 JSON/Markdown 尚不会自动显示在公开页面，也不会自动更新 sitemap。要实现发布闭环，还需将前端改为读取这些文件，并增加 sitemap 自动生成/校验流程。
 
 ### 发布后台修改
