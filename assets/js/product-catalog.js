@@ -1,5 +1,5 @@
 (function () {
-  const catalog = window.PRODUCTS_DATA;
+  const catalog = window.CMS_CONTENT?.catalog || window.PRODUCTS_DATA;
   const tabList = document.querySelector('#productCategoryTabs');
   const productGrid = document.querySelector('#productGrid');
   const count = document.querySelector('#productCategoryCount');

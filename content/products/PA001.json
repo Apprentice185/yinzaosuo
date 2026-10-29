@@ -1,0 +1,42 @@
+{
+  "id": "PA001",
+  "title": "名片 / 特种卡片",
+  "title_en": "Business Cards / Specialty Cards",
+  "category": "commercial",
+  "image": "",
+  "desc": "涵盖常规铜版纸、进口特种纸及超重磅工艺黑白卡",
+  "desc_en": "Standard coated stocks, premium imported textured papers, and ultra-heavy cardstocks.",
+  "materials": [
+    "常规: 300g铜版纸(哑膜/光膜)、白卡、莱尼卡、蛋壳纹、典雅纹、刚古水纹、针孔纸、竹丝纹、环保纸",
+    "精品(355g/710g): 白滑影(冰白)、德国经典麻纱纹(超白/米黄)、瑞典环保白卡、英国尼桑蛋壳纹、哥蒙德针孔超白、白唯美",
+    "高端工艺: 荷兰白卡480g、爵士金属白金500g、采石白色600g、黑卡500g",
+    "PVC卡: 磨砂、亮光、哑光、单砂透明"
+  ],
+  "materials_en": [
+    "Standard: 300g Coated Art Paper (Matte/Gloss), White Card, Laid, Eggshell, Classic Felt, Gmund, Needlepoint, Bamboo Fiber, Recycled Paper",
+    "Premium (355g/710g): Ice White, Classic Linen Ultra White/Chiffon, Swedish White, British Eggshell, Gmund Needlepoint 710g, Elegant White 710g",
+    "Bespoke Heavyweight: Dutch White 480g, Metallic White Gold 500g, Quarry White 600g, Heavy Black Card 500g",
+    "PVC Cards: Frosted, Glossy, Matte, Semi-Translucent Single-Frosted"
+  ],
+  "crafts": [
+    "烫金/烫银",
+    "击凸",
+    "局部UV",
+    "模切异形",
+    "圆角"
+  ],
+  "crafts_en": [
+    "Foil Stamping (Gold/Silver)",
+    "Embossing/Debossing",
+    "Spot UV",
+    "Die-Cut",
+    "Rounded Corners"
+  ],
+  "sort_order": 101,
+  "show_in_archive": true,
+  "category_title": "商务印制类",
+  "category_title_en": "Commercial Print",
+  "category_desc": "品牌视觉落地与商务事务物料，提供标准及特种工艺解决方案",
+  "category_desc_en": "Brand identity assets & enterprise print collaterals with bespoke finishes.",
+  "category_num": "01"
+}

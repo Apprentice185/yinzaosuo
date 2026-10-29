@@ -2,6 +2,7 @@
   "name": "yinzaosuo-static-site",
   "private": true,
   "scripts": {
-    "cms": "npx decap-server"
+    "cms": "npx decap-server",
+    "content:build": "node scripts/generate-content.js"
   }
 }

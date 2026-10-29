@@ -1,0 +1,38 @@
+{
+  "id": "PA010",
+  "title": "灯箱与水晶标识",
+  "title_en": "Fabric Lightboxes & Acrylic Badges",
+  "category": "exhibition",
+  "image": "",
+  "desc": "高端室内外导视、品牌台牌与空间发光装置",
+  "desc_en": "Frameless SEG fabric lightboxes and precision laser-engraved plaques.",
+  "materials": [
+    "卡布灯箱: 室内/户外超薄卡布(银色/黑色框, 6cm/8cm/10cm厚度)",
+    "水晶雕刻: 透明亚克力、透明亚克力+3mm面板、透明亚克力+双色板",
+    "金属牌: 拉丝银、镜面板、拉丝钛金、镜面钛金 (0.4×0.6m / 0.3×1.8m / 0.3×0.4m)",
+    "水晶标 / 超粘水晶标 / 文化墙 (白色雪弗板+亚克力面板)"
+  ],
+  "materials_en": [
+    "SEG Fabric Lightboxes: Indoor/Outdoor Slim Profile (Silver/Black Aluminum, 6cm/8cm/10cm)",
+    "Engraved Acrylic: Cast Clear Acrylic, Two-Color Plastic Sheet Laminate",
+    "Metal Plaques: Brushed/Mirror Titanium Gold, Brushed/Mirror Silver (0.4x0.6m / 0.3x1.8m / 0.3x0.4m)",
+    "UV Crystal Badges / Architectural Wall Feature Panels"
+  ],
+  "crafts": [
+    "激光精密雕刻",
+    "UV微浮雕直喷",
+    "金属边缘倒角"
+  ],
+  "crafts_en": [
+    "Laser Precision Cutting",
+    "UV Micro-Relief Print",
+    "Beveled Edge Polishing"
+  ],
+  "sort_order": 303,
+  "show_in_archive": true,
+  "category_title": "广告加工制作类",
+  "category_title_en": "Exhibition & Signage",
+  "category_desc": "商业美陈、展示道具、标识标牌与立体发光字全案制作",
+  "category_desc_en": "Event retail displays, CNC boards, luminous architectural lettering, and signage systems.",
+  "category_num": "03"
+}

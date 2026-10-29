@@ -1,0 +1,42 @@
+{
+  "id": "PA003",
+  "title": "画册 / 精装样本",
+  "title_en": "Brochures & Hardcover Books",
+  "category": "commercial",
+  "image": "",
+  "desc": "从平装手册到高端品牌艺术画册",
+  "desc_en": "From saddle-stitched manuals to archival collector-grade monographs.",
+  "materials": [
+    "封面: 特种纸 / 300g铜版 / 硬壳装帧布",
+    "内页: 157g/200g 哑粉纸 / 双胶纸"
+  ],
+  "materials_en": [
+    "Covers: Specialty Paper / 300g Coated / Linen Hardcover",
+    "Inner: 157g/200g Matte Art Paper / Woodfree"
+  ],
+  "crafts": [
+    "骑马钉",
+    "无线胶订",
+    "锁线胶订",
+    "裸背锁线装",
+    "硬壳精装",
+    "圈装",
+    "缝纫订"
+  ],
+  "crafts_en": [
+    "Saddle Stitch",
+    "Perfect Binding",
+    "Section Sewn",
+    "Exposed Spine Sewn",
+    "Hardcover Case Bound",
+    "Wire-O",
+    "Thread Stitch"
+  ],
+  "sort_order": 103,
+  "show_in_archive": true,
+  "category_title": "商务印制类",
+  "category_title_en": "Commercial Print",
+  "category_desc": "品牌视觉落地与商务事务物料，提供标准及特种工艺解决方案",
+  "category_desc_en": "Brand identity assets & enterprise print collaterals with bespoke finishes.",
+  "category_num": "01"
+}

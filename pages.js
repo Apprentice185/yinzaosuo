@@ -1,5 +1,18 @@
 const storedData = JSON.parse(localStorage.getItem('printData') || 'null');
-const data = storedData ? { ...printData, ...storedData, products: storedData.products || printData.products } : printData;
+const storedSiteData = storedData ? { ...printData, ...storedData, products: storedData.products || printData.products } : printData;
+const managedContent = window.CMS_CONTENT || {};
+const managedNews = (managedContent.news || []).map(item => ({
+  ...item,
+  category: item.tag || item.category,
+  excerpt: item.summary || item.excerpt
+}));
+const data = {
+  ...storedSiteData,
+  knowledge: Array.isArray(managedContent.knowledge) ? managedContent.knowledge : storedSiteData.knowledge,
+  articles: Array.isArray(managedContent.news) ? managedNews : storedSiteData.articles,
+  templates: Array.isArray(managedContent.templates) ? managedContent.templates : storedSiteData.templates,
+  solutions: managedContent.solutions || []
+};
 const pageDataVersion = localStorage.getItem('printDataVersion') || '';
 const language = () => localStorage.getItem('site_lang') || 'zh';
 const text = (type, item, field) => window.contentText(type, item.id, field, item[field] || '');
@@ -28,6 +41,16 @@ function renderContent(type) {
   target.innerHTML = items.map((item, index) => {
     const category = text(type, item, 'category');
     return `<article class="long-card"><div class="long-card-visual visual-${index % 4}" ${item.cover ? `style="background-image:url('${item.cover}')"` : ''}>${item.cover ? '' : `<span>${category}</span>`}</div><div class="article-meta">${category} · ${item.date || window.t('date_source')}</div><h2>${text(type, item, 'title')}</h2><p>${text(type, item, 'excerpt')}</p><a class="text-link" href="${articleUrl(type, item.id)}">${window.t('read_article')} <span>↗</span></a></article>`;
+  }).join('');
+}
+
+function renderSolutions() {
+  const target = document.querySelector('#solutionsGrid');
+  if (!target) return;
+  target.innerHTML = data.solutions.map((item, index) => {
+    const category = window.contentText('solutions', item.id, 'category', item.tag || '');
+    const summary = window.contentText('solutions', item.id, 'excerpt', item.summary || '');
+    return `<article class="long-card"><div class="long-card-visual visual-${index % 4}" ${item.cover ? `style="background-image:url('${item.cover}')"` : ''}>${item.cover ? '' : `<span>${category}</span>`}</div><div class="article-meta">${category} · ${item.date || window.t('date_source')}</div><h2>${window.contentText('solutions', item.id, 'title', item.title)}</h2><p>${summary}</p><a class="text-link" href="${articleUrl('solutions', item.id)}">${window.t('read_article')} <span>↗</span></a></article>`;
   }).join('');
 }
 
@@ -118,7 +141,23 @@ function openTemplate(id) {
   document.querySelector('#detailMeta').textContent = language() === 'en'
     ? `${item.id} · ${category} · ${window.t('template_style')}: ${style} · ${templateSize(item)}`
     : `${item.id}　·　${item.category}　·　风格：${item.style}　·　${item.size}`;
-  document.querySelector('#detailTags').innerHTML = tags.map(tag => `<span>${tag}</span>`).join('');
+  const detailTags = document.querySelector('#detailTags');
+  detailTags.replaceChildren();
+  tags.forEach(tag => {
+    const element = document.createElement('span');
+    element.textContent = tag;
+    detailTags.append(element);
+  });
+  if (item.file_url) {
+    const wrapper = document.createElement('span');
+    const link = document.createElement('a');
+    link.href = item.file_url;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.textContent = window.t('template_download');
+    wrapper.append(link);
+    detailTags.append(wrapper);
+  }
   document.querySelector('#detailPrice').textContent = `${window.t('template_price_label')}: ${templatePrice(item)}`;
   document.querySelector('#templateModal').classList.add('open');
   document.querySelectorAll('.gallery-dot').forEach((dot, index) => {
@@ -147,7 +186,10 @@ function openTemplate(id) {
 function renderArticle() {
   if (!document.querySelector('#articlePage')) return;
   const params = new URLSearchParams(location.search);
-  const type = params.get('type') === 'articles' ? 'articles' : 'knowledge';
+  const requestedType = params.get('type');
+  const type = requestedType === 'articles' || requestedType === 'news'
+    ? 'articles'
+    : requestedType === 'solutions' ? 'solutions' : 'knowledge';
   const item = data[type].find(entry => entry.id === params.get('id')) || data[type][0];
   if (!item) return;
   const title = text(type, item, 'title');
@@ -175,6 +217,7 @@ function renderAll() {
   renderContent('knowledge');
   renderContentFilters('articles');
   renderContent('articles');
+  renderSolutions();
   renderTemplateFilters();
   renderTemplates();
   if (activeTemplateId && document.querySelector('#templateModal')?.classList.contains('open')) openTemplate(activeTemplateId);

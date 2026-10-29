@@ -1,0 +1,62 @@
+{
+  "id": "P002",
+  "category": "commercial",
+  "name": "A5 宣传单张",
+  "desc": "让产品跃然于纸上",
+  "intro": "适合门店推广、活动宣传和产品介绍的高性价比单页印刷。",
+  "price": "¥89 起",
+  "tag": "推荐",
+  "thumb": "",
+  "sceneImage": "",
+  "options": [
+    {
+      "name": "尺寸",
+      "values": [
+        "A5",
+        "A4",
+        "A6",
+        "自定义尺寸"
+      ]
+    },
+    {
+      "name": "数量",
+      "values": [
+        "100 张",
+        "500 张",
+        "1000 张"
+      ]
+    },
+    {
+      "name": "纸张",
+      "values": [
+        "128g 铜版纸",
+        "157g 铜版纸",
+        "200g 铜版纸"
+      ]
+    },
+    {
+      "name": "印刷",
+      "values": [
+        "单面彩印",
+        "双面彩印"
+      ]
+    }
+  ],
+  "slug": "p002",
+  "seoTitle": "A5 宣传单张????",
+  "seoDescription": "适合门店推广、活动宣传和产品介绍的高性价比单页印刷。",
+  "title": "A5 宣传单张",
+  "title_en": "A5 Promotional Flyer",
+  "image": "",
+  "desc_en": "A compact flyer for promotions, events, and everyday brand communication.",
+  "materials": [],
+  "materials_en": [],
+  "crafts": [],
+  "crafts_en": [],
+  "sort_order": 1002,
+  "show_in_archive": false,
+  "category_legacy_en": "Promotional Print",
+  "intro_en": "A compact flyer for promotions, events, and everyday brand communication.",
+  "category_legacy": "宣传印品",
+  "name_en": "A5 Promotional Flyer"
+}

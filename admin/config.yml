@@ -15,43 +15,146 @@ logo_url: "https://yinzaosuo.com/assets/images/logo.svg"
 
 collections:
   - name: "products"
-    label: "产品与材质"
+    label: "产品中心"
     folder: "content/products"
     create: true
     format: "json"
     extension: "json"
+    identifier_field: "id"
+    slug: "{{id}}"
     fields:
-      - { label: "ID", name: "id", widget: "string" }
+      - { label: "商品编号(ID)", name: "id", widget: "string" }
       - { label: "中文品名", name: "title", widget: "string" }
       - { label: "英文品名", name: "title_en", widget: "string" }
-      - label: "产品分类"
+      - { label: "兼容名称", name: "name", widget: "string", required: false }
+      - { label: "兼容英文名称", name: "name_en", widget: "string", required: false }
+      - label: "分类"
         name: "category"
         widget: "select"
-        options:
-          - { label: "商务印制", value: "commercial" }
-          - { label: "包装定制", value: "packaging" }
-          - { label: "广告加工", value: "exhibition" }
-      - { label: "产品图片", name: "image", widget: "image" }
+        options: ["commercial", "packaging", "exhibition"]
+      - { label: "实物图", name: "image", widget: "image", required: false }
       - { label: "中文简介", name: "desc", widget: "text" }
       - { label: "英文简介", name: "desc_en", widget: "text" }
-      - label: "材质"
-        name: "materials"
-        widget: "list"
-      - label: "工艺标签"
-        name: "crafts"
-        widget: "list"
-      - { label: "日期", name: "date", widget: "datetime", date_format: "YYYY-MM-DD", time_format: false }
+      - { label: "可选材质", name: "materials", widget: "list" }
+      - { label: "英文材质", name: "materials_en", widget: "list", required: false }
+      - { label: "可选工艺", name: "crafts", widget: "list" }
+      - { label: "英文工艺", name: "crafts_en", widget: "list", required: false }
+      - { label: "排序权重", name: "sort_order", widget: "number", default: 10, value_type: "int" }
+      - { label: "显示在首页档案库", name: "show_in_archive", widget: "boolean", default: true }
+      - { label: "分类中文名称", name: "category_title", widget: "string", required: false }
+      - { label: "分类英文名称", name: "category_title_en", widget: "string", required: false }
+      - { label: "分类中文说明", name: "category_desc", widget: "text", required: false }
+      - { label: "分类英文说明", name: "category_desc_en", widget: "text", required: false }
+      - { label: "分类序号", name: "category_num", widget: "string", required: false }
+      - { label: "详情页简介", name: "intro", widget: "text", required: false }
+      - { label: "英文详情页简介", name: "intro_en", widget: "text", required: false }
+      - { label: "参考价格", name: "price", widget: "string", required: false }
+      - { label: "场景图", name: "sceneImage", widget: "image", required: false }
+      - { label: "详情选项", name: "options", widget: "list", required: false, fields: [{ label: "选项名称", name: "name", widget: "string" }, { label: "选项值", name: "values", widget: "list" }] }
+      - { label: "原分类名称", name: "category_legacy", widget: "string", required: false }
+      - { label: "原英文分类名称", name: "category_legacy_en", widget: "string", required: false }
+      - { label: "原产品标签", name: "tag", widget: "string", required: false }
+      - { label: "详情页缩略图", name: "thumb", widget: "image", required: false }
+      - { label: "产品链接", name: "slug", widget: "string", required: false }
+      - { label: "SEO 标题", name: "seoTitle", widget: "string", required: false }
+      - { label: "SEO 描述", name: "seoDescription", widget: "text", required: false }
+      - { label: "发布日期", name: "date", widget: "datetime", date_format: "YYYY-MM-DD", time_format: false, required: false }
+
+  - name: "solutions"
+    label: "场景方案"
+    folder: "content/solutions"
+    create: true
+    format: "yaml-frontmatter"
+    extension: "md"
+    identifier_field: "slug"
+    slug: "{{slug}}"
+    fields:
+      - { label: "内容编号(ID)", name: "id", widget: "string" }
+      - { label: "内容路径", name: "slug", widget: "string" }
+      - { label: "方案标题", name: "title", widget: "string" }
+      - { label: "英文标题", name: "title_en", widget: "string" }
+      - { label: "场景标签", name: "tag", widget: "string" }
+      - { label: "英文场景标签", name: "tag_en", widget: "string", required: false }
+      - { label: "封面图", name: "cover_image", widget: "image" }
+      - { label: "方案简述", name: "summary", widget: "text" }
+      - { label: "英文方案简述", name: "summary_en", widget: "text", required: false }
+      - { label: "发布日期", name: "date", widget: "datetime", date_format: "YYYY-MM-DD", time_format: false }
+      - { label: "实景图集", name: "gallery", widget: "list", required: false, fields: [{ label: "图片", name: "image", widget: "image" }] }
+      - { label: "方案详细内容", name: "body", widget: "markdown" }
+      - { label: "英文详细内容", name: "body_en", widget: "markdown", required: false }
 
   - name: "knowledge"
-    label: "印刷知识与案例"
+    label: "印刷知识"
     folder: "content/knowledge"
     create: true
     format: "yaml-frontmatter"
     extension: "md"
+    identifier_field: "slug"
+    slug: "{{slug}}"
     fields:
-      - { label: "中文标题", name: "title", widget: "string" }
+      - { label: "内容编号(ID)", name: "id", widget: "string" }
+      - { label: "内容路径", name: "slug", widget: "string" }
+      - { label: "文章标题", name: "title", widget: "string" }
+      - { label: "英文标题", name: "title_en", widget: "string" }
+      - { label: "知识分类", name: "category", widget: "select", options: ["材质科普", "工艺解析", "避坑指南"] }
+      - { label: "英文分类", name: "category_en", widget: "string", required: false }
+      - { label: "旧分类记录", name: "legacy_category", widget: "string", required: false }
+      - { label: "发布日期", name: "date", widget: "datetime", date_format: "YYYY-MM-DD", time_format: false }
+      - { label: "封面图", name: "cover", widget: "image", required: false }
+      - { label: "SEO 摘要", name: "summary", widget: "text" }
+      - { label: "英文 SEO 摘要", name: "summary_en", widget: "text", required: false }
+      - { label: "正文内容", name: "body", widget: "markdown" }
+      - { label: "英文正文", name: "body_en", widget: "markdown", required: false }
+
+  - name: "news"
+    label: "品牌资讯"
+    folder: "content/news"
+    create: true
+    format: "yaml-frontmatter"
+    extension: "md"
+    identifier_field: "slug"
+    slug: "{{slug}}"
+    fields:
+      - { label: "内容编号(ID)", name: "id", widget: "string" }
+      - { label: "内容路径", name: "slug", widget: "string" }
+      - { label: "资讯标题", name: "title", widget: "string" }
       - { label: "英文标题", name: "title_en", widget: "string" }
       - { label: "发布日期", name: "date", widget: "datetime", date_format: "YYYY-MM-DD", time_format: false }
-      - { label: "封面图", name: "thumbnail", widget: "image" }
-      - { label: "SEO 摘要", name: "description", widget: "text" }
-      - { label: "正文", name: "body", widget: "markdown" }
+      - { label: "封面图", name: "cover", widget: "image", required: false }
+      - { label: "标签", name: "tag", widget: "string" }
+      - { label: "英文标签", name: "tag_en", widget: "string", required: false }
+      - { label: "资讯摘要", name: "summary", widget: "text", required: false }
+      - { label: "英文摘要", name: "summary_en", widget: "text", required: false }
+      - { label: "排序权重", name: "sort_order", widget: "number", default: 10, value_type: "int", required: false }
+      - { label: "资讯正文", name: "body", widget: "markdown" }
+      - { label: "英文正文", name: "body_en", widget: "markdown", required: false }
+
+  - name: "templates"
+    label: "模板素材"
+    folder: "content/templates"
+    create: true
+    format: "json"
+    extension: "json"
+    identifier_field: "id"
+    slug: "{{id}}"
+    fields:
+      - { label: "素材编号(ID)", name: "id", widget: "string" }
+      - { label: "素材标题", name: "title", widget: "string" }
+      - { label: "英文标题", name: "title_en", widget: "string" }
+      - { label: "模板类型", name: "type", widget: "select", options: ["包装盒展开图", "展架刀模", "迎宾牌工程", "VI规范"] }
+      - { label: "预览图", name: "thumb", widget: "image", required: false }
+      - { label: "尺寸规范", name: "size_spec", widget: "string", required: false }
+      - { label: "源文件/下载链接", name: "file_url", widget: "string", required: false }
+      - { label: "英文模板类型", name: "type_en", widget: "string", required: false }
+      - { label: "描述", name: "description", widget: "text", required: false }
+      - { label: "发布日期", name: "date", widget: "datetime", date_format: "YYYY-MM-DD", time_format: false, required: false }
+      - { label: "原品类", name: "category", widget: "string", required: false }
+      - { label: "原风格", name: "style", widget: "string", required: false }
+      - { label: "尺寸", name: "size", widget: "string", required: false }
+      - { label: "价格参考", name: "price", widget: "string", required: false }
+      - { label: "标签", name: "tags", widget: "list", required: false }
+      - { label: "色调", name: "tone", widget: "string", required: false }
+      - { label: "颜色", name: "color", widget: "string", required: false }
+      - { label: "设计图", name: "designImage", widget: "image", required: false }
+      - { label: "尺寸图", name: "sizeImage", widget: "image", required: false }
+      - { label: "场景图", name: "sceneImage", widget: "image", required: false }

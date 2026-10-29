@@ -23,11 +23,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
       - name: Configure Pages
         uses: actions/configure-pages@v5
+      - name: Build CMS content and sitemap
+        run: npm run content:build
       - name: Verify published site files
         run: |
           test -f index.html
+          test -f assets/js/content-index.js
+          test -f sitemap.xml
           test "$(tr -d '\r\n' < CNAME)" = "yinzaosuo.com"
       - name: Upload site
         uses: actions/upload-pages-artifact@v3

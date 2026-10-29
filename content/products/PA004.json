@@ -1,0 +1,38 @@
+{
+  "id": "PA004",
+  "title": "宣传单页 / 折页",
+  "title_en": "Flyers & Folded Leaflets",
+  "category": "commercial",
+  "image": "",
+  "desc": "全克重宣传品高效批量印制",
+  "desc_en": "High-precision commercial flyers with diverse folding architectures.",
+  "materials": [
+    "铜版纸: 157g / 200g / 250g / 300g",
+    "双胶纸: 80g / 100g / 120g"
+  ],
+  "materials_en": [
+    "Coated Paper: 157g / 200g / 250g / 300g",
+    "Uncoated: 80g / 100g / 120g"
+  ],
+  "crafts": [
+    "对折页",
+    "三折页",
+    "风琴折",
+    "三折页-荷包折",
+    "自定模切"
+  ],
+  "crafts_en": [
+    "Half Fold",
+    "Tri-Fold",
+    "Z-Fold (Accordion)",
+    "Gate Fold",
+    "Custom Die-Cut"
+  ],
+  "sort_order": 104,
+  "show_in_archive": true,
+  "category_title": "商务印制类",
+  "category_title_en": "Commercial Print",
+  "category_desc": "品牌视觉落地与商务事务物料，提供标准及特种工艺解决方案",
+  "category_desc_en": "Brand identity assets & enterprise print collaterals with bespoke finishes.",
+  "category_num": "01"
+}

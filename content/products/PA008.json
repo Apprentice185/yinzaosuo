@@ -1,0 +1,35 @@
+{
+  "id": "PA008",
+  "title": "KT板 / 雪弗板展板",
+  "title_en": "KT & Foamex Rigid Display Panels",
+  "category": "exhibition",
+  "image": "",
+  "desc": "商业迎宾牌、活动展板及美陈立牌",
+  "desc_en": "Welcome boards, event backdrops, and freestanding retail cutouts.",
+  "materials": [
+    "高密抗起泡KT板、PVC微发泡雪弗板 (3mm / 5mm / 8mm / 10mm)"
+  ],
+  "materials_en": [
+    "Anti-Bubble High-Density KT Board, Closed-Cell PVC Foam Board (3mm / 5mm / 8mm / 10mm)"
+  ],
+  "crafts": [
+    "KT板裱写真(亮膜/哑膜)",
+    "雪弗板裱写真",
+    "高精度板材UV直喷",
+    "CNC异形裁切",
+    "配套注水伸缩支架"
+  ],
+  "crafts_en": [
+    "Vinyl Mounted (Matte/Gloss)",
+    "Direct UV Flatbed Print",
+    "CNC Contour Cut",
+    "Water-Weighted Adjustable Base Support"
+  ],
+  "sort_order": 301,
+  "show_in_archive": true,
+  "category_title": "广告加工制作类",
+  "category_title_en": "Exhibition & Signage",
+  "category_desc": "商业美陈、展示道具、标识标牌与立体发光字全案制作",
+  "category_desc_en": "Event retail displays, CNC boards, luminous architectural lettering, and signage systems.",
+  "category_num": "03"
+}

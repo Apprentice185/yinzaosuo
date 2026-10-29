@@ -1,0 +1,63 @@
+{
+  "id": "P006",
+  "category": "commercial",
+  "name": "餐饮菜单印刷",
+  "desc": "好看、耐用、易清洁",
+  "intro": "为餐厅、咖啡店、酒吧提供菜单、桌卡和外卖物料的一站式制作。",
+  "price": "¥149 起",
+  "tag": "",
+  "thumb": "",
+  "sceneImage": "",
+  "options": [
+    {
+      "name": "尺寸",
+      "values": [
+        "A4",
+        "A5",
+        "210 × 210mm",
+        "自定义尺寸"
+      ]
+    },
+    {
+      "name": "数量",
+      "values": [
+        "10 本",
+        "50 本",
+        "100 本"
+      ]
+    },
+    {
+      "name": "材料",
+      "values": [
+        "哑粉纸",
+        "艺术纸",
+        "PP 防水纸"
+      ]
+    },
+    {
+      "name": "装订",
+      "values": [
+        "骑马钉",
+        "胶装",
+        "线圈"
+      ]
+    }
+  ],
+  "slug": "p006",
+  "seoTitle": "餐饮菜单印刷????",
+  "seoDescription": "为餐厅、咖啡店、酒吧提供菜单、桌卡和外卖物料的一站式制作。",
+  "title": "餐饮菜单印刷",
+  "title_en": "Restaurant Menu Printing",
+  "image": "",
+  "desc_en": "Printed menus tailored to your format, stock, and finishing requirements.",
+  "materials": [],
+  "materials_en": [],
+  "crafts": [],
+  "crafts_en": [],
+  "sort_order": 1006,
+  "show_in_archive": false,
+  "category_legacy_en": "Restaurant Print",
+  "intro_en": "Printed menus tailored to your format, stock, and finishing requirements.",
+  "category_legacy": "餐饮物料",
+  "name_en": "Restaurant Menu Printing"
+}

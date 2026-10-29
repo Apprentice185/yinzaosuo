@@ -1,0 +1,34 @@
+{
+  "id": "PA005",
+  "title": "商务办公与活动周边",
+  "title_en": "Corporate Merchandise & Bags",
+  "category": "commercial",
+  "image": "",
+  "desc": "手提袋、环保袋、广告扇等品牌衍生品",
+  "desc_en": "Custom tote bags, PP fans, and promotional brand touchpoints.",
+  "materials": [
+    "手提袋: 白卡/牛皮纸手提袋、丝印机制一体袋、无纺布袋、帆布袋",
+    "广告扇: 团扇、短铆钉PP扇、长铆钉PP扇、筷子柄PP扇、无手柄PP扇"
+  ],
+  "materials_en": [
+    "Totes: Kraft / White Cardboard Paper Bags, Non-Woven, Canvas",
+    "Fans: PP Round Fans, Riveted Plastic Fans, Handheld Fans"
+  ],
+  "crafts": [
+    "环保丝网印",
+    "彩色UV印",
+    "提手加固"
+  ],
+  "crafts_en": [
+    "Silkscreen Printing",
+    "Full-Color UV",
+    "Reinforced Handles"
+  ],
+  "sort_order": 105,
+  "show_in_archive": true,
+  "category_title": "商务印制类",
+  "category_title_en": "Commercial Print",
+  "category_desc": "品牌视觉落地与商务事务物料，提供标准及特种工艺解决方案",
+  "category_desc_en": "Brand identity assets & enterprise print collaterals with bespoke finishes.",
+  "category_num": "01"
+}

@@ -1,0 +1,63 @@
+{
+  "id": "P004",
+  "category": "commercial",
+  "name": "企业画册印刷",
+  "desc": "完整呈现品牌故事",
+  "intro": "从封面、内页到装订，为企业介绍、产品目录和品牌手册提供完整呈现。",
+  "price": "¥399 起",
+  "tag": "",
+  "thumb": "",
+  "sceneImage": "",
+  "options": [
+    {
+      "name": "尺寸",
+      "values": [
+        "A4 竖版",
+        "A5 竖版",
+        "210 × 210mm"
+      ]
+    },
+    {
+      "name": "页数",
+      "values": [
+        "16P",
+        "24P",
+        "32P",
+        "48P"
+      ]
+    },
+    {
+      "name": "内页纸张",
+      "values": [
+        "157g 哑粉纸",
+        "200g 铜版纸",
+        "艺术纸"
+      ]
+    },
+    {
+      "name": "装订",
+      "values": [
+        "骑马钉",
+        "胶装",
+        "锁线胶装"
+      ]
+    }
+  ],
+  "slug": "p004",
+  "seoTitle": "企业画册印刷????",
+  "seoDescription": "从封面、内页到装订，为企业介绍、产品目录和品牌手册提供完整呈现。",
+  "title": "企业画册印刷",
+  "title_en": "Corporate Brochure Printing",
+  "image": "",
+  "desc_en": "Custom company brochures with flexible paper and binding options.",
+  "materials": [],
+  "materials_en": [],
+  "crafts": [],
+  "crafts_en": [],
+  "sort_order": 1004,
+  "show_in_archive": false,
+  "category_legacy_en": "Books & Brochures",
+  "intro_en": "Custom company brochures with flexible paper and binding options.",
+  "category_legacy": "画册书刊",
+  "name_en": "Corporate Brochure Printing"
+}

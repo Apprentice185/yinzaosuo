@@ -1,7 +1,27 @@
 const storedSiteData = JSON.parse(localStorage.getItem('printData') || 'null');
-const siteData = storedSiteData
+const legacySiteData = storedSiteData
   ? { ...printData, ...storedSiteData, productCategories: storedSiteData.productCategories || printData.productCategories, products: storedSiteData.products || printData.products }
   : printData;
+const managedContent = window.CMS_CONTENT || {};
+const managedProducts = (managedContent.products || []).map(item => ({
+  ...item,
+  name: item.title,
+  category: item.category_legacy || item.category_title || item.category,
+  intro: item.intro || item.desc,
+  thumb: item.thumb || item.image,
+  options: Array.isArray(item.options) ? item.options : []
+}));
+const managedNews = (managedContent.news || []).map(item => ({
+  ...item,
+  category: item.tag || item.category,
+  excerpt: item.summary || item.excerpt
+}));
+const siteData = {
+  ...legacySiteData,
+  products: Array.isArray(managedContent.products) ? managedProducts : legacySiteData.products,
+  knowledge: Array.isArray(managedContent.knowledge) ? managedContent.knowledge : legacySiteData.knowledge,
+  articles: Array.isArray(managedContent.news) ? managedNews : legacySiteData.articles
+};
 const pageDataVersion = localStorage.getItem('printDataVersion') || '';
 const products = siteData.products || [];
 const language = () => localStorage.getItem('site_lang') || 'zh';

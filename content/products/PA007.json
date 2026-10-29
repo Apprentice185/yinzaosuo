@@ -1,0 +1,40 @@
+{
+  "id": "PA007",
+  "title": "精品箱盒 (Rigid & Corrugated)",
+  "title_en": "Rigid & Corrugated Master Boxes",
+  "category": "packaging",
+  "image": "",
+  "desc": "高承重抗压、礼品外包装与运输包装方案",
+  "desc_en": "Crush-resistant transit mailers and luxury presentation rigid containers.",
+  "materials": [
+    "三层瓦楞(E瓦/B瓦)、五层高强瓦楞、精装灰板裱特种纸"
+  ],
+  "materials_en": [
+    "3-Ply Corrugated (E/B Flute), 5-Ply Heavy Duty, Wrapped Rigid Chipboard"
+  ],
+  "crafts": [
+    "自带手提盒",
+    "塑料提扣盒",
+    "双盖提绳盒",
+    "对插盖提绳盒",
+    "平口盒",
+    "锁底盒",
+    "飞机盒",
+    "天地盖礼盒"
+  ],
+  "crafts_en": [
+    "Integrated Handle Box",
+    "Plastic Handle Box",
+    "Rope Handle Box",
+    "Interlocking Lid",
+    "Mailer Box",
+    "Premium Rigid Case"
+  ],
+  "sort_order": 202,
+  "show_in_archive": true,
+  "category_title": "包装定制类",
+  "category_title_en": "Bespoke Packaging",
+  "category_desc": "精细盒型结构与高强度瓦楞防护包装一体化打样与批量量产",
+  "category_desc_en": "Structural cardboard folding cartons and heavy-duty corrugated shipping solutions.",
+  "category_num": "02"
+}

@@ -5,6 +5,7 @@ window.I18N = {
     brand_home: '印造所首页', lang_switch: '切换到英文', close: '关闭',
     meta_home_title: '印造所｜让每一次传播，都值得被看见', meta_home_description: '印造所 - 为中国大陆企业提供高品质、好选择、易下单的印刷广告服务。',
     meta_knowledge_title: '印刷知识库｜印造所', meta_knowledge_description: '了解印刷纸张、文件规范、色彩和装订工艺，掌握实用印刷知识。',
+    meta_solutions_title: '场景方案｜印造所', meta_solutions_description: '浏览印造所的场景方案，了解品牌印刷与物料如何服务活动、空间和业务需求。',
     meta_journal_title: '品牌资讯｜印造所', meta_journal_description: '阅读印造所品牌案例、材料上新与印刷行业观察。',
     meta_templates_title: '模板素材库｜印造所', meta_templates_description: '按场景和风格挑选印刷设计模板，查看尺寸、设计图和实景效果。',
     meta_product_title: '产品详情｜印造所', meta_product_description: '了解产品规格与印刷定制信息，提交项目咨询。',
@@ -57,6 +58,10 @@ window.I18N = {
     form_success: '咨询已收到，我们会尽快与您联系。', form_error: '提交失败，请检查网络后重试，或通过微信二维码和邮箱直接联系我们。',
     quote_direct: '也可以直接联系', quote_wechat: '微信扫码咨询', toast_received: '需求已收到，我们会尽快联系你。',
     quote_product_format: '我想了解：{product}', template_copy_message: '模板编号：{id}\n模板名称：{title}\n品类：{category}\n风格：{style}\n尺寸：{size}\n价格参考：{price}',
+    solutions_announcement: '<span>场景方案</span> 从实际需求出发，组合适合你的印刷与品牌物料',
+    solutions_eyebrow: '场景方案',
+    solutions_page_title: '让品牌表达，<em>落在真实场景里。</em>',
+    solutions_page_intro: '按活动、空间与业务需求浏览方案，了解材料、工艺与交付如何组合。',
     knowledge_announcement: '<span>印造所知识库</span> 把印刷专业知识，说成你听得懂的话',
     knowledge_page_title: '印刷知识库，<em>从基础到进阶。</em>', knowledge_page_intro: '选对纸张、做好文件、理解工艺，让每一次印刷都更接近你想要的效果。',
     journal_announcement: '<span>印造所品牌资讯</span> 新材料、新案例与印刷行业观察',
@@ -65,7 +70,7 @@ window.I18N = {
     template_page_title: '活动 KT 板，<em>先选风格再制作。</em>',
     template_page_intro: '按订婚、结婚、满月宴、寿宴、开学季等风格筛选模板。每个模板包含设计素材图、尺寸说明图和实景效果图。',
     template_filter_all: '全部风格', template_search: '搜索编号、风格或关键词', template_detail: '模板详情',
-    template_copy: '复制模板信息 <span>⧉</span>', template_copy_tip: '复制后可直接粘贴到微信，与印造所沟通制作。',
+    template_copy: '复制模板信息 <span>⧉</span>', template_download: '下载素材', template_copy_tip: '复制后可直接粘贴到微信，与印造所沟通制作。',
     template_copy_done: '模板关键信息已复制', article_announcement: '<span>印造所内容中心</span> 认真写每一篇文章，也认真做好每一件印品',
     article_back: '← 返回内容列表', article_cover_alt: '文章封面', article_aside_title: '印造所内容中心',
     article_aside_intro: '关于纸张、工艺、品牌物料和实际案例，我们持续更新。',
@@ -86,6 +91,7 @@ window.I18N = {
     brand_home: 'Print Atelier home', lang_switch: 'Switch to Chinese', close: 'Close',
     meta_home_title: 'Print Atelier | Make Every Message Worth Being Seen', meta_home_description: 'Print Atelier provides quality commercial printing and custom brand materials for businesses.',
     meta_knowledge_title: 'Print Knowledge | Print Atelier', meta_knowledge_description: 'Practical guidance on paper, file preparation, color, and print finishing.',
+    meta_solutions_title: 'Scenario Solutions | Print Atelier', meta_solutions_description: 'Explore how print and brand materials support events, spaces, and business needs.',
     meta_journal_title: 'Journal | Print Atelier', meta_journal_description: 'Read Print Atelier case studies, new materials, and print-industry observations.',
     meta_templates_title: 'Template Library | Print Atelier', meta_templates_description: 'Browse print templates by occasion and style, with artwork and production details.',
     meta_product_title: 'Product Details | Print Atelier', meta_product_description: 'Explore print specifications and request a custom project quote.',
@@ -146,6 +152,10 @@ window.I18N = {
     form_success: 'Thanks — your enquiry has been received. We will be in touch soon.',
     form_error: 'Could not send your enquiry. Check your connection and try again, or contact us by WeChat or email.',
     quote_direct: 'Or contact us directly', quote_wechat: 'Scan to contact us on WeChat', toast_received: 'Thanks — we will be in touch soon.',
+    solutions_announcement: '<span>Scenario Solutions</span> · Print and brand materials shaped around real needs',
+    solutions_eyebrow: 'SCENARIO SOLUTIONS',
+    solutions_page_title: 'Brand expression, <em>made for real-world settings.</em>',
+    solutions_page_intro: 'Browse ideas for events, spaces, and business needs, with materials, finishes, and production details.',
     knowledge_announcement: '<span>Print Atelier Knowledge</span> · Clear answers to practical print questions',
     knowledge_page_title: 'Print Knowledge, <em>from basics to advanced.</em>',
     knowledge_page_intro: 'Choose the right paper, prepare your files, and understand production so every print is closer to the result you expect.',
@@ -156,7 +166,7 @@ window.I18N = {
     template_page_title: 'Event display boards, <em>start with a style.</em>',
     template_page_intro: 'Browse templates by occasion and style. Each listing can include artwork, size information, and an in-use image.',
     template_filter_all: 'All styles', template_search: 'Search by ID, style, or keyword', template_detail: 'TEMPLATE DETAIL',
-    template_copy: 'Copy template details <span>⧉</span>', template_copy_tip: 'Paste the copied details into WeChat to discuss production with Print Atelier.',
+    template_copy: 'Copy template details <span>⧉</span>', template_download: 'Download files', template_copy_tip: 'Paste the copied details into WeChat to discuss production with Print Atelier.',
     template_copy_done: 'Template details copied', article_announcement: '<span>Print Atelier Editorial</span> · Thoughtful writing and thoughtful print',
     article_back: '← Back to content', article_cover_alt: 'Article cover', article_aside_title: 'Print Atelier Editorial',
     article_aside_intro: 'We regularly publish guidance on paper, print finishes, branded materials, and real-world projects.',
@@ -227,6 +237,8 @@ window.I18N = {
   const current = () => window.I18N[language];
   window.t = key => current()[key] ?? key;
   window.contentText = (type, id, field, fallback = '') => {
+    const managed = window.CMS_CONTENT?.translations?.[language]?.[type]?.[id]?.[field];
+    if (managed !== undefined && managed !== '') return managed;
     const translated = current().content?.[type]?.[id]?.[field];
     if (translated !== undefined) return translated;
     if (language === 'en') {

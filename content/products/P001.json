@@ -1,0 +1,63 @@
+{
+  "id": "P001",
+  "category": "commercial",
+  "name": "经典铜版纸名片",
+  "desc": "经典款式，性价比之选",
+  "intro": "适合企业、个人和日常商务沟通的经典名片，色彩稳定，制作效率高。",
+  "price": "¥49 起",
+  "tag": "",
+  "thumb": "",
+  "sceneImage": "",
+  "options": [
+    {
+      "name": "尺寸",
+      "values": [
+        "90 × 54mm",
+        "90 × 50mm",
+        "自定义尺寸"
+      ]
+    },
+    {
+      "name": "数量",
+      "values": [
+        "100 张",
+        "500 张",
+        "1000 张",
+        "5000 张"
+      ]
+    },
+    {
+      "name": "纸张",
+      "values": [
+        "300g 铜版纸",
+        "350g 铜版纸",
+        "哑粉纸"
+      ]
+    },
+    {
+      "name": "工艺",
+      "values": [
+        "暂不添加",
+        "覆膜",
+        "圆角"
+      ]
+    }
+  ],
+  "slug": "p001",
+  "seoTitle": "经典铜版纸名片????",
+  "seoDescription": "适合企业、个人和日常商务沟通的经典名片，色彩稳定，制作效率高。",
+  "title": "经典铜版纸名片",
+  "title_en": "Classic Coated Business Cards",
+  "image": "",
+  "desc_en": "A versatile business card with a choice of paper stocks and premium finishes.",
+  "materials": [],
+  "materials_en": [],
+  "crafts": [],
+  "crafts_en": [],
+  "sort_order": 1001,
+  "show_in_archive": false,
+  "category_legacy_en": "Business Cards",
+  "intro_en": "A versatile business card with a choice of paper stocks and premium finishes.",
+  "category_legacy": "精美名片",
+  "name_en": "Classic Coated Business Cards"
+}

@@ -1,7 +1,19 @@
 const storedProductData = JSON.parse(localStorage.getItem('printData') || 'null');
-const productData = storedProductData
+const siteProductData = storedProductData
   ? { ...printData, ...storedProductData, products: storedProductData.products || printData.products }
   : printData;
+const managedProducts = (window.CMS_CONTENT?.products || []).map(item => ({
+  ...item,
+  name: item.title,
+  category: item.category_legacy || item.category_title || item.category,
+  intro: item.intro || item.desc,
+  thumb: item.thumb || item.image,
+  options: Array.isArray(item.options) ? item.options : []
+}));
+const productData = {
+  ...siteProductData,
+  products: Array.isArray(window.CMS_CONTENT?.products) ? managedProducts : siteProductData.products || []
+};
 const productId = new URLSearchParams(location.search).get('id');
 const product = productData.products.find(item => item.id === productId) || productData.products[0];
 const language = () => localStorage.getItem('site_lang') || 'zh';
@@ -25,6 +37,7 @@ function optionValue(value) {
 }
 
 function referencePrice() {
+  if (!product.price) return window.t('price_reference');
   if (language() !== 'en') return `${product.price}｜${window.t('price_reference')}`;
   const amount = product.price.replace(/^¥\s*/, '').replace(/\s*起$/, '');
   return `${window.t('template_price_from')} ¥${amount} · ${window.t('price_reference')}`;

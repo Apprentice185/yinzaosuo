@@ -1,0 +1,36 @@
+{
+  "id": "PA012",
+  "title": "展架、布艺与活动物料",
+  "title_en": "Fabric Displays & Fast Pop-Up Systems",
+  "category": "exhibition",
+  "image": "",
+  "desc": "快速装配会展系统与仪式物料",
+  "desc_en": "Portable tension fabric exhibition walls, teardrop flags, and conference decor.",
+  "materials": [
+    "海报展架: 门型架、X展架、易拉宝、板材展架",
+    "布艺系统: 快幕秀(经编弹力布单/双面印)、旗帜布、贡缎布",
+    "旗帜横幅: 厂旗、注水旗、沙滩旗、刀旗、背包旗、桌旗、横幅条幅(幅宽70-160cm)"
+  ],
+  "materials_en": [
+    "Stands: Roll-Up Banner, X-Banner, Heavy Door-Type Frame",
+    "Tension Fabric: Pop-Up Fabric Wall (Single/Double Sided), Flag Cloth, Satin",
+    "Flags & Banners: Factory Flags, Water-Base Beach Flags, Teardrop Banners, Table Runners"
+  ],
+  "crafts": [
+    "热升华转印",
+    "烫金大龙须锦旗",
+    "包边打孔"
+  ],
+  "crafts_en": [
+    "Dye-Sublimation Printing",
+    "Gold Fringe Ceremony Pennants",
+    "Hemmed Edges & Grommets"
+  ],
+  "sort_order": 305,
+  "show_in_archive": true,
+  "category_title": "广告加工制作类",
+  "category_title_en": "Exhibition & Signage",
+  "category_desc": "商业美陈、展示道具、标识标牌与立体发光字全案制作",
+  "category_desc_en": "Event retail displays, CNC boards, luminous architectural lettering, and signage systems.",
+  "category_num": "03"
+}

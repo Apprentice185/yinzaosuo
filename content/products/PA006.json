@@ -1,0 +1,38 @@
+{
+  "id": "PA006",
+  "title": "轻型卡盒 (Cardboard Boxes)",
+  "title_en": "Cardboard Folding Cartons",
+  "category": "packaging",
+  "image": "",
+  "desc": "适用于消费品、化妆品、文创及小型器物",
+  "desc_en": "Optimized for retail cosmetics, consumer electronics, and cultural gifts.",
+  "materials": [
+    "单铜白卡、金银卡纸、牛皮卡纸、触感纸裱糊卡"
+  ],
+  "materials_en": [
+    "SBS Cardboard, Gold/Silver Foil Card, Kraft Card, Soft-Touch Laminated Board"
+  ],
+  "crafts": [
+    "双插盒",
+    "锁底盒",
+    "自动锁底盒",
+    "平粘盒",
+    "飞机盒",
+    "天地盒"
+  ],
+  "crafts_en": [
+    "Straight Tuck",
+    "Snap Lock Bottom",
+    "Auto-Lock Bottom",
+    "Side Glue Box",
+    "Mailer Box",
+    "Rigid Lid & Base"
+  ],
+  "sort_order": 201,
+  "show_in_archive": true,
+  "category_title": "包装定制类",
+  "category_title_en": "Bespoke Packaging",
+  "category_desc": "精细盒型结构与高强度瓦楞防护包装一体化打样与批量量产",
+  "category_desc_en": "Structural cardboard folding cartons and heavy-duty corrugated shipping solutions.",
+  "category_num": "02"
+}

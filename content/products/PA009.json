@@ -1,0 +1,34 @@
+{
+  "id": "PA009",
+  "title": "卷材写真与特种UV",
+  "title_en": "Roll Media & Large-Format UV",
+  "category": "exhibition",
+  "image": "",
+  "desc": "高清写真、橱窗贴膜与通透视觉方案",
+  "desc_en": "Ultra-clear window graphics, vehicle graphics, and durable vinyl banners.",
+  "materials": [
+    "室内/户外写真、550喷绘布、黑底布、网格布、刀刮布",
+    "卷材UV: 磨砂贴、超透贴、透明车贴、静电贴、PET户外超透贴"
+  ],
+  "materials_en": [
+    "Indoor/Outdoor Vinyl, 550 Frontlit, Blackback Banner, Mesh, Blockout Flex",
+    "Roll UV: Frosted Film, Ultra-Clear Vinyl, Static Cling, PET Outdoor Cling"
+  ],
+  "crafts": [
+    "UV彩白彩",
+    "双面喷(双喷)",
+    "高耐候防晒防水"
+  ],
+  "crafts_en": [
+    "UV Multi-Layer White Ink",
+    "Double-Sided Print",
+    "Weatherproof & UV-Resistant"
+  ],
+  "sort_order": 302,
+  "show_in_archive": true,
+  "category_title": "广告加工制作类",
+  "category_title_en": "Exhibition & Signage",
+  "category_desc": "商业美陈、展示道具、标识标牌与立体发光字全案制作",
+  "category_desc_en": "Event retail displays, CNC boards, luminous architectural lettering, and signage systems.",
+  "category_num": "03"
+}
