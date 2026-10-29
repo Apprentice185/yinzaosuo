@@ -4,6 +4,8 @@ backend:
   name: github
   repo: Apprentice185/yinzaosuo
   branch: main
+  base_url: https://decap-oauth.xiaotanqingqing.workers.dev
+  auth_endpoint: auth
 
 media_folder: "assets/images/products"
 public_folder: "assets/images/products"
