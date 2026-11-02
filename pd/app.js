@@ -24,14 +24,9 @@ const state = {
   showLabelsOnBeads: true,
   highlightColorId: null,
 
-  // 新增落地功能 1：水平镜像翻转
   isMirrored: false,
-
-  // 新增落地功能 2：拼装打卡消消乐辅助
   isProgressMode: false,
   completedBeads: new Set(),
-
-  // 新增落地功能 3：物理尺寸换算规格 (2.6 或 5.0)
   beadSpecMm: 2.6,
 
   materialSortMode: 'qty',
@@ -101,7 +96,7 @@ function getPartitionColor(bx, by) {
 }
 
 /* ==========================================================================
-   2. Core Image Processing Algorithm (含空洞掏空、水印过滤、黑线保护)
+   2. Core Image Processing Algorithm
    ========================================================================== */
 function processImage() {
   if (!state.sourceImage) {
@@ -118,7 +113,6 @@ function processImage() {
   const origW = img.width;
   const origH = img.height;
 
-  // 1. 高清缓冲区提取特征
   hiResCanvas.width = origW;
   hiResCanvas.height = origH;
   hiResCtx.clearRect(0, 0, origW, origH);
@@ -127,7 +121,6 @@ function processImage() {
   const hiData = hiResCtx.getImageData(0, 0, origW, origH);
   const hd = hiData.data;
 
-  // 通道 A：原图级自适应背景连通泛洪
   const corners = [0, origW - 1, (origH - 1) * origW, (origH - 1) * origW + origW - 1];
   let bgR = 0, bgG = 0, bgB = 0, validBg = 0;
 
@@ -194,7 +187,7 @@ function processImage() {
     }
   }
 
-  // 通道 A-2：内部封闭镂空洞掏空（解决超人双手叉腰等内部夹缝未扣除问题）
+  // 内部封闭空洞掏空
   const visitedHoles = new Uint8Array(origW * origH);
   for (let y = 1; y < origH - 1; y++) {
     for (let x = 1; x < origW - 1; x++) {
@@ -230,7 +223,6 @@ function processImage() {
     }
   }
 
-  // 通道 B：原图真实黑线骨架提取
   const hiLum = new Float32Array(origW * origH);
   for (let i = 0; i < origW * origH; i++) {
     if (isOrigBg[i]) {
@@ -261,7 +253,6 @@ function processImage() {
     }
   }
 
-  // 计算视口居中
   const imgAspect = origW / origH;
   let dw, dh, dx, dy;
   if (imgAspect > 1) {
@@ -280,7 +271,6 @@ function processImage() {
   const gridColors = Array.from({ length: targetH }, () => new Array(targetW).fill(null));
   const isOuterVoid = Array.from({ length: targetH }, () => new Uint8Array(targetW));
 
-  // 通道 C：网格采样与颜色直方图统计
   for (let gy = 0; gy < dh; gy++) {
     for (let gx = 0; gx < dw; gx++) {
       const targetGridX = dx + gx;
@@ -366,7 +356,6 @@ function processImage() {
     }
   }
 
-  // 通道 D：候选调色板聚类与映射
   const baseOpaquePalette = state.paletteMode === '221' ? OPAQUE_PALETTE_221 : OPAQUE_PALETTE_291;
   let candidatePalette = baseOpaquePalette;
 
@@ -406,7 +395,6 @@ function processImage() {
     }
   }
 
-  // 通道 E：初次生成网格
   const grid = Array.from({ length: targetH }, () => new Array(targetW).fill(null));
 
   for (let y = 0; y < targetH; y++) {
@@ -441,7 +429,6 @@ function processImage() {
     }
   }
 
-  // 通道 F：超低频碎色吸收（用量 <= 3 颗合并）
   const tempStats = {};
   for (let y = 0; y < targetH; y++) {
     for (let x = 0; x < targetW; x++) {
@@ -470,7 +457,6 @@ function processImage() {
     }
   }
 
-  // 通道 G：轻量级线条削薄（消去 2x2 实心黑块）
   for (let y = 1; y < targetH - 1; y++) {
     for (let x = 1; x < targetW - 1; x++) {
       if (grid[y][x]?.id === 'H7' &&
@@ -485,7 +471,6 @@ function processImage() {
     }
   }
 
-  // 通道 H：外沿悬挂毛刺与单刺削平
   for (let pass = 0; pass < 3; pass++) {
     for (let y = 0; y < targetH; y++) {
       for (let x = 0; x < targetW; x++) {
@@ -503,17 +488,7 @@ function processImage() {
         if (hasLeft) orthoCount++;
         if (hasRight) orthoCount++;
 
-        if (orthoCount <= 1) {
-          grid[y][x] = null;
-          continue;
-        }
-
-        if (!hasBottom && !hasLeft && !hasRight) {
-          grid[y][x] = null;
-          continue;
-        }
-
-        if (!hasTop && !hasLeft && !hasRight) {
+        if (orthoCount <= 1 || (!hasBottom && !hasLeft && !hasRight) || (!hasTop && !hasLeft && !hasRight)) {
           grid[y][x] = null;
           continue;
         }
@@ -521,7 +496,6 @@ function processImage() {
     }
   }
 
-  // 通道 I：微小悬浮岛剔除（彻底清除 AI 水印与飞墨）
   const islandVisited = Array.from({ length: targetH }, () => new Uint8Array(targetW));
   const islands = [];
 
@@ -650,7 +624,6 @@ function updateStatsUI() {
   document.getElementById('patternPalettePill').innerText = `Mard-${state.paletteMode}`;
   document.getElementById('patternTotalPill').innerText = `${state.totalBeads} 颗豆子`;
 
-  // 物理尺寸与重量估算
   const spec = state.beadSpecMm;
   const pitchCm = spec === 2.6 ? 0.26 : 0.50;
   const gramPerBead = spec === 2.6 ? 0.01 : 0.065;
@@ -869,7 +842,7 @@ function copyPurchaseList() {
 }
 
 /* ==========================================================================
-   5. Interactive Canvas & Pegboard Renderer (支持镜像与打卡)
+   5. Interactive Canvas & Pegboard Renderer
    ========================================================================== */
 const beadCanvas = document.getElementById('beadCanvas');
 const ctx = beadCanvas.getContext('2d');
@@ -1030,7 +1003,6 @@ function renderCanvas() {
   if (state.grid) {
     for (let y = 0; y < state.gridHeight; y++) {
       for (let x = 0; x < state.gridWidth; x++) {
-        // 水平镜像坐标变换逻辑
         const sampleX = state.isMirrored ? (state.gridWidth - 1 - x) : x;
         const bead = state.grid[y][sampleX];
         if (!bead) continue;
@@ -1077,7 +1049,6 @@ function renderCanvas() {
           ctx.fill();
         }
 
-        // 打卡消消乐已拼标记
         if (isCompleted) {
           ctx.strokeStyle = "#10B981";
           ctx.lineWidth = 0.12;
@@ -1146,7 +1117,6 @@ function applyToolAt(cx, cy) {
 
   const actualX = state.isMirrored ? (state.gridWidth - 1 - cx) : cx;
 
-  // 拼装辅助打卡消消乐模式交互
   if (state.isProgressMode) {
     if (!state.grid[cy][actualX]) return;
     const key = `${actualX},${cy}`;
@@ -1189,15 +1159,15 @@ function setBrushColor(colorObj) {
 function setTool(toolName) {
   state.currentTool = toolName;
   ['toolBrushBtn', 'toolEraserBtn', 'toolEyedropperBtn'].forEach(id => {
-    document.getElementById(id).className = "py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-medium flex items-center justify-center gap-1.5 transition";
+    document.getElementById(id).className = "py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-medium flex items-center justify-center gap-1.5 transition cursor-pointer";
   });
 
   if (toolName === 'brush') {
-    document.getElementById('toolBrushBtn').className = "py-1.5 rounded-lg border border-apple-blue bg-blue-50 text-apple-blue font-medium flex items-center justify-center gap-1.5 transition";
+    document.getElementById('toolBrushBtn').className = "py-1.5 rounded-lg border border-apple-blue bg-blue-50 text-apple-blue font-medium flex items-center justify-center gap-1.5 transition cursor-pointer";
   } else if (toolName === 'eraser') {
-    document.getElementById('toolEraserBtn').className = "py-1.5 rounded-lg border border-red-500 bg-red-50 text-red-600 font-medium flex items-center justify-center gap-1.5 transition";
+    document.getElementById('toolEraserBtn').className = "py-1.5 rounded-lg border border-red-500 bg-red-50 text-red-600 font-medium flex items-center justify-center gap-1.5 transition cursor-pointer";
   } else if (toolName === 'eyedropper') {
-    document.getElementById('toolEyedropperBtn').className = "py-1.5 rounded-lg border border-purple-500 bg-purple-50 text-purple-600 font-medium flex items-center justify-center gap-1.5 transition";
+    document.getElementById('toolEyedropperBtn').className = "py-1.5 rounded-lg border border-purple-500 bg-purple-50 text-purple-600 font-medium flex items-center justify-center gap-1.5 transition cursor-pointer";
   }
 }
 
@@ -1216,7 +1186,7 @@ function toggleEditMode() {
     section.classList.add('bg-blue-50/40', 'border-apple-blue/50');
     indicator.innerText = '微调中';
     indicator.className = 'px-1.5 py-0.5 rounded text-[10px] font-semibold bg-apple-blue text-white animate-pulse';
-    btn.className = 'px-2.5 py-1 rounded-lg text-xs font-semibold bg-apple-blue text-white hover:bg-apple-hoverBlue transition flex items-center gap-1 shadow-xs';
+    btn.className = 'px-2.5 py-1 rounded-lg text-xs font-semibold bg-apple-blue text-white hover:bg-apple-hoverBlue transition flex items-center gap-1 shadow-xs cursor-pointer';
     btnText.innerText = '完成退出';
     panel.classList.remove('opacity-50', 'pointer-events-none');
     viewportEl.style.cursor = 'crosshair';
@@ -1226,7 +1196,7 @@ function toggleEditMode() {
     section.classList.remove('bg-blue-50/40', 'border-apple-blue/50');
     indicator.innerText = '已锁定';
     indicator.className = 'px-1.5 py-0.5 rounded text-[10px] font-medium bg-gray-200 text-gray-600';
-    btn.className = 'px-2.5 py-1 rounded-lg text-xs font-semibold bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 transition flex items-center gap-1';
+    btn.className = 'px-2.5 py-1 rounded-lg text-xs font-semibold bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 transition flex items-center gap-1 cursor-pointer';
     btnText.innerText = '开启微调';
     panel.classList.add('opacity-50', 'pointer-events-none');
     viewportEl.style.cursor = '';
@@ -1241,10 +1211,10 @@ function toggleMirror() {
   document.getElementById('mirrorToggle').checked = state.isMirrored;
   const btn = document.getElementById('mirrorToggleBtn');
   if (state.isMirrored) {
-    btn.className = "h-9 px-2.5 rounded-xl border border-apple-blue bg-blue-50 text-apple-blue flex items-center gap-1.5 text-xs font-semibold transition shadow-xs";
+    btn.className = "h-9 px-2.5 rounded-xl border border-apple-blue bg-blue-50 text-apple-blue flex items-center gap-1.5 text-xs font-semibold transition shadow-xs cursor-pointer";
     showToast('已开启水平镜像 (适合反面热熔烫平)');
   } else {
-    btn.className = "h-9 px-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 flex items-center gap-1.5 text-xs font-medium transition shadow-2xs";
+    btn.className = "h-9 px-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 flex items-center gap-1.5 text-xs font-medium transition shadow-2xs cursor-pointer";
     showToast('已恢复正面原始视角');
   }
   renderCanvas();
@@ -1255,11 +1225,11 @@ function toggleProgressMode() {
   const btn = document.getElementById('progressToggleBtn');
   if (state.isProgressMode) {
     if (state.isEditMode) toggleEditMode();
-    btn.className = "h-9 px-2.5 rounded-xl border border-emerald-500 bg-emerald-50 text-emerald-700 flex items-center gap-1.5 text-xs font-semibold transition shadow-xs";
+    btn.className = "h-9 px-2.5 rounded-xl border border-emerald-500 bg-emerald-50 text-emerald-700 flex items-center gap-1.5 text-xs font-semibold transition shadow-xs cursor-pointer";
     viewport.style.cursor = 'pointer';
     showToast('已进入拼装打卡模式：点击豆子即可标记已拼！');
   } else {
-    btn.className = "h-9 px-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 flex items-center gap-1.5 text-xs font-medium transition shadow-2xs";
+    btn.className = "h-9 px-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 flex items-center gap-1.5 text-xs font-medium transition shadow-2xs cursor-pointer";
     viewport.style.cursor = '';
     showToast('已退出打卡模式');
   }
@@ -1341,7 +1311,7 @@ viewport.addEventListener('wheel', (e) => {
 }, { passive: false });
 
 /* ==========================================================================
-   7. Export Engine (PNG & Vector PDF - 完美支持镜像导出)
+   7. Export Engine (PNG & Vector PDF)
    ========================================================================== */
 function renderHighResCanvas() {
   const expCanvas = document.getElementById('exportCanvas');
@@ -1942,16 +1912,16 @@ const sortSeriesBtn = document.getElementById('sortSeriesBtn');
 
 sortQtyBtn.addEventListener('click', () => {
   state.materialSortMode = 'qty';
-  sortQtyBtn.className = "px-2 py-0.5 rounded-md font-medium text-[10px] transition bg-white text-gray-900 shadow-2xs";
-  sortSeriesBtn.className = "px-2 py-0.5 rounded-md font-medium text-[10px] transition text-gray-500 hover:text-gray-800";
+  sortQtyBtn.className = "px-2 py-0.5 rounded-md font-medium text-[10px] transition bg-white text-gray-900 shadow-2xs cursor-pointer";
+  sortSeriesBtn.className = "px-2 py-0.5 rounded-md font-medium text-[10px] transition text-gray-500 hover:text-gray-800 cursor-pointer";
   renderMaterialList();
   showToast('用料已按用量排序');
 });
 
 sortSeriesBtn.addEventListener('click', () => {
   state.materialSortMode = 'series';
-  sortSeriesBtn.className = "px-2 py-0.5 rounded-md font-medium text-[10px] transition bg-white text-gray-900 shadow-2xs";
-  sortQtyBtn.className = "px-2 py-0.5 rounded-md font-medium text-[10px] transition text-gray-500 hover:text-gray-800";
+  sortSeriesBtn.className = "px-2 py-0.5 rounded-md font-medium text-[10px] transition bg-white text-gray-900 shadow-2xs cursor-pointer";
+  sortQtyBtn.className = "px-2 py-0.5 rounded-md font-medium text-[10px] transition text-gray-500 hover:text-gray-800 cursor-pointer";
   renderMaterialList();
   showToast('用料已按系列排序');
 });
@@ -1964,16 +1934,16 @@ const palette291Btn = document.getElementById('palette291Btn');
 palette221Btn.addEventListener('click', () => {
   state.paletteMode = '221';
   state.activePalette = MARD_221;
-  palette221Btn.className = "py-1 rounded-lg font-medium text-center transition bg-white text-gray-900 shadow-xs";
-  palette291Btn.className = "py-1 rounded-lg font-medium text-center transition text-gray-500 hover:text-gray-900";
+  palette221Btn.className = "py-1 rounded-lg font-medium text-center transition bg-white text-gray-900 shadow-xs cursor-pointer";
+  palette291Btn.className = "py-1 rounded-lg font-medium text-center transition text-gray-500 hover:text-gray-900 cursor-pointer";
   processImage();
 });
 
 palette291Btn.addEventListener('click', () => {
   state.paletteMode = '291';
   state.activePalette = MARD_291;
-  palette291Btn.className = "py-1 rounded-lg font-medium text-center transition bg-white text-gray-900 shadow-xs";
-  palette221Btn.className = "py-1 rounded-lg font-medium text-center transition text-gray-500 hover:text-gray-900";
+  palette291Btn.className = "py-1 rounded-lg font-medium text-center transition bg-white text-gray-900 shadow-xs cursor-pointer";
+  palette221Btn.className = "py-1 rounded-lg font-medium text-center transition text-gray-500 hover:text-gray-900 cursor-pointer";
   processImage();
 });
 
@@ -2085,7 +2055,6 @@ document.getElementById('mirrorToggleBtn').addEventListener('click', toggleMirro
 document.getElementById('mirrorToggle').addEventListener('change', toggleMirror);
 document.getElementById('progressToggleBtn').addEventListener('click', toggleProgressMode);
 
-// 点击顶部物理尺寸在 2.6mm 与 5.0mm 之间切换换算
 const physicalSizePill = document.getElementById('physicalSizePill');
 if (physicalSizePill) {
   physicalSizePill.addEventListener('click', () => {
@@ -2102,9 +2071,9 @@ boardBtns.forEach(btn => {
     state.boardType = val;
 
     boardBtns.forEach(b => {
-      b.className = "board-type-btn py-2 px-1 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-semibold text-center transition";
+      b.className = "board-type-btn py-2 px-1 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-semibold text-center transition cursor-pointer";
     });
-    btn.className = "board-type-btn py-2 px-1 rounded-xl border border-apple-blue bg-blue-50/50 text-apple-blue font-semibold text-center transition";
+    btn.className = "board-type-btn py-2 px-1 rounded-xl border border-apple-blue bg-blue-50/50 text-apple-blue font-semibold text-center transition cursor-pointer";
 
     updateStatsUI();
     renderCanvas();
@@ -2134,7 +2103,7 @@ function openReplaceDropdown() {
       if (!col) return;
       const isLight = (0.299 * col.r + 0.587 * col.g + 0.114 * col.b) > 155;
       const btn = document.createElement('button');
-      btn.className = "flex flex-col items-center justify-center p-1 rounded-md border border-gray-200 hover:border-apple-blue hover:scale-105 transition";
+      btn.className = "flex flex-col items-center justify-center p-1 rounded-md border border-gray-200 hover:border-apple-blue hover:scale-105 transition cursor-pointer";
       btn.innerHTML = `
         <div class="w-full h-5 rounded flex items-center justify-center font-mono font-bold text-[10px]" style="background-color: ${col.hex}; color: ${isLight ? '#1D1D1F' : '#FFFFFF'};">
           ${id}
@@ -2257,6 +2226,142 @@ function showToast(msg) {
   setTimeout(() => {
     toast.classList.add('opacity-0', 'translate-y-2');
   }, 2000);
+}
+
+/* ==========================================================================
+   全量色库快速选色弹窗逻辑 (Fixed Modal)
+   ========================================================================== */
+const openPalettePickerBtn = document.getElementById('openPalettePickerBtn');
+const closePalettePickerBtn = document.getElementById('closePalettePickerBtn');
+const fullPalettePickerModal = document.getElementById('fullPalettePickerModal');
+const fullPaletteGrid = document.getElementById('fullPaletteGrid');
+const paletteSearchInput = document.getElementById('paletteSearchInput');
+const paletteSeriesTags = document.getElementById('paletteSeriesTags');
+
+let activePaletteFilterSeries = 'ALL';
+
+// 渲染字母系列过滤标签
+function initPaletteSeriesTags() {
+  const currentPalette = state.activePalette || [];
+  const seriesSet = new Set(['ALL']);
+
+  currentPalette.forEach(c => {
+    const prefix = c.id.replace(/[0-9]/g, '').trim().toUpperCase();
+    if (prefix) seriesSet.add(prefix);
+  });
+
+  paletteSeriesTags.innerHTML = '';
+  seriesSet.forEach(s => {
+    const tag = document.createElement('button');
+    tag.type = 'button';
+    tag.dataset.series = s;
+    const isAct = activePaletteFilterSeries === s;
+    tag.className = `px-2.5 py-1 rounded-lg font-mono text-[11px] shrink-0 transition cursor-pointer select-none ${
+      isAct ? 'bg-apple-blue text-white font-bold shadow-xs' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+    }`;
+    tag.innerText = s;
+
+    tag.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      activePaletteFilterSeries = s;
+
+      Array.from(paletteSeriesTags.children).forEach(child => {
+        if (child.dataset.series === s) {
+          child.className = 'px-2.5 py-1 rounded-lg font-mono text-[11px] shrink-0 transition cursor-pointer select-none bg-apple-blue text-white font-bold shadow-xs';
+        } else {
+          child.className = 'px-2.5 py-1 rounded-lg font-mono text-[11px] shrink-0 transition cursor-pointer select-none bg-gray-100 text-gray-600 hover:bg-gray-200';
+        }
+      });
+
+      renderFilteredPaletteColors();
+    });
+
+    paletteSeriesTags.appendChild(tag);
+  });
+}
+
+// 渲染色号网格
+function renderFilteredPaletteColors() {
+  const currentPalette = state.activePalette || [];
+  const keyword = (paletteSearchInput.value || '').trim().toUpperCase();
+
+  const filtered = currentPalette.filter(c => {
+    const prefix = c.id.replace(/[0-9]/g, '').trim().toUpperCase();
+    const matchesSeries = (activePaletteFilterSeries === 'ALL') || (prefix === activePaletteFilterSeries);
+    const matchesKeyword = !keyword || c.id.toUpperCase().includes(keyword);
+    return matchesSeries && matchesKeyword;
+  });
+
+  fullPaletteGrid.innerHTML = '';
+  if (filtered.length === 0) {
+    fullPaletteGrid.innerHTML = `<span class="text-gray-400 text-center col-span-5 py-6 text-xs">未找到匹配色号</span>`;
+    return;
+  }
+
+  filtered.forEach(c => {
+    const isLight = (0.299 * c.r + 0.587 * c.g + 0.114 * c.b) > 155;
+    const isCur = state.brushColor && state.brushColor.id === c.id;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = `flex flex-col items-center justify-center p-1 rounded-lg border transition cursor-pointer select-none ${
+      isCur ? 'border-apple-blue ring-2 ring-apple-blue/30 scale-105' : 'border-gray-200 hover:border-gray-400 hover:scale-105'
+    }`;
+
+    btn.innerHTML = `
+      <div class="w-full h-6 rounded flex items-center justify-center font-mono font-bold text-[10px] shadow-2xs" 
+           style="background-color: ${c.hex}; color: ${isLight ? '#1D1D1F' : '#FFFFFF'};">
+        ${c.id}
+      </div>
+    `;
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setBrushColor(c);
+      setTool('brush');
+      fullPalettePickerModal.classList.add('hidden');
+      showToast(`已更换画笔颜色为 ${c.id}`);
+    });
+
+    fullPaletteGrid.appendChild(btn);
+  });
+}
+
+// 选色弹窗开启监听：若微调未开启，自动一并激活微调状态
+if (openPalettePickerBtn) {
+  openPalettePickerBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (!state.isEditMode) {
+      toggleEditMode();
+    }
+    activePaletteFilterSeries = 'ALL';
+    paletteSearchInput.value = '';
+    initPaletteSeriesTags();
+    renderFilteredPaletteColors();
+    fullPalettePickerModal.classList.remove('hidden');
+  });
+}
+
+if (closePalettePickerBtn) {
+  closePalettePickerBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    fullPalettePickerModal.classList.add('hidden');
+  });
+}
+
+if (paletteSearchInput) {
+  paletteSearchInput.addEventListener('input', () => {
+    renderFilteredPaletteColors();
+  });
+}
+
+// 点击遮罩空白区域收起
+if (fullPalettePickerModal) {
+  fullPalettePickerModal.addEventListener('click', (e) => {
+    if (e.target === fullPalettePickerModal) {
+      fullPalettePickerModal.classList.add('hidden');
+    }
+  });
 }
 
 window.addEventListener('resize', resizeCanvas);
