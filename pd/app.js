@@ -4,6 +4,9 @@
 const offscreenCanvas = document.getElementById('offscreenCanvas');
 const offscreenCtx = offscreenCanvas.getContext('2d', { willReadFrequently: true });
 
+const hiResCanvas = document.createElement('canvas');
+const hiResCtx = hiResCanvas.getContext('2d', { willReadFrequently: true });
+
 const state = {
   paletteMode: '221',
   activePalette: MARD_221,
@@ -20,6 +23,16 @@ const state = {
   showPegboardBg: true,
   showLabelsOnBeads: true,
   highlightColorId: null,
+
+  // 新增落地功能 1：水平镜像翻转
+  isMirrored: false,
+
+  // 新增落地功能 2：拼装打卡消消乐辅助
+  isProgressMode: false,
+  completedBeads: new Set(),
+
+  // 新增落地功能 3：物理尺寸换算规格 (2.6 或 5.0)
+  beadSpecMm: 2.6,
 
   materialSortMode: 'qty',
 
@@ -88,7 +101,7 @@ function getPartitionColor(bx, by) {
 }
 
 /* ==========================================================================
-   2. Core Image Processing Algorithm (白底连通泛洪扣除 + 边缘二值化抗杂色)
+   2. Core Image Processing Algorithm (含空洞掏空、水印过滤、黑线保护)
    ========================================================================== */
 function processImage() {
   if (!state.sourceImage) {
@@ -101,11 +114,155 @@ function processImage() {
   state.gridWidth = targetW;
   state.gridHeight = targetH;
 
-  offscreenCanvas.width = targetW;
-  offscreenCanvas.height = targetH;
-
   const img = state.sourceImage;
-  const imgAspect = img.width / img.height;
+  const origW = img.width;
+  const origH = img.height;
+
+  // 1. 高清缓冲区提取特征
+  hiResCanvas.width = origW;
+  hiResCanvas.height = origH;
+  hiResCtx.clearRect(0, 0, origW, origH);
+  hiResCtx.drawImage(img, 0, 0);
+
+  const hiData = hiResCtx.getImageData(0, 0, origW, origH);
+  const hd = hiData.data;
+
+  // 通道 A：原图级自适应背景连通泛洪
+  const corners = [0, origW - 1, (origH - 1) * origW, (origH - 1) * origW + origW - 1];
+  let bgR = 0, bgG = 0, bgB = 0, validBg = 0;
+
+  corners.forEach(idx => {
+    const p = idx * 4;
+    if (hd[p + 3] > 30) {
+      bgR += hd[p]; bgG += hd[p + 1]; bgB += hd[p + 2];
+      validBg++;
+    }
+  });
+
+  const refBgR = validBg > 0 ? bgR / validBg : 255;
+  const refBgG = validBg > 0 ? bgG / validBg : 255;
+  const refBgB = validBg > 0 ? bgB / validBg : 255;
+
+  function isPixelMatchingBg(r, g, b, a) {
+    if (a < 60) return true;
+    const dist = Math.hypot(r - refBgR, g - refBgG, b - refBgB);
+    const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+    if (refBgR > 230 && refBgG > 230 && refBgB > 230) {
+      return dist < 30 || (lum > 245 && (Math.max(r, g, b) - Math.min(r, g, b) < 14));
+    }
+    return dist < 22;
+  }
+
+  const isOrigBg = new Uint8Array(origW * origH);
+  const qBg = [];
+
+  function seedOrigBg(x, y) {
+    const p = (y * origW + x) * 4;
+    if (isPixelMatchingBg(hd[p], hd[p + 1], hd[p + 2], hd[p + 3])) {
+      isOrigBg[y * origW + x] = 1;
+      qBg.push(x, y);
+    }
+  }
+
+  for (let x = 0; x < origW; x++) {
+    seedOrigBg(x, 0);
+    if (origH > 1) seedOrigBg(x, origH - 1);
+  }
+  for (let y = 1; y < origH - 1; y++) {
+    seedOrigBg(0, y);
+    if (origW > 1) seedOrigBg(origW - 1, y);
+  }
+
+  const dxy = [1, 0, -1, 0, 0, 1, 0, -1];
+  let headBg = 0;
+  while (headBg < qBg.length) {
+    const cx = qBg[headBg++];
+    const cy = qBg[headBg++];
+    for (let i = 0; i < 8; i += 2) {
+      const nx = cx + dxy[i];
+      const ny = cy + dxy[i + 1];
+      if (nx >= 0 && nx < origW && ny >= 0 && ny < origH) {
+        const nIdx = ny * origW + nx;
+        if (!isOrigBg[nIdx]) {
+          const p = nIdx * 4;
+          if (isPixelMatchingBg(hd[p], hd[p + 1], hd[p + 2], hd[p + 3])) {
+            isOrigBg[nIdx] = 1;
+            qBg.push(nx, ny);
+          }
+        }
+      }
+    }
+  }
+
+  // 通道 A-2：内部封闭镂空洞掏空（解决超人双手叉腰等内部夹缝未扣除问题）
+  const visitedHoles = new Uint8Array(origW * origH);
+  for (let y = 1; y < origH - 1; y++) {
+    for (let x = 1; x < origW - 1; x++) {
+      const idx = y * origW + x;
+      if (isOrigBg[idx] || visitedHoles[idx]) continue;
+
+      const p = idx * 4;
+      if (isPixelMatchingBg(hd[p], hd[p + 1], hd[p + 2], hd[p + 3])) {
+        const holeQueue = [x, y];
+        visitedHoles[idx] = 1;
+        isOrigBg[idx] = 1;
+
+        let qHead = 0;
+        while (qHead < holeQueue.length) {
+          const hx = holeQueue[qHead++];
+          const hy = holeQueue[qHead++];
+          for (let i = 0; i < 8; i += 2) {
+            const nx = hx + dxy[i], ny = hy + dxy[i + 1];
+            if (nx >= 0 && nx < origW && ny >= 0 && ny < origH) {
+              const nIdx = ny * origW + nx;
+              if (!isOrigBg[nIdx] && !visitedHoles[nIdx]) {
+                const np = nIdx * 4;
+                if (isPixelMatchingBg(hd[np], hd[np + 1], hd[np + 2], hd[np + 3])) {
+                  visitedHoles[nIdx] = 1;
+                  isOrigBg[nIdx] = 1;
+                  holeQueue.push(nx, ny);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // 通道 B：原图真实黑线骨架提取
+  const hiLum = new Float32Array(origW * origH);
+  for (let i = 0; i < origW * origH; i++) {
+    if (isOrigBg[i]) {
+      hiLum[i] = 255;
+    } else {
+      hiLum[i] = 0.299 * hd[i * 4] + 0.587 * hd[i * 4 + 1] + 0.114 * hd[i * 4 + 2];
+    }
+  }
+
+  const hiLineMask = new Uint8Array(origW * origH);
+  if (state.h7OutlineLock) {
+    for (let y = 2; y < origH - 2; y++) {
+      for (let x = 2; x < origW - 2; x++) {
+        const idx = y * origW + x;
+        if (isOrigBg[idx]) continue;
+        const cur = hiLum[idx];
+        if (cur > 100) continue;
+
+        const lapH = (hiLum[idx - 2] + hiLum[idx + 2]) - 2 * cur;
+        const lapV = (hiLum[idx - origW * 2] + hiLum[idx + origW * 2]) - 2 * cur;
+
+        if ((lapH > 35 || lapV > 35) && cur < 80) {
+          hiLineMask[idx] = 1;
+        } else if (cur < 20) {
+          hiLineMask[idx] = 1;
+        }
+      }
+    }
+  }
+
+  // 计算视口居中
+  const imgAspect = origW / origH;
   let dw, dh, dx, dy;
   if (imgAspect > 1) {
     dw = targetW;
@@ -119,129 +276,123 @@ function processImage() {
     dy = 0;
   }
 
-  offscreenCtx.clearRect(0, 0, targetW, targetH);
-
-  // 关闭平滑插值：阻断羽化灰阶生成
-  offscreenCtx.imageSmoothingEnabled = false;
-  offscreenCtx.drawImage(img, dx, dy, dw, dh);
-
-  const imgData = offscreenCtx.getImageData(0, 0, targetW, targetH);
-  const d = imgData.data;
-
-  // 四角背景采样自适应判定
-  const cornerIndices = [0, targetW - 1, (targetH - 1) * targetW, (targetH - 1) * targetW + targetW - 1];
-  let bgRSum = 0, bgGSum = 0, bgBSum = 0, bgSamples = 0;
-
-  cornerIndices.forEach(idx => {
-    const pIdx = idx * 4;
-    if (d[pIdx + 3] > 100) {
-      bgRSum += d[pIdx];
-      bgGSum += d[pIdx + 1];
-      bgBSum += d[pIdx + 2];
-      bgSamples++;
-    }
-  });
-
-  const refBgR = bgSamples > 0 ? bgRSum / bgSamples : 255;
-  const refBgG = bgSamples > 0 ? bgGSum / bgSamples : 255;
-  const refBgB = bgSamples > 0 ? bgBSum / bgSamples : 255;
-
-  function isBgPixel(r, g, b, a) {
-    if (a < 80) return true;
-    const dist = Math.hypot(r - refBgR, g - refBgG, b - refBgB);
-    const lum = 0.299 * r + 0.587 * g + 0.114 * b;
-    return dist < 32 || (lum > 246 && (Math.max(r, g, b) - Math.min(r, g, b) < 15));
-  }
-
-  // 四边界向内 BFS 泛洪
+  const gridLines = Array.from({ length: targetH }, () => new Uint8Array(targetW));
+  const gridColors = Array.from({ length: targetH }, () => new Array(targetW).fill(null));
   const isOuterVoid = Array.from({ length: targetH }, () => new Uint8Array(targetW));
-  const queue = [];
 
-  function checkAndSeed(x, y) {
-    const pIdx = (y * targetW + x) * 4;
-    if (isBgPixel(d[pIdx], d[pIdx + 1], d[pIdx + 2], d[pIdx + 3])) {
-      isOuterVoid[y][x] = 1;
-      queue.push([x, y]);
-    }
-  }
+  // 通道 C：网格采样与颜色直方图统计
+  for (let gy = 0; gy < dh; gy++) {
+    for (let gx = 0; gx < dw; gx++) {
+      const targetGridX = dx + gx;
+      const targetGridY = dy + gy;
+      if (targetGridX < 0 || targetGridX >= targetW || targetGridY < 0 || targetGridY >= targetH) continue;
 
-  for (let x = 0; x < targetW; x++) {
-    checkAndSeed(x, 0);
-    if (targetH > 1) checkAndSeed(x, targetH - 1);
-  }
-  for (let y = 1; y < targetH - 1; y++) {
-    checkAndSeed(0, y);
-    if (targetW > 1) checkAndSeed(targetW - 1, y);
-  }
+      const startX = Math.floor((gx / dw) * origW);
+      const endX = Math.min(origW, Math.floor(((gx + 1) / dw) * origW));
+      const startY = Math.floor((gy / dh) * origH);
+      const endY = Math.min(origH, Math.floor(((gy + 1) / dh) * origH));
 
-  const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
-  let head = 0;
-  while (head < queue.length) {
-    const [cx, cy] = queue[head++];
-    for (let i = 0; i < 4; i++) {
-      const nx = cx + dirs[i][0];
-      const ny = cy + dirs[i][1];
-      if (nx >= 0 && nx < targetW && ny >= 0 && ny < targetH && !isOuterVoid[ny][nx]) {
-        const pIdx = (ny * targetW + nx) * 4;
-        if (isBgPixel(d[pIdx], d[pIdx + 1], d[pIdx + 2], d[pIdx + 3])) {
-          isOuterVoid[ny][nx] = 1;
-          queue.push([nx, ny]);
+      let lineHits = 0;
+      let totalSamples = 0;
+      let bgCount = 0;
+      const colorHistogram = {};
+
+      for (let sy = startY; sy < endY; sy++) {
+        for (let sx = startX; sx < endX; sx++) {
+          const sIdx = sy * origW + sx;
+          const pIdx = sIdx * 4;
+          totalSamples++;
+
+          if (isOrigBg[sIdx]) {
+            bgCount++;
+            continue;
+          }
+
+          if (hiLineMask[sIdx]) {
+            lineHits++;
+          }
+
+          const r = hd[pIdx], g = hd[pIdx + 1], b = hd[pIdx + 2];
+          const maxRGB = Math.max(r, g, b);
+          const minRGB = Math.min(r, g, b);
+          const saturation = maxRGB > 0 ? (maxRGB - minRGB) / maxRGB : 0;
+
+          const qr = Math.round(r / 10) * 10;
+          const qg = Math.round(g / 10) * 10;
+          const qb = Math.round(b / 10) * 10;
+          const key = `${qr},${qg},${qb}`;
+          if (!colorHistogram[key]) {
+            colorHistogram[key] = { count: 0, r, g, b };
+          }
+          const weight = (saturation > 0.35 && r > 160 && g > 120) ? 3.5 : 1;
+          colorHistogram[key].count += weight;
         }
       }
-    }
-  }
 
-  // 内部像素提取与暗部收紧
-  const rawPixels = new Array(targetW * targetH);
-  for (let y = 0; y < targetH; y++) {
-    for (let x = 0; x < targetW; x++) {
-      const idx = y * targetW + x;
-      if (isOuterVoid[y][x]) {
-        rawPixels[idx] = null;
+      if (bgCount / totalSamples > 0.65 && lineHits === 0) {
+        isOuterVoid[targetGridY][targetGridX] = 1;
         continue;
       }
 
-      const pIdx = idx * 4;
-      let r = d[pIdx];
-      let g = d[pIdx + 1];
-      let b = d[pIdx + 2];
+      if (state.h7OutlineLock && lineHits > 0 && (lineHits / (totalSamples - bgCount) >= 0.22 || (lineHits >= 2 && totalSamples <= 16))) {
+        gridLines[targetGridY][targetGridX] = 1;
+      }
 
-      if (state.h7OutlineLock) {
-        const lum = 0.299 * r + 0.587 * g + 0.114 * b;
-        if (lum < 64) {
-          r = 0; g = 0; b = 0;
+      let maxCount = 0;
+      let dominant = null;
+      for (const k in colorHistogram) {
+        if (colorHistogram[k].count > maxCount) {
+          maxCount = colorHistogram[k].count;
+          dominant = colorHistogram[k];
         }
       }
 
-      rawPixels[idx] = { r, g, b, lab: rgbToLab(r, g, b) };
+      if (dominant) {
+        gridColors[targetGridY][targetGridX] = {
+          r: dominant.r,
+          g: dominant.g,
+          b: dominant.b,
+          lab: rgbToLab(dominant.r, dominant.g, dominant.b)
+        };
+      }
     }
   }
 
-  // 颜色上限频次截断
+  for (let y = 0; y < targetH; y++) {
+    for (let x = 0; x < targetW; x++) {
+      if (x < dx || x >= dx + dw || y < dy || y >= dy + dh) {
+        isOuterVoid[y][x] = 1;
+      }
+    }
+  }
+
+  // 通道 D：候选调色板聚类与映射
   const baseOpaquePalette = state.paletteMode === '221' ? OPAQUE_PALETTE_221 : OPAQUE_PALETTE_291;
   let candidatePalette = baseOpaquePalette;
 
   if (state.maxColorsLimit > 0 && state.maxColorsLimit < baseOpaquePalette.length) {
     const freqMap = {};
-    for (let i = 0; i < rawPixels.length; i++) {
-      const p = rawPixels[i];
-      if (!p) continue;
-
-      if (p.r === 0 && p.g === 0 && p.b === 0) {
-        freqMap['H7'] = (freqMap['H7'] || 0) + 1;
-        continue;
-      }
-
-      let bestC = baseOpaquePalette[0];
-      let bestDist = Infinity;
-      for (let k = 0; k < baseOpaquePalette.length; k++) {
-        const dist = deltaE(p.lab, baseOpaquePalette[k].lab);
-        if (dist < bestDist) {
-          bestDist = dist;
-          bestC = baseOpaquePalette[k];
+    for (let y = 0; y < targetH; y++) {
+      for (let x = 0; x < targetW; x++) {
+        if (isOuterVoid[y][x]) continue;
+        if (gridLines[y][x]) {
+          freqMap['H7'] = (freqMap['H7'] || 0) + 1;
+          continue;
         }
+        const c = gridColors[y][x];
+        if (!c) continue;
+
+        let bestC = baseOpaquePalette[0];
+        let bestDist = Infinity;
+        for (let k = 0; k < baseOpaquePalette.length; k++) {
+          const dist = deltaE(c.lab, baseOpaquePalette[k].lab);
+          if (dist < bestDist) {
+            bestDist = dist;
+            bestC = baseOpaquePalette[k];
+          }
+        }
+        freqMap[bestC.id] = (freqMap[bestC.id] || 0) + 1;
       }
-      freqMap[bestC.id] = (freqMap[bestC.id] || 0) + 1;
     }
 
     const sorted = Object.keys(freqMap)
@@ -255,88 +406,173 @@ function processImage() {
     }
   }
 
-  // 初始赋值
+  // 通道 E：初次生成网格
   const grid = Array.from({ length: targetH }, () => new Array(targetW).fill(null));
+
   for (let y = 0; y < targetH; y++) {
     for (let x = 0; x < targetW; x++) {
-      const idx = y * targetW + x;
-      const p = rawPixels[idx];
-      if (!p) {
+      if (isOuterVoid[y][x]) {
         grid[y][x] = null;
         continue;
       }
 
-      if (state.h7OutlineLock && p.r === 0 && p.g === 0 && p.b === 0) {
+      if (state.h7OutlineLock && gridLines[y][x]) {
         grid[y][x] = H7_COLOR;
+        continue;
+      }
+
+      const c = gridColors[y][x];
+      if (!c) {
+        grid[y][x] = candidatePalette.find(p => p.id === 'H2') || H7_COLOR;
         continue;
       }
 
       let bestColor = candidatePalette[0];
       let bestDist = Infinity;
       for (let k = 0; k < candidatePalette.length; k++) {
-        const c = candidatePalette[k];
-        const dist = deltaE(p.lab, c.lab);
+        const item = candidatePalette[k];
+        const dist = deltaE(c.lab, item.lab);
         if (dist < bestDist) {
           bestDist = dist;
-          bestColor = c;
+          bestColor = item;
         }
       }
       grid[y][x] = bestColor;
     }
   }
 
-  // 邻域降噪平滑滤波（消除笔锋毛刺与孤立单像素）
-  for (let pass = 0; pass < 2; pass++) {
-    for (let y = 1; y < targetH - 1; y++) {
-      for (let x = 1; x < targetW - 1; x++) {
-        const cur = grid[y][x];
-        if (!cur) continue;
+  // 通道 F：超低频碎色吸收（用量 <= 3 颗合并）
+  const tempStats = {};
+  for (let y = 0; y < targetH; y++) {
+    for (let x = 0; x < targetW; x++) {
+      if (grid[y][x]) {
+        tempStats[grid[y][x].id] = (tempStats[grid[y][x].id] || 0) + 1;
+      }
+    }
+  }
 
+  for (let y = 0; y < targetH; y++) {
+    for (let x = 0; x < targetW; x++) {
+      const cur = grid[y][x];
+      if (cur && cur.id !== 'H7' && tempStats[cur.id] <= 3) {
         const neighbors = [
-          grid[y - 1][x],
-          grid[y + 1][x],
-          grid[y][x - 1],
-          grid[y][x + 1]
-        ].filter(Boolean);
+          grid[y - 1]?.[x],
+          grid[y + 1]?.[x],
+          grid[y]?.[x - 1],
+          grid[y]?.[x + 1]
+        ].filter(n => n && n.id !== cur.id);
 
-        if (neighbors.length >= 3) {
-          const sameCount = neighbors.filter(n => n.id === cur.id).length;
-          if (sameCount === 0) {
-            const neighborVotes = {};
-            neighbors.forEach(n => {
-              neighborVotes[n.id] = (neighborVotes[n.id] || 0) + 1;
-            });
-            let domId = null;
-            let maxVotes = 0;
-            for (const id in neighborVotes) {
-              if (neighborVotes[id] > maxVotes) {
-                maxVotes = neighborVotes[id];
-                domId = id;
-              }
-            }
-            if (domId && maxVotes >= 2) {
-              const targetColor = candidatePalette.find(c => c.id === domId);
-              if (targetColor) grid[y][x] = targetColor;
-            }
-          }
+        if (neighbors.length > 0) {
+          neighbors.sort((a, b) => (tempStats[b.id] || 0) - (tempStats[a.id] || 0));
+          grid[y][x] = neighbors[0];
         }
       }
     }
   }
 
-  // 封闭空洞填充 H1 透明豆支撑
-  for (let y = 0; y < targetH; y++) {
-    for (let x = 0; x < targetW; x++) {
-      const pIdx = (y * targetW + x) * 4;
-      const a = d[pIdx + 3];
-      if (a < 50 && !isOuterVoid[y][x]) {
-        grid[y][x] = H1_COLOR;
+  // 通道 G：轻量级线条削薄（消去 2x2 实心黑块）
+  for (let y = 1; y < targetH - 1; y++) {
+    for (let x = 1; x < targetW - 1; x++) {
+      if (grid[y][x]?.id === 'H7' &&
+          grid[y + 1][x]?.id === 'H7' &&
+          grid[y][x + 1]?.id === 'H7' &&
+          grid[y + 1][x + 1]?.id === 'H7') {
+        const fillNeighbor = grid[y - 1][x] || grid[y][x - 1] || grid[y + 2]?.[x + 1];
+        if (fillNeighbor && fillNeighbor.id !== 'H7') {
+          grid[y + 1][x + 1] = fillNeighbor;
+        }
       }
     }
   }
 
+  // 通道 H：外沿悬挂毛刺与单刺削平
+  for (let pass = 0; pass < 3; pass++) {
+    for (let y = 0; y < targetH; y++) {
+      for (let x = 0; x < targetW; x++) {
+        const cur = grid[y][x];
+        if (!cur) continue;
+
+        const hasTop    = !!(y > 0 && grid[y - 1]?.[x]);
+        const hasBottom = !!(y < targetH - 1 && grid[y + 1]?.[x]);
+        const hasLeft   = !!(x > 0 && grid[y]?.[x - 1]);
+        const hasRight  = !!(x < targetW - 1 && grid[y]?.[x + 1]);
+
+        let orthoCount = 0;
+        if (hasTop) orthoCount++;
+        if (hasBottom) orthoCount++;
+        if (hasLeft) orthoCount++;
+        if (hasRight) orthoCount++;
+
+        if (orthoCount <= 1) {
+          grid[y][x] = null;
+          continue;
+        }
+
+        if (!hasBottom && !hasLeft && !hasRight) {
+          grid[y][x] = null;
+          continue;
+        }
+
+        if (!hasTop && !hasLeft && !hasRight) {
+          grid[y][x] = null;
+          continue;
+        }
+      }
+    }
+  }
+
+  // 通道 I：微小悬浮岛剔除（彻底清除 AI 水印与飞墨）
+  const islandVisited = Array.from({ length: targetH }, () => new Uint8Array(targetW));
+  const islands = [];
+
+  for (let y = 0; y < targetH; y++) {
+    for (let x = 0; x < targetW; x++) {
+      if (!grid[y][x] || islandVisited[y][x]) continue;
+
+      const cluster = [];
+      const q = [[x, y]];
+      islandVisited[y][x] = 1;
+
+      while (q.length > 0) {
+        const [cx, cy] = q.pop();
+        cluster.push([cx, cy]);
+
+        for (let dy = -1; dy <= 1; dy++) {
+          for (let dx = -1; dx <= 1; dx++) {
+            if (dx === 0 && dy === 0) continue;
+            const nx = cx + dx, ny = cy + dy;
+            if (nx >= 0 && nx < targetW && ny >= 0 && ny < targetH) {
+              if (grid[ny][nx] && !islandVisited[ny][nx]) {
+                islandVisited[ny][nx] = 1;
+                q.push([nx, ny]);
+              }
+            }
+          }
+        }
+      }
+      islands.push(cluster);
+    }
+  }
+
+  if (islands.length > 1) {
+    let maxClusterSize = 0;
+    islands.forEach(isl => {
+      if (isl.length > maxClusterSize) maxClusterSize = isl.length;
+    });
+
+    islands.forEach(isl => {
+      if (isl.length <= 15 && isl.length < maxClusterSize * 0.05) {
+        isl.forEach(([ix, iy]) => {
+          grid[iy][ix] = null;
+        });
+      }
+    });
+  }
+
   state.grid = grid;
   state.history = [];
+  state.completedBeads.clear();
+  updateProgressUI();
   recalculateStats();
   renderCanvas();
 }
@@ -405,6 +641,58 @@ function recalculateStats() {
   state.effectiveHeight = eff.height;
   updateStatsUI();
   renderMaterialList();
+}
+
+function updateStatsUI() {
+  const effW = state.effectiveWidth || state.gridWidth;
+  const effH = state.effectiveHeight || state.gridHeight;
+  document.getElementById('patternDimPill').innerText = `${effW} × ${effH}`;
+  document.getElementById('patternPalettePill').innerText = `Mard-${state.paletteMode}`;
+  document.getElementById('patternTotalPill').innerText = `${state.totalBeads} 颗豆子`;
+
+  // 物理尺寸与重量估算
+  const spec = state.beadSpecMm;
+  const pitchCm = spec === 2.6 ? 0.26 : 0.50;
+  const gramPerBead = spec === 2.6 ? 0.01 : 0.065;
+  const wCm = (effW * pitchCm).toFixed(1);
+  const hCm = (effH * pitchCm).toFixed(1);
+  const weightG = Math.round(state.totalBeads * gramPerBead);
+
+  const physPill = document.getElementById('physicalSizePill');
+  if (physPill) {
+    physPill.innerText = `${spec}mm: ${wCm}×${hCm}cm (约${weightG}g)`;
+  }
+
+  const bSize = state.boardType;
+  const offX = state.enableOffset ? state.offsetX : 0;
+  const offY = state.enableOffset ? state.offsetY : 0;
+  const extentX = Math.max(bSize, offX + state.gridWidth);
+  const extentY = Math.max(bSize, offY + state.gridHeight);
+  const boardsX = Math.ceil(extentX / bSize);
+  const boardsY = Math.ceil(extentY / bSize);
+  const totalBoards = boardsX * boardsY;
+  const boardPlanPill = document.getElementById('boardPlanPill');
+  if (totalBoards > 1) {
+    boardPlanPill.innerText = `${boardsX}×${boardsY} 共${totalBoards}块板 (${bSize}钉)`;
+  } else {
+    boardPlanPill.innerText = `1 块板 (${bSize}钉)`;
+  }
+
+  const distinct = Object.keys(state.colorStats).length;
+  document.getElementById('materialCountLabel').innerText = `${distinct} 种用色 (${state.totalBeads} 颗)`;
+}
+
+function updateProgressUI() {
+  const badge = document.getElementById('progressBadge');
+  if (!badge) return;
+  if (!state.isProgressMode || state.totalBeads === 0) {
+    badge.classList.add('hidden');
+    return;
+  }
+  badge.classList.remove('hidden');
+  const count = state.completedBeads.size;
+  const pct = Math.round((count / state.totalBeads) * 100);
+  badge.innerText = `${count}/${state.totalBeads} (${pct}%)`;
 }
 
 function generateDemo() {
@@ -482,38 +770,14 @@ function generateDemo() {
 
   state.grid = grid;
   state.history = [];
+  state.completedBeads.clear();
+  updateProgressUI();
   recalculateStats();
   renderCanvas();
 }
 
-function updateStatsUI() {
-  const effW = state.effectiveWidth || state.gridWidth;
-  const effH = state.effectiveHeight || state.gridHeight;
-  document.getElementById('patternDimPill').innerText = `${effW} × ${effH}`;
-  document.getElementById('patternPalettePill').innerText = `Mard-${state.paletteMode}`;
-  document.getElementById('patternTotalPill').innerText = `${state.totalBeads} 颗豆子`;
-
-  const bSize = state.boardType;
-  const offX = state.enableOffset ? state.offsetX : 0;
-  const offY = state.enableOffset ? state.offsetY : 0;
-  const extentX = Math.max(bSize, offX + state.gridWidth);
-  const extentY = Math.max(bSize, offY + state.gridHeight);
-  const boardsX = Math.ceil(extentX / bSize);
-  const boardsY = Math.ceil(extentY / bSize);
-  const totalBoards = boardsX * boardsY;
-  const boardPlanPill = document.getElementById('boardPlanPill');
-  if (totalBoards > 1) {
-    boardPlanPill.innerText = `${boardsX}×${boardsY} 共${totalBoards}块板 (${bSize}钉)`;
-  } else {
-    boardPlanPill.innerText = `1 块板 (${bSize}钉)`;
-  }
-
-  const distinct = Object.keys(state.colorStats).length;
-  document.getElementById('materialCountLabel').innerText = `${distinct} 种用色 (${state.totalBeads} 颗)`;
-}
-
 /* ==========================================================================
-   4. Material List UI
+   4. Material List UI & 采购清单生成器
    ========================================================================== */
 function renderMaterialList() {
   const materialList = document.getElementById('materialList');
@@ -552,7 +816,7 @@ function renderMaterialList() {
         state.highlightColorId = null;
       } else {
         state.highlightColorId = id;
-        showToast(`已选择画笔色号 ${id}`);
+        showToast(`已高亮色号 ${id}`);
       }
       renderMaterialList();
       renderCanvas();
@@ -562,8 +826,50 @@ function renderMaterialList() {
   });
 }
 
+function copyPurchaseList() {
+  if (state.totalBeads === 0) {
+    showToast('暂无用料数据可复制');
+    return;
+  }
+
+  const effW = state.effectiveWidth || state.gridWidth;
+  const effH = state.effectiveHeight || state.gridHeight;
+  const sorted = getSortedColorIds();
+
+  const spec26W = (effW * 0.26).toFixed(1);
+  const spec26H = (effH * 0.26).toFixed(1);
+  const spec50W = (effW * 0.50).toFixed(1);
+  const spec50H = (effH * 0.50).toFixed(1);
+
+  let text = `【印造所拼豆采购单 · yinzaosuo.com/pd】\n`;
+  text += `色库体系: Mard-${state.paletteMode} | 图纸规格: ${effW}×${effH}钉\n`;
+  text += `总用量: ${state.totalBeads} 颗 (共 ${sorted.length} 种用色)\n`;
+  text += `成品尺寸参考:\n`;
+  text += `· 2.6mm 迷你豆: 约 ${spec26W} × ${spec26H} cm (总重约 ${Math.round(state.totalBeads * 0.01)}g)\n`;
+  text += `· 5.0mm 标准豆: 约 ${spec50W} × ${spec50H} cm (总重约 ${Math.round(state.totalBeads * 0.065)}g)\n`;
+  text += `--------------------------------------\n`;
+  text += `采购明细 (按用量排序):\n`;
+
+  sorted.forEach((id, idx) => {
+    const qty = state.colorStats[id];
+    const bags500 = Math.ceil(qty / 500);
+    const color = state.activePalette.find(c => c.id === id);
+    const colorName = color?.name ? `(${color.name})` : '';
+    text += `${(idx + 1).toString().padStart(2, '0')}. 色号 ${id.padEnd(4, ' ')}${colorName}: ${qty} 颗  [约需 ${bags500} 包/500粒装]\n`;
+  });
+
+  text += `--------------------------------------\n`;
+  text += `生成于印造所拼豆工作台 (yinzaosuo.com/pd)`;
+
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('采购清单已复制到剪贴板！');
+  }).catch(() => {
+    showToast('复制失败，请手动检查浏览器剪贴板权限');
+  });
+}
+
 /* ==========================================================================
-   5. Interactive Canvas & Pegboard Renderer
+   5. Interactive Canvas & Pegboard Renderer (支持镜像与打卡)
    ========================================================================== */
 const beadCanvas = document.getElementById('beadCanvas');
 const ctx = beadCanvas.getContext('2d');
@@ -724,15 +1030,19 @@ function renderCanvas() {
   if (state.grid) {
     for (let y = 0; y < state.gridHeight; y++) {
       for (let x = 0; x < state.gridWidth; x++) {
-        const bead = state.grid[y][x];
+        // 水平镜像坐标变换逻辑
+        const sampleX = state.isMirrored ? (state.gridWidth - 1 - x) : x;
+        const bead = state.grid[y][sampleX];
         if (!bead) continue;
 
         const drawX = offX + x;
         const drawY = offY + y;
+        const key = `${sampleX},${y}`;
+        const isCompleted = state.completedBeads.has(key);
 
         const isMatch = !state.highlightColorId || state.highlightColorId === bead.id;
         ctx.save();
-        ctx.globalAlpha = isMatch ? 1.0 : 0.2;
+        ctx.globalAlpha = isCompleted ? 0.35 : (isMatch ? 1.0 : 0.2);
 
         const pad = 0.06;
 
@@ -765,6 +1075,15 @@ function renderCanvas() {
           ctx.beginPath();
           ctx.arc(drawX + 0.5, drawY + 0.5, 0.11, 0, Math.PI * 2);
           ctx.fill();
+        }
+
+        // 打卡消消乐已拼标记
+        if (isCompleted) {
+          ctx.strokeStyle = "#10B981";
+          ctx.lineWidth = 0.12;
+          ctx.beginPath();
+          ctx.arc(drawX + 0.5, drawY + 0.5, 0.32, 0, Math.PI * 2);
+          ctx.stroke();
         }
 
         if (state.showLabelsOnBeads && state.zoom >= 18) {
@@ -800,7 +1119,7 @@ function renderCanvas() {
 }
 
 /* ==========================================================================
-   6. Touch, Pan, Zoom & Manual Edit Actions
+   6. Touch, Pan, Zoom, Manual Edit & 打卡交互
    ========================================================================== */
 function recordHistory() {
   if (!state.grid) return;
@@ -823,11 +1142,28 @@ function undoLastAction() {
 }
 
 function applyToolAt(cx, cy) {
-  if (!state.isEditMode) return;
   if (!state.grid || cx < 0 || cx >= state.gridWidth || cy < 0 || cy >= state.gridHeight) return;
 
+  const actualX = state.isMirrored ? (state.gridWidth - 1 - cx) : cx;
+
+  // 拼装辅助打卡消消乐模式交互
+  if (state.isProgressMode) {
+    if (!state.grid[cy][actualX]) return;
+    const key = `${actualX},${cy}`;
+    if (state.completedBeads.has(key)) {
+      state.completedBeads.delete(key);
+    } else {
+      state.completedBeads.add(key);
+    }
+    updateProgressUI();
+    renderCanvas();
+    return;
+  }
+
+  if (!state.isEditMode) return;
+
   if (state.currentTool === 'eyedropper') {
-    const picked = state.grid[cy][cx];
+    const picked = state.grid[cy][actualX];
     if (picked) {
       setBrushColor(picked);
       setTool('brush');
@@ -837,8 +1173,8 @@ function applyToolAt(cx, cy) {
   }
 
   const targetBead = state.currentTool === 'eraser' ? null : state.brushColor;
-  if (state.grid[cy][cx] !== targetBead) {
-    state.grid[cy][cx] = targetBead;
+  if (state.grid[cy][actualX] !== targetBead) {
+    state.grid[cy][actualX] = targetBead;
     recalculateStats();
     renderCanvas();
   }
@@ -875,6 +1211,7 @@ function toggleEditMode() {
   const viewportEl = document.getElementById('viewport');
 
   if (state.isEditMode) {
+    if (state.isProgressMode) toggleProgressMode();
     section.classList.remove('bg-gray-50', 'border-gray-200/60');
     section.classList.add('bg-blue-50/40', 'border-apple-blue/50');
     indicator.innerText = '微调中';
@@ -899,8 +1236,39 @@ function toggleEditMode() {
   }
 }
 
+function toggleMirror() {
+  state.isMirrored = !state.isMirrored;
+  document.getElementById('mirrorToggle').checked = state.isMirrored;
+  const btn = document.getElementById('mirrorToggleBtn');
+  if (state.isMirrored) {
+    btn.className = "h-9 px-2.5 rounded-xl border border-apple-blue bg-blue-50 text-apple-blue flex items-center gap-1.5 text-xs font-semibold transition shadow-xs";
+    showToast('已开启水平镜像 (适合反面热熔烫平)');
+  } else {
+    btn.className = "h-9 px-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 flex items-center gap-1.5 text-xs font-medium transition shadow-2xs";
+    showToast('已恢复正面原始视角');
+  }
+  renderCanvas();
+}
+
+function toggleProgressMode() {
+  state.isProgressMode = !state.isProgressMode;
+  const btn = document.getElementById('progressToggleBtn');
+  if (state.isProgressMode) {
+    if (state.isEditMode) toggleEditMode();
+    btn.className = "h-9 px-2.5 rounded-xl border border-emerald-500 bg-emerald-50 text-emerald-700 flex items-center gap-1.5 text-xs font-semibold transition shadow-xs";
+    viewport.style.cursor = 'pointer';
+    showToast('已进入拼装打卡模式：点击豆子即可标记已拼！');
+  } else {
+    btn.className = "h-9 px-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 flex items-center gap-1.5 text-xs font-medium transition shadow-2xs";
+    viewport.style.cursor = '';
+    showToast('已退出打卡模式');
+  }
+  updateProgressUI();
+  renderCanvas();
+}
+
 viewport.addEventListener('mousedown', (e) => {
-  if (state.isEditMode && e.button === 0 && !e.altKey && !e.shiftKey) {
+  if ((state.isEditMode || state.isProgressMode) && e.button === 0 && !e.altKey && !e.shiftKey) {
     const rect = viewport.getBoundingClientRect();
     const offX = state.enableOffset ? state.offsetX : 0;
     const offY = state.enableOffset ? state.offsetY : 0;
@@ -911,7 +1279,7 @@ viewport.addEventListener('mousedown', (e) => {
 
     if (cx >= 0 && cx < state.gridWidth && cy >= 0 && cy < state.gridHeight) {
       state.isPainting = true;
-      recordHistory();
+      if (state.isEditMode) recordHistory();
       applyToolAt(cx, cy);
       return;
     }
@@ -930,7 +1298,7 @@ window.addEventListener('mousemove', (e) => {
     return;
   }
 
-  if (!state.isEditMode) return;
+  if (!state.isEditMode && !state.isProgressMode) return;
 
   const rect = viewport.getBoundingClientRect();
   const offX = state.enableOffset ? state.offsetX : 0;
@@ -940,7 +1308,7 @@ window.addEventListener('mousemove', (e) => {
   const cx = Math.floor(mx) - offX;
   const cy = Math.floor(my) - offY;
 
-  if (state.isPainting) {
+  if (state.isPainting && state.isEditMode) {
     applyToolAt(cx, cy);
   }
 
@@ -972,72 +1340,8 @@ viewport.addEventListener('wheel', (e) => {
   renderCanvas();
 }, { passive: false });
 
-let touchDist = 0;
-viewport.addEventListener('touchstart', (e) => {
-  if (e.touches.length === 1) {
-    if (state.isEditMode) {
-      const rect = viewport.getBoundingClientRect();
-      const offX = state.enableOffset ? state.offsetX : 0;
-      const offY = state.enableOffset ? state.offsetY : 0;
-      const mx = (e.touches[0].clientX - rect.left - state.panX) / state.zoom;
-      const my = (e.touches[0].clientY - rect.top - state.panY) / state.zoom;
-      const cx = Math.floor(mx) - offX;
-      const cy = Math.floor(my) - offY;
-
-      if (cx >= 0 && cx < state.gridWidth && cy >= 0 && cy < state.gridHeight) {
-        state.isPainting = true;
-        recordHistory();
-        applyToolAt(cx, cy);
-        return;
-      }
-    }
-    state.isDragging = true;
-    state.startX = e.touches[0].clientX - state.panX;
-    state.startY = e.touches[0].clientY - state.panY;
-  } else if (e.touches.length === 2) {
-    state.isDragging = false;
-    state.isPainting = false;
-    touchDist = Math.hypot(
-      e.touches[0].clientX - e.touches[1].clientX,
-      e.touches[0].clientY - e.touches[1].clientY
-    );
-  }
-});
-
-viewport.addEventListener('touchmove', (e) => {
-  e.preventDefault();
-  if (e.touches.length === 1) {
-    if (state.isEditMode && state.isPainting) {
-      const rect = viewport.getBoundingClientRect();
-      const offX = state.enableOffset ? state.offsetX : 0;
-      const offY = state.enableOffset ? state.offsetY : 0;
-      const mx = (e.touches[0].clientX - rect.left - state.panX) / state.zoom;
-      const my = (e.touches[0].clientY - rect.top - state.panY) / state.zoom;
-      applyToolAt(Math.floor(mx) - offX, Math.floor(my) - offY);
-    } else if (state.isDragging) {
-      state.panX = e.touches[0].clientX - state.startX;
-      state.panY = e.touches[0].clientY - state.startY;
-      renderCanvas();
-    }
-  } else if (e.touches.length === 2) {
-    const d = Math.hypot(
-      e.touches[0].clientX - e.touches[1].clientX,
-      e.touches[0].clientY - e.touches[1].clientY
-    );
-    const factor = d / touchDist;
-    state.zoom = Math.min(80, Math.max(3, state.zoom * factor));
-    touchDist = d;
-    renderCanvas();
-  }
-}, { passive: false });
-
-viewport.addEventListener('touchend', () => {
-  state.isDragging = false;
-  state.isPainting = false;
-});
-
 /* ==========================================================================
-   7. Export Engine (PNG & Vector PDF)
+   7. Export Engine (PNG & Vector PDF - 完美支持镜像导出)
    ========================================================================== */
 function renderHighResCanvas() {
   const expCanvas = document.getElementById('exportCanvas');
@@ -1094,13 +1398,18 @@ function renderHighResCanvas() {
   expCtx.fillRect(0, 0, totalW, totalH);
 
   expCtx.fillStyle = "#1D1D1F";
-  expCtx.font = "bold 72px -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif";
+  expCtx.font = "bold 64px -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif";
   expCtx.textAlign = "center";
   expCtx.textBaseline = "middle";
 
   const boardDesc = totalBoards > 1 ? `${totalBoards}块板 (${bSize}钉)` : `1块板 (${bSize}钉)`;
-  const headerTitle = `${effW} × ${effH}   ·   Mard-${state.paletteMode}   ·   ${boardDesc}   ·   ${state.totalBeads} 颗豆子`;
-  expCtx.fillText(headerTitle, totalW / 2, 90);
+  const mirrorTag = state.isMirrored ? " [反面镜像]" : "";
+  const headerTitle = `${effW} × ${effH}${mirrorTag}   ·   Mard-${state.paletteMode}   ·   ${boardDesc}   ·   ${state.totalBeads} 颗豆子`;
+  expCtx.fillText(headerTitle, totalW / 2, 75);
+
+  expCtx.font = "normal 24px 'SF Mono', monospace";
+  expCtx.fillStyle = "#86868B";
+  expCtx.fillText(`官方出图: yinzaosuo.com/pd  |  2.6mm: ${(effW*0.26).toFixed(1)}×${(effH*0.26).toFixed(1)}cm  |  5.0mm: ${(effW*0.5).toFixed(1)}×${(effH*0.5).toFixed(1)}cm`, totalW / 2, 125);
 
   const startX = margin + rulerPx;
   const startY = headerH + rulerPx;
@@ -1222,7 +1531,8 @@ function renderHighResCanvas() {
 
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < cols; x++) {
-      const bead = state.grid[y][x];
+      const sampleX = state.isMirrored ? (cols - 1 - x) : x;
+      const bead = state.grid[y][sampleX];
       if (!bead) continue;
 
       const px = startX + (offX + x) * cellPx;
@@ -1377,13 +1687,18 @@ function exportVectorPDF() {
   const tCtx = titleCanvas.getContext('2d');
   tCtx.scale(3, 3);
   tCtx.fillStyle = "#1D1D1F";
-  tCtx.font = "bold 26px -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif";
+  tCtx.font = "bold 24px -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif";
   tCtx.textAlign = "center";
   tCtx.textBaseline = "middle";
 
   const boardDesc = totalBoards > 1 ? `${totalBoards}块板 (${bSize}钉)` : `1块板 (${bSize}钉)`;
-  const headerTitle = `${effW} × ${effH}   ·   Mard-${state.paletteMode}   ·   ${boardDesc}   ·   ${state.totalBeads} 颗豆子`;
-  tCtx.fillText(headerTitle, pageW / 2, headerH / 2);
+  const mirrorTag = state.isMirrored ? " [反面镜像]" : "";
+  const headerTitle = `${effW} × ${effH}${mirrorTag}   ·   Mard-${state.paletteMode}   ·   ${boardDesc}   ·   ${state.totalBeads} 颗豆子`;
+  tCtx.fillText(headerTitle, pageW / 2, headerH / 2 - 8);
+
+  tCtx.font = "normal 10px 'SF Mono', monospace";
+  tCtx.fillStyle = "#86868B";
+  tCtx.fillText(`官方出图: yinzaosuo.com/pd   2.6mm: ${(effW*0.26).toFixed(1)}×${(effH*0.26).toFixed(1)}cm   5.0mm: ${(effW*0.5).toFixed(1)}×${(effH*0.5).toFixed(1)}cm`, pageW / 2, headerH / 2 + 16);
 
   pdf.addImage(titleCanvas.toDataURL('image/png'), 'PNG', 0, 0, pageW, headerH);
 
@@ -1485,7 +1800,8 @@ function exportVectorPDF() {
 
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < cols; x++) {
-      const bead = state.grid[y][x];
+      const sampleX = state.isMirrored ? (cols - 1 - x) : x;
+      const bead = state.grid[y][sampleX];
       if (!bead) continue;
 
       const px = startX + (offX + x) * cellPt;
@@ -1557,7 +1873,8 @@ function exportVectorPDF() {
     pdf.text(`x${count}`, cx + cardW / 2, cy + swatchH + (cardH - swatchH) * 0.65, { align: 'center', baseline: 'middle' });
   });
 
-  const exportFileName = `${state.paletteMode}色-${effW}X${effH}-${state.totalBeads}.pdf`;
+  const mirrorFileTag = state.isMirrored ? "-镜像" : "";
+  const exportFileName = `${state.paletteMode}色-${effW}X${effH}${mirrorFileTag}-${state.totalBeads}.pdf`;
   pdf.save(exportFileName);
   showToast('矢量 PDF 导出成功！');
 }
@@ -1638,6 +1955,8 @@ sortSeriesBtn.addEventListener('click', () => {
   renderMaterialList();
   showToast('用料已按系列排序');
 });
+
+document.getElementById('copyPurchaseBtn').addEventListener('click', copyPurchaseList);
 
 const palette221Btn = document.getElementById('palette221Btn');
 const palette291Btn = document.getElementById('palette291Btn');
@@ -1762,6 +2081,19 @@ offsetYInput.addEventListener('input', (e) => {
 });
 
 document.getElementById('toggleEditModeBtn').addEventListener('click', toggleEditMode);
+document.getElementById('mirrorToggleBtn').addEventListener('click', toggleMirror);
+document.getElementById('mirrorToggle').addEventListener('change', toggleMirror);
+document.getElementById('progressToggleBtn').addEventListener('click', toggleProgressMode);
+
+// 点击顶部物理尺寸在 2.6mm 与 5.0mm 之间切换换算
+const physicalSizePill = document.getElementById('physicalSizePill');
+if (physicalSizePill) {
+  physicalSizePill.addEventListener('click', () => {
+    state.beadSpecMm = state.beadSpecMm === 2.6 ? 5.0 : 2.6;
+    updateStatsUI();
+    showToast(`已切换至 ${state.beadSpecMm}mm 规格尺寸换算`);
+  });
+}
 
 const boardBtns = document.querySelectorAll('.board-type-btn');
 boardBtns.forEach(btn => {
@@ -1908,7 +2240,8 @@ document.getElementById('exportPngBtn').addEventListener('click', () => {
     const a = document.createElement('a');
     const effW = state.effectiveWidth || state.gridWidth;
     const effH = state.effectiveHeight || state.gridHeight;
-    a.download = `${state.paletteMode}色-${effW}X${effH}-${state.totalBeads}.png`;
+    const mirrorTag = state.isMirrored ? "-镜像" : "";
+    a.download = `${state.paletteMode}色-${effW}X${effH}${mirrorTag}-${state.totalBeads}.png`;
     a.href = c.toDataURL('image/png');
     a.click();
     showToast('高清 PNG 已下载！');

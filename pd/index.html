@@ -38,27 +38,54 @@
 </head>
 <body class="h-screen w-screen overflow-hidden flex flex-col font-sans">
 
-  <!-- Apple Minimal Header -->
-  <header class="h-13 border-b border-apple-border glass px-4 md:px-6 flex items-center justify-between shrink-0 z-40">
+  <!-- Apple Minimal Header (加高至 h-16，集成网址、镜像切换与打卡模式) -->
+  <header class="h-16 border-b border-apple-border glass px-4 md:px-6 flex items-center justify-between shrink-0 z-40">
     <div class="flex items-center space-x-3">
-      <div class="w-7 h-7 rounded-lg bg-apple-dark flex items-center justify-center text-white text-xs">
+      <!-- 品牌 Logo 图标 -->
+      <div class="w-8 h-8 rounded-lg bg-apple-dark flex items-center justify-center text-white text-xs shadow-xs">
         <i class="fa-solid fa-shapes"></i>
       </div>
-      <h1 class="text-sm font-semibold tracking-tight text-gray-900">拼豆工作台</h1>
+      
+      <!-- 标题与专属网址 -->
+      <div class="flex items-center gap-2.5">
+        <h1 class="text-base font-semibold tracking-tight text-gray-900">拼豆工作台</h1>
+        
+        <!-- 网址展示胶囊 -->
+        <a href="https://yinzaosuo.com/pd" target="_blank" 
+           class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-gray-100 hover:bg-gray-200/80 text-[11px] font-mono text-gray-600 hover:text-gray-900 transition border border-gray-200/60 group">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="tracking-wide font-medium">yinzaosuo.com/pd</span>
+          <i class="fa-solid fa-arrow-up-right-from-square text-[9px] text-gray-400 group-hover:text-gray-600 transition-colors"></i>
+        </a>
+      </div>
     </div>
 
+    <!-- 右侧操作区：工具动作集合 -->
     <div class="flex items-center space-x-2">
+      <!-- 水平镜像按钮 -->
+      <button id="mirrorToggleBtn" title="水平镜像翻转 (反面热熔烫平)" class="h-9 px-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 flex items-center gap-1.5 text-xs font-medium transition shadow-2xs">
+        <i class="fa-solid fa-arrows-left-right text-gray-500"></i>
+        <span class="hidden sm:inline">镜像</span>
+      </button>
+
+      <!-- 拼装打卡消消乐辅助按钮 -->
+      <button id="progressToggleBtn" title="拼装打卡辅助模式 (点击豆子消消乐)" class="h-9 px-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 flex items-center gap-1.5 text-xs font-medium transition shadow-2xs">
+        <i class="fa-solid fa-circle-check text-emerald-500"></i>
+        <span class="hidden sm:inline">拼装打卡</span>
+        <span id="progressBadge" class="hidden text-[10px] px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-700 font-mono font-semibold">0%</span>
+      </button>
+
       <button id="toggleSidebarBtn" class="md:hidden px-2.5 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-xs font-medium text-gray-700 transition">
         <i class="fa-solid fa-sliders"></i>
       </button>
 
-      <button id="resetViewBtn" title="复位视角" class="p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition text-xs">
+      <button id="resetViewBtn" title="复位视角" class="w-9 h-9 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-600 flex items-center justify-center transition text-xs shadow-2xs">
         <i class="fa-solid fa-arrows-rotate"></i>
       </button>
 
       <!-- Export Dropdown -->
       <div class="relative">
-        <button id="exportDropdownBtn" class="px-3.5 py-1.5 rounded-lg bg-apple-blue hover:bg-apple-hoverBlue text-white text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
+        <button id="exportDropdownBtn" class="h-9 px-3.5 rounded-xl bg-apple-blue hover:bg-apple-hoverBlue text-white text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
           <span>导出图纸</span>
           <i class="fa-solid fa-chevron-down text-[9px] opacity-80"></i>
         </button>
@@ -264,6 +291,11 @@
             <span class="text-gray-600">显示豆内色号</span>
             <input type="checkbox" id="showLabelsOnBeadsToggle" checked class="rounded border-gray-300 text-apple-blue focus:ring-0">
           </div>
+
+          <div class="flex items-center justify-between pt-1">
+            <span class="text-gray-600">水平镜像翻转 (反面烫平)</span>
+            <input type="checkbox" id="mirrorToggle" class="rounded border-gray-300 text-apple-blue focus:ring-0">
+          </div>
         </section>
 
       </div>
@@ -272,7 +304,7 @@
     <!-- Canvas Area -->
     <main class="flex-1 flex flex-col h-full bg-[#ECECF0] relative overflow-hidden">
       
-      <!-- Top Minimal Stats Pill -->
+      <!-- Top Minimal Stats Pill (扩展物理尺寸与克重换算) -->
       <div class="absolute top-3.5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2.5 px-4 py-1.5 rounded-full glass shadow-xs text-xs font-medium text-gray-800 border border-white/60 whitespace-nowrap overflow-x-auto max-w-[94vw]">
         <span id="patternDimPill" class="font-mono font-semibold text-gray-900">0 × 0</span>
         <span class="text-gray-300">|</span>
@@ -281,6 +313,9 @@
         <span id="boardPlanPill" class="text-apple-blue font-semibold">1 块板</span>
         <span class="text-gray-300">|</span>
         <span id="patternTotalPill" class="font-mono">0 颗豆子</span>
+        <span class="text-gray-300">|</span>
+        <!-- 实物物理尺寸与重量估算 -->
+        <span id="physicalSizePill" class="font-mono text-gray-600 text-[11px]" title="点击可在 2.6mm 迷你豆 与 5.0mm 标准豆 之间切换换算">2.6mm: 0×0cm (约0g)</span>
       </div>
 
       <!-- Viewport Navigation Floating Buttons -->
@@ -301,22 +336,32 @@
         <canvas id="beadCanvas" class="absolute top-0 left-0"></canvas>
       </div>
 
-      <!-- Bottom Material Drawer -->
+      <!-- Bottom Material Drawer (加入复制采购清单按钮) -->
       <div id="materialDrawer" class="h-26 bg-white border-t border-apple-border shrink-0 flex flex-col px-4 py-2 relative z-20">
         <div class="flex items-center justify-between pb-1 border-b border-gray-100">
           <div class="flex items-center gap-2">
             <span class="text-xs font-semibold text-gray-800">用料清单</span>
             <span id="materialCountLabel" class="text-[10px] text-gray-500 font-mono">0 种用色</span>
           </div>
-          <!-- 排序控制 -->
-          <div class="flex items-center gap-1.5 text-[11px]">
+
+          <!-- 排序控制与一键复制采购单 -->
+          <div class="flex items-center gap-2 text-[11px]">
             <span class="text-gray-400 text-[10px]">排序:</span>
             <div class="flex bg-gray-100 p-0.5 rounded-lg border border-gray-200/60">
               <button id="sortQtyBtn" class="px-2 py-0.5 rounded-md font-medium text-[10px] transition bg-white text-gray-900 shadow-2xs">按用量</button>
               <button id="sortSeriesBtn" class="px-2 py-0.5 rounded-md font-medium text-[10px] transition text-gray-500 hover:text-gray-800">按系列</button>
             </div>
-            <span class="text-gray-300 mx-1">|</span>
-            <span class="text-[10px] text-gray-400">点击色块可单独高亮</span>
+            
+            <span class="text-gray-300 mx-0.5">|</span>
+
+            <!-- 一键复制采购单 -->
+            <button id="copyPurchaseBtn" class="px-2.5 py-1 rounded-lg font-medium text-[10px] bg-apple-blue hover:bg-apple-hoverBlue text-white transition flex items-center gap-1 shadow-2xs active:scale-95">
+              <i class="fa-regular fa-copy"></i>
+              <span>复制采购单</span>
+            </button>
+
+            <span class="text-gray-300 mx-0.5 hidden sm:inline">|</span>
+            <span class="text-[10px] text-gray-400 hidden sm:inline">点击色块可单独高亮</span>
           </div>
         </div>
         <div id="materialList" class="flex-1 flex items-center gap-2 overflow-x-auto py-1"></div>
@@ -330,7 +375,7 @@
   <canvas id="offscreenCanvas" class="hidden"></canvas>
   <canvas id="exportCanvas" class="hidden"></canvas>
 
-  <!-- 引入拆分脚本 -->
+  <!-- 引入脚本 -->
   <script src="palette.js"></script>
   <script src="app.js"></script>
 </body>
