@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>拼豆工作台</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- jsPDF for True Vector PDF Generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"SF Pro Text"', 'system-ui', 'sans-serif'],
+            mono: ['"SF Mono"', 'Menlo', 'Monaco', 'Consolas', 'monospace']
+          },
+          colors: {
+            apple: {
+              bg: '#F5F5F7',
+              surface: '#FFFFFF',
+              border: '#E5E5EA',
+              blue: '#0071E3',
+              hoverBlue: '#0077ED',
+              dark: '#1D1D1F',
+              secondary: '#86868B'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="h-screen w-screen overflow-hidden flex flex-col font-sans">
+
+  <!-- Apple Minimal Header -->
+  <header class="h-13 border-b border-apple-border glass px-4 md:px-6 flex items-center justify-between shrink-0 z-40">
+    <div class="flex items-center space-x-3">
+      <div class="w-7 h-7 rounded-lg bg-apple-dark flex items-center justify-center text-white text-xs">
+        <i class="fa-solid fa-shapes"></i>
+      </div>
+      <h1 class="text-sm font-semibold tracking-tight text-gray-900">拼豆工作台</h1>
+    </div>
+
+    <div class="flex items-center space-x-2">
+      <button id="toggleSidebarBtn" class="md:hidden px-2.5 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-xs font-medium text-gray-700 transition">
+        <i class="fa-solid fa-sliders"></i>
+      </button>
+
+      <button id="resetViewBtn" title="复位视角" class="p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition text-xs">
+        <i class="fa-solid fa-arrows-rotate"></i>
+      </button>
+
+      <!-- Export Dropdown -->
+      <div class="relative">
+        <button id="exportDropdownBtn" class="px-3.5 py-1.5 rounded-lg bg-apple-blue hover:bg-apple-hoverBlue text-white text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
+          <span>导出图纸</span>
+          <i class="fa-solid fa-chevron-down text-[9px] opacity-80"></i>
+        </button>
+        <div id="exportMenu" class="hidden absolute right-0 mt-1.5 w-44 rounded-xl bg-white shadow-xl py-1.5 z-50 border border-apple-border text-xs text-gray-800">
+          <button id="exportPngBtn" class="w-full text-left px-3.5 py-2 hover:bg-blue-50 hover:text-apple-blue flex items-center gap-2 transition">
+            <i class="fa-regular fa-image text-sm"></i>
+            <span>超清 PNG 图纸</span>
+          </button>
+          <button id="exportPdfBtn" class="w-full text-left px-3.5 py-2 hover:bg-blue-50 hover:text-apple-blue flex items-center gap-2 transition">
+            <i class="fa-regular fa-file-pdf text-sm text-red-500"></i>
+            <span>矢量 PDF 图纸</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Workspace Container -->
+  <div class="flex-1 flex overflow-hidden relative">
+
+    <!-- Sidebar Controls -->
+    <aside id="sidebar" class="w-76 md:w-80 border-r border-apple-border bg-white flex flex-col h-full z-30 transition-transform duration-200 absolute md:relative -translate-x-full md:translate-x-0">
+      <div class="flex-1 overflow-y-auto p-4 space-y-4 text-xs">
+        
+        <!-- 1. 图片上传 -->
+        <section class="space-y-1.5">
+          <div id="dropZone" class="border border-dashed border-gray-300 hover:border-apple-blue rounded-xl p-3 text-center cursor-pointer transition bg-gray-50/50 hover:bg-blue-50/30 relative overflow-hidden min-h-[64px] flex flex-col items-center justify-center">
+            <input type="file" id="imageInput" accept="image/*" class="hidden">
+            <div id="uploadPlaceholder" class="flex flex-col items-center justify-center">
+              <i class="fa-solid fa-cloud-arrow-up text-lg text-gray-400 mb-0.5"></i>
+              <p class="text-[11px] text-gray-600 font-medium">点击选择或拖拽图片</p>
+            </div>
+            <div id="imageActiveState" class="hidden w-full flex items-center justify-between px-1">
+              <div class="flex items-center gap-2 overflow-hidden">
+                <img id="imageThumb" class="w-8 h-8 rounded-md object-cover border border-gray-200 shrink-0" src="" alt="预览">
+                <span id="imageName" class="truncate text-left text-[11px] font-medium text-gray-700 max-w-[130px]"></span>
+              </div>
+              <button id="removeImageBtn" class="px-2 py-1 text-[11px] rounded text-red-500 hover:bg-red-50 transition shrink-0 font-medium">清除</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. 色库选择 -->
+        <section class="space-y-1.5">
+          <label class="font-medium text-gray-800">色库方案</label>
+          <div class="grid grid-cols-2 gap-1.5 bg-gray-100 p-1 rounded-xl">
+            <button id="palette221Btn" class="py-1 rounded-lg font-medium text-center transition bg-white text-gray-900 shadow-xs">
+              MARD 221
+            </button>
+            <button id="palette291Btn" class="py-1 rounded-lg font-medium text-center transition text-gray-500 hover:text-gray-900">
+              MARD 291
+            </button>
+          </div>
+
+          <!-- 颜色上限限制控制 -->
+          <div class="pt-2 space-y-1.5">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-600">最大用色上限</span>
+              <span id="maxColorsVal" class="font-mono font-medium text-gray-900">不限</span>
+            </div>
+            <div class="grid grid-cols-5 gap-1 text-[10px]">
+              <button class="color-limit-btn py-1 rounded border border-apple-blue bg-blue-50 text-apple-blue font-medium" data-val="0">不限</button>
+              <button class="color-limit-btn py-1 rounded border border-gray-200 bg-white text-gray-700 hover:bg-gray-50" data-val="16">16色</button>
+              <button class="color-limit-btn py-1 rounded border border-gray-200 bg-white text-gray-700 hover:bg-gray-50" data-val="24">24色</button>
+              <button class="color-limit-btn py-1 rounded border border-gray-200 bg-white text-gray-700 hover:bg-gray-50" data-val="36">36色</button>
+              <button class="color-limit-btn py-1 rounded border border-gray-200 bg-white text-gray-700 hover:bg-gray-50" data-val="48">48色</button>
+            </div>
+            <div class="flex items-center gap-2 pt-1">
+              <input type="range" id="colorLimitSlider" min="2" max="100" value="100" class="flex-1">
+              <span class="text-[10px] text-gray-400 font-mono w-7 text-right" id="sliderValDisplay">全</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. 网格尺寸 -->
+        <section class="space-y-2 bg-gray-50 p-3 rounded-xl border border-gray-200/60">
+          <div class="flex items-center justify-between">
+            <span class="font-medium text-gray-800">拼豆网格大小</span>
+            <label class="text-[11px] text-gray-600 cursor-pointer flex items-center gap-1.5">
+              <input type="checkbox" id="giantToggle" class="rounded border-gray-300 text-apple-blue focus:ring-0">
+              <span>超大尺寸</span>
+            </label>
+          </div>
+          <div class="flex justify-between items-center text-[11px]">
+            <span class="text-gray-500">网格像素:</span>
+            <span id="gridSizeLabel" class="font-mono font-bold text-apple-blue text-sm">52</span>
+          </div>
+          <input type="range" id="gridSizeSlider" min="20" max="104" step="1" value="52" class="w-full">
+          <div class="flex justify-between text-[10px] text-gray-400 font-mono">
+            <span id="minGridText">20</span>
+            <span id="maxGridText">104</span>
+          </div>
+
+          <!-- 起始位置勾选与坐标输入 -->
+          <div class="pt-2 border-t border-gray-200/50 space-y-2">
+            <div class="flex items-center justify-between">
+              <label class="text-[11px] text-gray-700 cursor-pointer flex items-center gap-1.5 font-medium">
+                <input type="checkbox" id="offsetToggle" class="rounded border-gray-300 text-apple-blue focus:ring-0">
+                <span>图案位置</span>
+              </label>
+            </div>
+            <div id="offsetInputsContainer" class="hidden grid-cols-2 gap-2 text-[11px]">
+              <div class="flex items-center gap-1.5 bg-white px-2 py-1.5 rounded-lg border border-gray-200">
+                <span class="text-gray-400 font-mono">X:</span>
+                <input type="number" id="offsetXInput" value="0" min="0" max="500" class="w-full bg-transparent outline-none font-mono font-semibold text-gray-800">
+              </div>
+              <div class="flex items-center gap-1.5 bg-white px-2 py-1.5 rounded-lg border border-gray-200">
+                <span class="text-gray-400 font-mono">Y:</span>
+                <input type="number" id="offsetYInput" value="0" min="0" max="500" class="w-full bg-transparent outline-none font-mono font-semibold text-gray-800">
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. 拼板尺寸选择 -->
+        <section class="space-y-1.5">
+          <label class="font-medium text-gray-800">拼板尺寸</label>
+          <div class="grid grid-cols-3 gap-1.5">
+            <button class="board-type-btn py-2 px-1 rounded-xl border border-apple-blue bg-blue-50/50 text-apple-blue font-semibold text-center transition" data-board="52">
+              52 钉
+            </button>
+            <button class="board-type-btn py-2 px-1 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-semibold text-center transition" data-board="78">
+              78 钉
+            </button>
+            <button class="board-type-btn py-2 px-1 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-semibold text-center transition" data-board="104">
+              104 钉
+            </button>
+          </div>
+        </section>
+
+        <!-- 手动微调画笔工具 -->
+        <section id="manualEditSection" class="space-y-2 bg-gray-50 p-3 rounded-xl border border-gray-200/60 transition-all duration-200">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+              <span class="font-medium text-gray-800">手动微调画笔</span>
+              <span id="editModeIndicator" class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-gray-200 text-gray-600">已锁定</span>
+            </div>
+            <button id="toggleEditModeBtn" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 transition flex items-center gap-1">
+              <i class="fa-solid fa-pen-to-square text-[11px]"></i>
+              <span id="toggleEditBtnText">开启微调</span>
+            </button>
+          </div>
+
+          <!-- 工具面板 -->
+          <div id="brushToolsPanel" class="space-y-2 opacity-50 pointer-events-none transition-opacity duration-200">
+            <div class="flex items-center justify-between pt-1">
+              <div class="grid grid-cols-3 gap-1.5 text-xs flex-1 mr-2">
+                <button id="toolBrushBtn" class="py-1.5 rounded-lg border border-apple-blue bg-blue-50 text-apple-blue font-medium flex items-center justify-center gap-1.5 transition">
+                  <i class="fa-solid fa-paintbrush text-[11px]"></i>
+                  <span>画笔</span>
+                </button>
+                <button id="toolEraserBtn" class="py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-medium flex items-center justify-center gap-1.5 transition">
+                  <i class="fa-solid fa-eraser text-[11px]"></i>
+                  <span>橡皮擦</span>
+                </button>
+                <button id="toolEyedropperBtn" class="py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-medium flex items-center justify-center gap-1.5 transition">
+                  <i class="fa-solid fa-eye-dropper text-[11px]"></i>
+                  <span>吸管</span>
+                </button>
+              </div>
+              <button id="undoBtn" class="py-1.5 px-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-600 text-xs flex items-center gap-1" title="撤销">
+                <i class="fa-solid fa-arrow-rotate-left"></i>
+              </button>
+            </div>
+
+            <!-- 当前笔刷色 -->
+            <div class="flex items-center justify-between pt-1">
+              <div class="flex items-center gap-2">
+                <span class="text-gray-500 text-[11px]">当前填色:</span>
+                <div id="activeBrushSwatch" class="w-5 h-5 rounded-md border border-black/15 shadow-2xs" style="background-color: #000000;"></div>
+                <span id="activeBrushId" class="font-mono font-bold text-gray-900 text-xs">H7</span>
+              </div>
+              <div class="relative">
+                <button id="replaceColorBtn" class="px-2 py-0.5 rounded-md border border-gray-200 bg-white hover:bg-gray-50 text-[11px] text-gray-600 hover:text-apple-blue transition flex items-center gap-1 font-medium" title="将全图中某颜色一键批量替换为当前填色">
+                  <i class="fa-solid fa-repeat text-[10px]"></i>
+                  <span>替换全图</span>
+                </button>
+                <div id="replaceColorDropdown" class="hidden absolute right-0 bottom-full mb-1.5 w-48 rounded-xl bg-white shadow-xl p-2 z-50 border border-apple-border text-xs">
+                  <div class="flex justify-between items-center pb-1 mb-1 border-b border-gray-100">
+                    <span class="text-[10px] text-gray-500">选择要被替换的原色</span>
+                    <button id="closeReplaceBtn" class="text-gray-400 hover:text-gray-600 text-xs px-1">✕</button>
+                  </div>
+                  <div id="replaceColorGrid" class="grid grid-cols-4 gap-1 max-h-36 overflow-y-auto p-0.5"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 5. 图像算法与底板选项 -->
+        <section class="space-y-2 pt-2 border-t border-gray-100">
+          <div class="flex items-center justify-between">
+            <span class="font-medium text-gray-800">黑色轮廓强制 H7 锁定</span>
+            <input type="checkbox" id="h7OutlineLock" checked class="rounded border-gray-300 text-apple-blue focus:ring-0">
+          </div>
+
+          <div class="flex items-center justify-between pt-1">
+            <span class="text-gray-600">显示底板分区色彩</span>
+            <input type="checkbox" id="showPegboardBgToggle" checked class="rounded border-gray-300 text-apple-blue focus:ring-0">
+          </div>
+
+          <div class="flex items-center justify-between">
+            <span class="text-gray-600">显示豆内色号</span>
+            <input type="checkbox" id="showLabelsOnBeadsToggle" checked class="rounded border-gray-300 text-apple-blue focus:ring-0">
+          </div>
+        </section>
+
+      </div>
+    </aside>
+
+    <!-- Canvas Area -->
+    <main class="flex-1 flex flex-col h-full bg-[#ECECF0] relative overflow-hidden">
+      
+      <!-- Top Minimal Stats Pill -->
+      <div class="absolute top-3.5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2.5 px-4 py-1.5 rounded-full glass shadow-xs text-xs font-medium text-gray-800 border border-white/60 whitespace-nowrap overflow-x-auto max-w-[94vw]">
+        <span id="patternDimPill" class="font-mono font-semibold text-gray-900">0 × 0</span>
+        <span class="text-gray-300">|</span>
+        <span id="patternPalettePill">Mard-221</span>
+        <span class="text-gray-300">|</span>
+        <span id="boardPlanPill" class="text-apple-blue font-semibold">1 块板</span>
+        <span class="text-gray-300">|</span>
+        <span id="patternTotalPill" class="font-mono">0 颗豆子</span>
+      </div>
+
+      <!-- Viewport Navigation Floating Buttons -->
+      <div class="absolute bottom-4 right-4 z-20 flex flex-col gap-1 bg-white p-1 rounded-xl shadow-sm border border-gray-200">
+        <button id="zoomInBtn" class="w-7 h-7 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-700 transition" title="放大">
+          <i class="fa-solid fa-plus text-xs"></i>
+        </button>
+        <button id="zoomOutBtn" class="w-7 h-7 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-700 transition" title="缩小">
+          <i class="fa-solid fa-minus text-xs"></i>
+        </button>
+        <button id="fitViewBtn" class="w-7 h-7 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-700 transition" title="自适应">
+          <i class="fa-solid fa-expand text-xs"></i>
+        </button>
+      </div>
+
+      <!-- Canvas -->
+      <div id="viewport" class="flex-1 w-full h-full relative cursor-grab active:cursor-grabbing overflow-hidden">
+        <canvas id="beadCanvas" class="absolute top-0 left-0"></canvas>
+      </div>
+
+      <!-- Bottom Material Drawer -->
+      <div id="materialDrawer" class="h-26 bg-white border-t border-apple-border shrink-0 flex flex-col px-4 py-2 relative z-20">
+        <div class="flex items-center justify-between pb-1 border-b border-gray-100">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-semibold text-gray-800">用料清单</span>
+            <span id="materialCountLabel" class="text-[10px] text-gray-500 font-mono">0 种用色</span>
+          </div>
+          <!-- 排序控制 -->
+          <div class="flex items-center gap-1.5 text-[11px]">
+            <span class="text-gray-400 text-[10px]">排序:</span>
+            <div class="flex bg-gray-100 p-0.5 rounded-lg border border-gray-200/60">
+              <button id="sortQtyBtn" class="px-2 py-0.5 rounded-md font-medium text-[10px] transition bg-white text-gray-900 shadow-2xs">按用量</button>
+              <button id="sortSeriesBtn" class="px-2 py-0.5 rounded-md font-medium text-[10px] transition text-gray-500 hover:text-gray-800">按系列</button>
+            </div>
+            <span class="text-gray-300 mx-1">|</span>
+            <span class="text-[10px] text-gray-400">点击色块可单独高亮</span>
+          </div>
+        </div>
+        <div id="materialList" class="flex-1 flex items-center gap-2 overflow-x-auto py-1"></div>
+      </div>
+
+    </main>
+  </div>
+
+  <div id="toast" class="fixed bottom-28 left-1/2 -translate-x-1/2 z-50 glass border border-white px-3.5 py-1.5 rounded-full shadow-md text-xs text-gray-800 transition-all duration-200 opacity-0 pointer-events-none translate-y-2"></div>
+
+  <canvas id="offscreenCanvas" class="hidden"></canvas>
+  <canvas id="exportCanvas" class="hidden"></canvas>
+
+  <!-- 引入拆分脚本 -->
+  <script src="palette.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
