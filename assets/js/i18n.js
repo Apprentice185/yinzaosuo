@@ -104,7 +104,7 @@ window.I18N = {
     meta_article_title: 'Article | YINZAOSUO', meta_article_description: 'Print knowledge, brand stories, materials, and production techniques from YINZAOSUO.',
     home_announcement: '<span class="announcement-mark" aria-hidden="true">○</span> Wholesale large-format print materials · Global trade enquiries welcome',
     hero_title: 'Large-format print materials<br><em>for trade partners worldwide.</em>', hero_description: 'Source PVC banners, mesh banners, synthetic paper, and self-adhesive vinyl through our production partners in China. Share your specifications, quantity, and destination for a tailored trade quote.',
-    hero_products: 'Explore core products <span>↗</span>', hero_solutions: 'How trade supply works <span>→</span>', hero_social_proof: 'For Australian print brokers, resellers, and trade buyers',
+    hero_products: 'Explore core products <span>↗</span>', hero_solutions: 'How trade supply works <span>→</span>', hero_social_proof: 'For print brokers, resellers, and trade buyers worldwide',
     hero_avatars: '<b>P</b><b>A</b><b>+</b>',
     eyebrow_purpose: 'PRINT WITH PURPOSE', eyebrow_archive: 'PRODUCT / CAPABILITIES',
     eyebrow_process: 'A SIMPLE PROCESS', eyebrow_knowledge: 'PRINT KNOWLEDGE', eyebrow_journal: 'FROM THE ATELIER',
