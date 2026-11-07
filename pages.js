@@ -14,7 +14,7 @@ const data = {
   solutions: managedContent.solutions || []
 };
 const pageDataVersion = localStorage.getItem('printDataVersion') || '';
-const language = () => localStorage.getItem('site_lang') || 'zh';
+const language = () => localStorage.getItem('site_lang') || 'en';
 const text = (type, item, field) => window.contentText(type, item.id, field, item[field] || '');
 const articleUrl = (type, id) => `article.html?type=${type}&id=${encodeURIComponent(id)}`;
 const filterState = { knowledge: '全部', articles: '全部' };
@@ -79,10 +79,8 @@ function templateField(item, field) {
 }
 
 function templatePrice(item) {
-  const amount = item.price.replace(/^¥\s*/, '').replace(/\s*起$/, '');
-  return language() === 'en' ? `${window.t('template_price_from')} ¥${amount}` : item.price;
+  return window.t('price_quote_only');
 }
-
 function templateSize(item) {
   return templateField(item, 'size');
 }
