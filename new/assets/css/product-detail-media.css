@@ -1,0 +1,5 @@
+.product-detail-image{display:grid;place-items:center;height:520px;min-height:0;padding:24px;border:1px solid #ededf0;background:#f9f9fb;color:var(--muted)}
+.product-detail-image:before{display:none}
+.product-detail-image img{display:block;width:100%;height:100%;object-fit:contain}
+.product-detail-image span{position:static;color:var(--muted);font-size:12px}
+@media(max-width:800px){.product-detail-image{height:330px;min-height:0}}
