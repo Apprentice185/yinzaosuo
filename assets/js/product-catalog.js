@@ -10,7 +10,7 @@
   const categories = catalog.zh.categories;
   const params = new URLSearchParams(location.search);
   const requestedCategory = params.get('category');
-  let language = localStorage.getItem('site_lang') || 'zh';
+  let language = localStorage.getItem('site_lang') || 'en';
   let activeCategory = categories.some(category => category.id === requestedCategory)
     ? requestedCategory
     : categories.some(category => category.id === sessionStorage.getItem('productCatalogCategory'))
