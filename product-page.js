@@ -15,7 +15,7 @@ const productData = {
   products: [...catalogueProducts, ...legacyProducts.filter(item => !catalogueProducts.some(current => current.id === item.id))]
 };
 const productId = new URLSearchParams(location.search).get('id');
-const product = productData.products.find(item => item.id === productId) || productData.products[0];
+let product = productData.products.find(item => item.id === productId) || productData.products[0];
 const language = () => localStorage.getItem('site_lang') || 'en';
 const productText = field => window.contentText('products', product.id, field, product[field] || product.desc || '');
 
@@ -40,6 +40,10 @@ function referencePrice() {
   return window.t('price_quote_only');
 }
 function renderProductDetails() {
+  const localizedCategory = (window.PRODUCTS_DATA?.[language()]?.categories || [])
+    .find(category => category.items.some(item => item.id === productId));
+  const localizedItem = localizedCategory?.items.find(item => item.id === productId);
+  if (localizedItem) product = { ...localizedItem, category: localizedCategory.title, intro: localizedItem.desc, options: localizedItem.options || [] };
   const currentValues = [...document.querySelectorAll('#detailOptions select')].map(select => select.selectedIndex);
   const title = `${productText('name')} | YINZAOSUO`;
   const description = language() === 'en'
