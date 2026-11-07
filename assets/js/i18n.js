@@ -95,7 +95,7 @@ window.I18N = {
     nav_products: 'Products', nav_solutions: 'Trade Supply', nav_knowledge: 'Materials Guide', nav_journal: 'Insights', nav_templates: 'Resources',
     nav_quote: 'Get a quote <span>↗</span>', nav_search: 'Search', nav_menu: 'Open menu', nav_main: 'Main navigation',
     brand_home: 'YINZAOSUO home', lang_switch: 'Switch to Chinese', close: 'Close',
-    meta_home_title: 'Wholesale Large Format Print Materials | YINZAOSUO', meta_home_description: 'Wholesale PVC banners, mesh banners, synthetic paper, and self-adhesive vinyl for print brokers, resellers, and trade buyers worldwide. Request a tailored quote.',
+    meta_home_title: 'Custom Print Production & Display Supply | YINZAOSUO', meta_home_description: 'Wholesale PVC banners, mesh banners, synthetic paper, and self-adhesive vinyl for print brokers, resellers, and trade buyers worldwide. Request a tailored quote.',
     meta_knowledge_title: 'Print Knowledge | YINZAOSUO', meta_knowledge_description: 'Practical guidance on paper, file preparation, color, and print finishing.',
     meta_solutions_title: 'Scenario Solutions | YINZAOSUO', meta_solutions_description: 'Explore how print and brand materials support events, spaces, and business needs.',
     meta_journal_title: 'Journal | YINZAOSUO', meta_journal_description: 'Read YINZAOSUO case studies, new materials, and print-industry observations.',
