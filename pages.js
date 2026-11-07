@@ -14,7 +14,7 @@ const data = {
   solutions: managedContent.solutions || []
 };
 const pageDataVersion = localStorage.getItem('printDataVersion') || '';
-const language = () => localStorage.getItem('site_lang') || 'zh';
+const language = () => localStorage.getItem('site_lang') || 'en';
 const text = (type, item, field) => window.contentText(type, item.id, field, item[field] || '');
 const articleUrl = (type, id) => `article.html?type=${type}&id=${encodeURIComponent(id)}`;
 const filterState = { knowledge: '全部', articles: '全部' };
@@ -79,10 +79,8 @@ function templateField(item, field) {
 }
 
 function templatePrice(item) {
-  const amount = item.price.replace(/^¥\s*/, '').replace(/\s*起$/, '');
-  return language() === 'en' ? `${window.t('template_price_from')} ¥${amount}` : item.price;
+  return window.t('price_quote_only');
 }
-
 function templateSize(item) {
   return templateField(item, 'size');
 }
@@ -194,7 +192,7 @@ function renderArticle() {
   if (!item) return;
   const title = text(type, item, 'title');
   const excerpt = text(type, item, 'excerpt');
-  document.title = language() === 'en' ? `${title} | Print Atelier` : item.seoTitle || `${item.title}｜印造所`;
+  document.title = language() === 'en' ? `${title} | YINZAOSUO` : item.seoTitle || `${item.title}｜印造所`;
   document.querySelector('meta[name="description"]').content = language() === 'en' ? excerpt : item.seoDescription || item.excerpt || item.title;
   document.querySelector('meta[property="og:title"]').content = document.title;
   document.querySelector('meta[property="og:description"]').content = language() === 'en' ? excerpt : item.seoDescription || item.excerpt || item.title;
@@ -204,7 +202,7 @@ function renderArticle() {
   document.querySelector('#articleCategory').textContent = text(type, item, 'category');
   document.querySelector('#articleTitle').textContent = title;
   document.querySelector('#articleDate').textContent = language() === 'en'
-    ? `${text(type, item, 'category')} · ${item.date || 'Print Atelier'}`
+    ? `${text(type, item, 'category')} · ${item.date || 'YINZAOSUO'}`
     : `${item.category}　·　${item.date || '印造所知识库'}`;
   const cover = document.querySelector('#articleCover');
   cover.hidden = !item.cover;

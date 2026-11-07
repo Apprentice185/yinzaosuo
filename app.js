@@ -24,7 +24,7 @@ const siteData = {
 };
 const pageDataVersion = localStorage.getItem('printDataVersion') || '';
 const products = siteData.products || [];
-const language = () => localStorage.getItem('site_lang') || 'zh';
+const language = () => localStorage.getItem('site_lang') || 'en';
 const productText = (product, field) => window.contentText('products', product.id, field, product[field] || product.desc || '');
 const resolveContentImage = value => {
   if (typeof value !== 'string' || !value.trim()) return '';
