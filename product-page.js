@@ -112,5 +112,47 @@ document.querySelector('#productQuote').addEventListener('click', () => {
   window.location.href = 'index.html#quoteModal';
 });
 
+
+function renderProductInformation() {
+  const detail = product.detail;
+  const root = document.querySelector('#productInformation');
+  if (!root || !detail) {
+    if (root) root.hidden = true;
+    return;
+  }
+  root.hidden = false;
+  const labels = language() === 'en'
+    ? { eyebrow: 'PRODUCT DETAILS', title: 'Made around your project requirements.', highlights: 'PRODUCTION OPTIONS', applications: 'TYPICAL APPLICATIONS', finishing: 'FINISHING & PROCESSING', delivery: 'DELIVERY FORMATS', artworkTitle: 'Artwork support', briefTitle: 'What to include in your enquiry', quote: 'Discuss your project ↗' }
+    : { eyebrow: '产品详情', title: '根据项目需求定制生产。', highlights: '生产与定制能力', applications: '适用场景', finishing: '加工与后道处理', delivery: '交付形式', artworkTitle: '设计文件支持', briefTitle: '询价时建议提供的信息', quote: '咨询项目需求 ↗' };
+  document.querySelector('#productInfoEyebrow').textContent = labels.eyebrow;
+  document.querySelector('#productInfoTitle').textContent = labels.title;
+  document.querySelector('#productInfoLead').textContent = detail.lead;
+  document.querySelector('#productHighlightsLabel').textContent = labels.highlights;
+  document.querySelector('#productApplicationsLabel').textContent = labels.applications;
+  document.querySelector('#productFinishingLabel').textContent = labels.finishing;
+  document.querySelector('#productDeliveryLabel').textContent = labels.delivery;
+  document.querySelector('#productArtworkTitle').textContent = labels.artworkTitle;
+  document.querySelector('#productBriefTitle').textContent = labels.briefTitle;
+  document.querySelector('#productInformationQuote').textContent = labels.quote;
+  const renderList = (selector, values) => {
+    const list = document.querySelector(selector);
+    list.replaceChildren();
+    (values || []).forEach(value => {
+      const item = document.createElement('li');
+      item.textContent = value;
+      list.append(item);
+    });
+  };
+  renderList('#productHighlights', detail.highlights);
+  renderList('#productApplications', detail.applications);
+  renderList('#productFinishing', detail.finishing);
+  renderList('#productDelivery', detail.delivery);
+  document.querySelector('#productArtwork').textContent = detail.artwork;
+  document.querySelector('#productBrief').textContent = detail.brief;
+  document.querySelector('#productCaveat').textContent = detail.caveat;
+}
+
 window.registerLanguageRenderer(renderProductDetails);
+window.registerLanguageRenderer(renderProductInformation);
 renderProductDetails();
+renderProductInformation();
