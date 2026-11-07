@@ -37,12 +37,8 @@ function optionValue(value) {
 }
 
 function referencePrice() {
-  if (!product.price) return window.t('price_reference');
-  if (language() !== 'en') return `${product.price}｜${window.t('price_reference')}`;
-  const amount = product.price.replace(/^¥\s*/, '').replace(/\s*起$/, '');
-  return `${window.t('template_price_from')} ¥${amount} · ${window.t('price_reference')}`;
+  return window.t('price_quote_only');
 }
-
 function renderProductDetails() {
   const currentValues = [...document.querySelectorAll('#detailOptions select')].map(select => select.selectedIndex);
   const title = `${productText('name')} | Print Atelier`;
