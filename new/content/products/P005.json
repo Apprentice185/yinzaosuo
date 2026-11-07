@@ -1,0 +1,62 @@
+{
+  "id": "P005",
+  "category": "packaging",
+  "name": "质感不干胶标签",
+  "desc": "让每一件产品被记住",
+  "intro": "适合包装、瓶身、礼盒和活动物料，支持多种形状与表面效果。",
+  "price": "¥120 起",
+  "tag": "上新",
+  "thumb": "",
+  "sceneImage": "",
+  "options": [
+    {
+      "name": "形状",
+      "values": [
+        "圆形",
+        "方形",
+        "异形裁切"
+      ]
+    },
+    {
+      "name": "数量",
+      "values": [
+        "100 张",
+        "500 张",
+        "1000 张"
+      ]
+    },
+    {
+      "name": "材料",
+      "values": [
+        "铜版不干胶",
+        "透明不干胶",
+        "牛皮纸不干胶"
+      ]
+    },
+    {
+      "name": "表面",
+      "values": [
+        "哑膜",
+        "亮膜",
+        "暂不覆膜"
+      ]
+    }
+  ],
+  "slug": "p005",
+  "seoTitle": "质感不干胶标签????",
+  "seoDescription": "适合包装、瓶身、礼盒和活动物料，支持多种形状与表面效果。",
+  "title": "质感不干胶标签",
+  "title_en": "Textured Adhesive Labels",
+  "image": "",
+  "desc_en": "Custom labels for packaging, product identification, and brand details.",
+  "materials": [],
+  "materials_en": [],
+  "crafts": [],
+  "crafts_en": [],
+  "sort_order": 1005,
+  "show_in_archive": false,
+  "category_legacy_en": "Labels & Stickers",
+  "intro_en": "Custom labels for packaging, product identification, and brand details.",
+  "category_legacy": "标签贴纸",
+  "name_en": "Textured Adhesive Labels"
+}
