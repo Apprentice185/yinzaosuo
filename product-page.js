@@ -152,6 +152,10 @@ function renderProductInformation() {
   document.querySelector('#productCaveat').textContent = detail.caveat;
 }
 
+document.querySelector('#productInformationQuote')?.addEventListener('click', () => {
+  localStorage.setItem('pendingQuote', window.t('quote_product_format').replace('{product}', productText('name')));
+});
+
 window.registerLanguageRenderer(renderProductDetails);
 window.registerLanguageRenderer(renderProductInformation);
 renderProductDetails();
