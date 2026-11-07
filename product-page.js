@@ -16,7 +16,7 @@ const productData = {
 };
 const productId = new URLSearchParams(location.search).get('id');
 const product = productData.products.find(item => item.id === productId) || productData.products[0];
-const language = () => localStorage.getItem('site_lang') || 'zh';
+const language = () => localStorage.getItem('site_lang') || 'en';
 const productText = field => window.contentText('products', product.id, field, product[field] || product.desc || '');
 
 function optionLabel(name) {
