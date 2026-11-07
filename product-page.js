@@ -41,7 +41,7 @@ function referencePrice() {
 }
 function renderProductDetails() {
   const currentValues = [...document.querySelectorAll('#detailOptions select')].map(select => select.selectedIndex);
-  const title = `${productText('name')} | Print Atelier`;
+  const title = `${productText('name')} | YINZAOSUO`;
   const description = language() === 'en'
     ? productText('intro')
     : product.seoDescription || product.intro || product.desc || product.name;
