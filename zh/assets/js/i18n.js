@@ -249,7 +249,7 @@ window.I18N = {
 };
 
 (() => {
-  let language = localStorage.getItem('site_lang');
+  let language = 'zh';
   if (!['zh', 'en'].includes(language)) language = 'zh';
   const renderers = new Set();
   const current = () => window.I18N[language];
@@ -274,8 +274,8 @@ window.I18N = {
     return () => renderers.delete(renderer);
   };
   window.setLanguage = lang => {
-    language = lang === 'en' ? 'en' : 'zh';
-    localStorage.setItem('site_lang', language);
+    language = 'zh';
+    localStorage.setItem('site_lang', 'zh');
     document.documentElement.lang = language;
     document.querySelectorAll('[data-i18n]').forEach(element => {
       const value = current()[element.dataset.i18n];
@@ -305,7 +305,7 @@ window.I18N = {
     renderers.forEach(renderer => renderer(language));
   };
   document.querySelectorAll('#languageToggle').forEach(button => {
-    button.addEventListener('click', () => window.setLanguage(language === 'zh' ? 'en' : 'zh'));
+    button.addEventListener('click', () => { window.location.href = '/'; });
   });
   window.setLanguage(language);
 })();

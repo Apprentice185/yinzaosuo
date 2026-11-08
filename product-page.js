@@ -55,7 +55,7 @@ function renderProductDetails() {
   document.querySelector('meta[property="og:title"]').content = document.title;
   document.querySelector('meta[property="og:description"]').content = description;
 
-  const url = new URL(`new/product.html?id=${encodeURIComponent(product.id)}`, 'https://yinzaosuo.com/');
+  const url = new URL(`product.html?id=${encodeURIComponent(product.id)}`, 'https://yinzaosuo.com/');
   document.querySelector('link[rel="canonical"]').href = url.href;
   document.querySelector('meta[property="og:url"]').content = url.href;
   document.querySelector('#productCategory').textContent = `${productText('category')} · ${product.id}`;
