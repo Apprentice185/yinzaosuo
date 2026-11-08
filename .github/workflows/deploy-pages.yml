@@ -33,8 +33,6 @@ jobs:
         run: npm run content:build
       - name: Build Chinese site content and sitemap
         run: node zh/scripts/generate-content.js
-      - name: Build legacy preview content and sitemap
-        run: node new/scripts/generate-content.js
       - name: Verify published site files
         run: |
           test -f index.html
