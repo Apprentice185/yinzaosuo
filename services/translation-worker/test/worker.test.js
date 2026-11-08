@@ -38,6 +38,15 @@ test("rejects oversized bodies even without a content-length header", async () =
   assert.equal(response.status, 413);
 });
 
+test("rejects non-object JSON payloads", async () => {
+  const response = await worker.fetch(new Request("https://worker.example/translate", {
+    method: "POST",
+    headers: { Origin: origin, "Content-Type": "application/json" },
+    body: "null",
+  }), {});
+  assert.equal(response.status, 400);
+});
+
 test("requires server-side secrets before calling providers", async () => {
   const response = await worker.fetch(request({ text: "印刷产品" }), {});
   assert.equal(response.status, 503);
