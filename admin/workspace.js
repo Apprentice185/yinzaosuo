@@ -31,13 +31,11 @@
     for (var i = 0; i < candidates.length; i += 1) {
       var candidate = candidates[i];
       if (candidate.closest(".yinzaosuo-editor-actions")) continue;
-      if (!isStatusButton(candidate)) continue;
-      var parent = candidate.parentElement;
-      for (var depth = 0; parent && parent !== root && depth < 8; depth += 1, parent = parent.parentElement) {
-        var hasDelete = Array.prototype.slice.call(parent.querySelectorAll("button,[role='button']"))
-          .some(function (node) { return /^(删除内容|删除|Delete)$/i.test(cleanText(node)); });
-        if (hasDelete) return candidate;
-      }
+      if (candidate.disabled || !isStatusButton(candidate)) continue;
+      // The status control is unique to the entry editor. Do not require the
+      // delete action to share an ancestor: Decap versions render these in
+      // separate toolbar containers, which previously prevented injection.
+      return candidate;
     }
     return null;
   }
@@ -149,10 +147,18 @@
   }
 
   function targetName(name, names) {
-    if (name.slice(-3) === "_zh") {
-      var direct = name.slice(0, -3) + "_en";
-      return names.has(direct) ? direct : null;
+    if (names.has(name.slice(0, -3) + "_en") && name.slice(-3) === "_zh") {
+      return name.slice(0, -3) + "_en";
     }
+
+    // Support nested object and list fields such as detail_zh.lead and
+    // nav_items[0].label_zh, not just top-level *_zh controls.
+    var leafMatch = name.match(/(^|[.\\]])([^.[\\]]+)_zh$/);
+    if (leafMatch) {
+      var nestedCandidate = name.slice(0, name.length - 3) + "_en";
+      if (names.has(nestedCandidate)) return nestedCandidate;
+    }
+
     var dot = name.indexOf(".");
     var bracket = name.indexOf("[");
     var cut = dot < 0 ? bracket : (bracket < 0 ? dot : Math.min(dot, bracket));
