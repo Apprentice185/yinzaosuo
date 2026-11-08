@@ -1,8 +1,13 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const root = path.resolve(__dirname, '..');
-const contentRoot = path.join(root, 'content');
+const repositoryRoot = path.resolve(__dirname, '..');
+const root = process.env.CMS_SITE_ROOT
+  ? path.resolve(repositoryRoot, process.env.CMS_SITE_ROOT)
+  : repositoryRoot;
+const contentRoot = path.join(repositoryRoot, 'content');
+const isChineseBuild = root !== repositoryRoot;
+const sitePrefix = isChineseBuild ? '/zh' : '';
 const outputFile = path.join(root, 'assets', 'js', 'content-index.js');
 const siteUrl = 'https://yinzaosuo.com';
 
@@ -183,13 +188,36 @@ function readMarkdownCollection(name) {
   });
 }
 
+const publicationTargets = new Set(['both', 'domestic', 'international']);
+const publicationStatuses = new Set(['published', 'hidden']);
+
+function normalizePublication(item) {
+  const publishTo = item.publish_to || 'both';
+  const status = item.status || 'published';
+  if (!publicationTargets.has(publishTo)) {
+    throw new Error(`Content ${item.id || item.slug || ''} has an invalid publish_to value: ${publishTo}`);
+  }
+  if (!publicationStatuses.has(status)) {
+    throw new Error(`Content ${item.id || item.slug || ''} has an invalid status value: ${status}`);
+  }
+  return { ...item, publish_to: publishTo, status };
+}
+
+function isPublishedForCurrentSite(item) {
+  if (item.status !== 'published') return false;
+  if (item.publish_to === 'both') return true;
+  return isChineseBuild ? item.publish_to === 'domestic' : item.publish_to === 'international';
+}
+
 function normalizeProduct(product) {
   return {
-    ...product,
+    ...normalizePublication(product),
     id: String(product.id),
     title: product.title || product.name || '',
     title_en: product.title_en || product.name_en || product.title || product.name || '',
-    image: typeof product.image === 'string' ? product.image : product.thumb || '',
+    image: isChineseBuild && typeof product.image_zh === 'string'
+      ? product.image_zh
+      : typeof product.image === 'string' ? product.image : product.thumb || '',
     desc: product.desc || product.intro || '',
     desc_en: product.desc_en || product.intro_en || product.desc || product.intro || '',
     intro: product.intro || product.desc || '',
@@ -229,7 +257,7 @@ function deduplicateProducts(products) {
 }
 
 function normalizeTemplate(template) {
-  const item = { ...template, id: String(template.id) };
+  const item = normalizePublication({ ...template, id: String(template.id) });
   if (item.file_url && !/^(https?:\/\/|\/|\.\/|\.\.\/)/i.test(item.file_url)) {
     throw new Error(`Template ${item.id} has an unsupported file_url: ${item.file_url}`);
   }
@@ -260,7 +288,7 @@ function normalizeArticle(item, collection) {
   const body = `${renderMarkdown(item.body)}${gallery}`;
   const bodyEn = `${renderMarkdown(item.body_en)}${gallery}`;
   return {
-    ...item,
+    ...normalizePublication(item),
     id: String(item.id),
     title: item.title || '',
     title_en: item.title_en || item.title || '',
@@ -389,7 +417,8 @@ function buildSitemap(data) {
     const tags = details
       ? `<changefreq>${details.changefreq}</changefreq><priority>${details.priority}</priority>`
       : '';
-    return `  <url><loc>${escapeHtml(`${siteUrl}${route}`)}</loc>${tags}</url>`;
+    const publicRoute = sitePrefix ? (route === '/' ? `${sitePrefix}/` : `${sitePrefix}${route}`) : route;
+    return `  <url><loc>${escapeHtml(`${siteUrl}${publicRoute}`)}</loc>${tags}</url>`;
   });
   fs.writeFileSync(path.join(root, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>\n`);
 }
@@ -400,6 +429,7 @@ function main() {
       file,
       product: normalizeProduct(JSON.parse(fs.readFileSync(file, 'utf8')))
     })))
+    .filter(isPublishedForCurrentSite)
     .sort((a, b) => a.sort_order - b.sort_order || a.id.localeCompare(b.id));
   const settingsFile = path.join(contentRoot, 'settings', 'home.json');
   const homeSettings = fs.existsSync(settingsFile)
@@ -407,24 +437,61 @@ function main() {
     : {};
   const heroImage = String(homeSettings.hero_image || '').trim();
   if (heroImage && !safeMediaUrl(heroImage)) throw new Error(`Unsupported homepage hero image URL: ${heroImage}`);
+  const heroSlides = Array.isArray(homeSettings.hero_slides)
+    ? homeSettings.hero_slides.map((slide, index) => {
+        const image = String(slide?.image || '').trim();
+        if (!image || !safeMediaUrl(image)) throw new Error(`Homepage hero slide ${index + 1} has an invalid image URL`);
+        return { image };
+      }).filter(slide => slide.image)
+    : [];
+  if (heroSlides.length && (heroSlides.length < 3 || heroSlides.length > 5)) {
+    throw new Error('Homepage hero carousel must contain 3 to 5 slides');
+  }
+  const globalSettingsFile = path.join(contentRoot, 'settings', 'site.json');
+  const globalSettings = fs.existsSync(globalSettingsFile) ? JSON.parse(fs.readFileSync(globalSettingsFile, 'utf8')) : {};
   const siteSettings = {
+    global: globalSettings,
     home: {
-      hero_image: heroImage,
-      hero_image_alt: homeSettings.hero_image_alt || '',
-      hero_image_alt_en: homeSettings.hero_image_alt_en || ''
+      ...homeSettings,
+      hero_slides: heroSlides,
+      modules: homeSettings.modules || {},
+      module_order: Array.isArray(homeSettings.module_order) ? homeSettings.module_order : [],
+      faq_items: Array.isArray(homeSettings.faq_items) ? homeSettings.faq_items : []
     }
   };
+  const catalogue = filesIn('catalogue', '.json').map(file => normalizePublication(JSON.parse(fs.readFileSync(file, 'utf8')))).filter(item => item && item.id).filter(isPublishedForCurrentSite);
+  const requiredCatalogueIds = ['YS-PVC-BANNER', 'YS-PVC-MESH', 'YS-SYNTHETIC-PAPER', 'YS-ADHESIVE-VINYL', 'YS-ROLL-UP', 'YS-X-BANNER', 'YS-DOOR-STAND'];
+  const catalogueById = new Map(catalogue.map(item => [String(item.id), item]));
+  const missingCatalogueIds = requiredCatalogueIds.filter(id => !catalogueById.has(id));
+  if (missingCatalogueIds.length) throw new Error(`Missing core catalogue records: ${missingCatalogueIds.join(', ')}`);
+  for (const id of requiredCatalogueIds) {
+    const item = catalogueById.get(id);
+    for (const lang of ['zh', 'en']) {
+      const detail = item[`detail_${lang}`];
+      if (!item[`name_${lang}`] || !item[`desc_${lang}`] || !detail || !detail.lead || !detail.artwork || !detail.brief || !detail.caveat) {
+        throw new Error(`Core catalogue record ${id} is missing required ${lang} content`);
+      }
+      for (const field of ['highlights', 'applications', 'finishing', 'delivery']) {
+        if (!Array.isArray(detail[field]) || detail[field].length === 0) {
+          throw new Error(`Core catalogue record ${id} has no ${lang} ${field}`);
+        }
+      }
+    }
+  }
   const templates = filesIn('templates', '.json')
-    .map(file => normalizeTemplate(JSON.parse(fs.readFileSync(file, 'utf8'))));
-  const solutions = readMarkdownCollection('solutions').map(item => normalizeArticle(item, 'solutions'));
-  const knowledge = readMarkdownCollection('knowledge').map(item => normalizeArticle(item, 'knowledge'));
+    .map(file => normalizeTemplate(JSON.parse(fs.readFileSync(file, 'utf8'))))
+    .filter(isPublishedForCurrentSite);
+  const solutions = readMarkdownCollection('solutions').map(item => normalizeArticle(item, 'solutions')).filter(isPublishedForCurrentSite);
+  const knowledge = readMarkdownCollection('knowledge').map(item => normalizeArticle(item, 'knowledge')).filter(isPublishedForCurrentSite);
   const news = readMarkdownCollection('news')
     .map(item => normalizeArticle(item, 'news'))
+    .filter(isPublishedForCurrentSite)
     .sort((a, b) => a.sort_order - b.sort_order || a.id.localeCompare(b.id));
   const data = {
     products,
     siteSettings,
     catalog: buildCatalog(products),
+    catalogue,
     solutions,
     knowledge,
     news,

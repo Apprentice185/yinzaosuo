@@ -1,4 +1,73 @@
 {
+  "eyebrow_zh": "面向全球贸易客户的印刷合作伙伴",
+  "hero_slides": [
+    {
+      "image": "/pic/display-stands.jpg"
+    },
+    {
+      "image": "/pic/banner.png"
+    },
+    {
+      "image": "pic/pvc-mesh-banner.jpg"
+    },
+    {
+      "image": "pic/display-stands.jpg"
+    },
+    {
+      "image": "pic/finishing-details.jpg"
+    }
+  ],
+  "modules": {
+    "trust": true,
+    "products": true,
+    "process": true,
+    "knowledge": true,
+    "journal": true,
+    "about": true,
+    "faq": true
+  },
+  "hero_note_en": "Custom specifications · Flexible finishing · Global order support",
+  "hero_description_en": "Printed graphics and display solutions for print resellers, agencies and trade buyers worldwide.",
+  "hero_title_en": "Custom Print Production, Ready for Your Business.",
+  "hero_description_zh": "面向印刷经销商、广告制作商与贸易采购商，提供横幅、网格布、合成纸、背胶印刷及展示架，按订单协调生产与交付。",
+  "hero_note_zh": "定制规格 · 灵活加工 · 国际订单协调",
+  "faq_items": [
+    {
+      "question_zh": "可以先确认材料和生产规格吗？",
+      "answer_zh": "可以。请在询价时说明用途和关注的材料规格，我们会根据可供产品确认具体参数及样品安排。",
+      "question_en": "Can I confirm materials and specifications before ordering?",
+      "answer_en": "Yes. Share your application and material requirements, and we will confirm available specifications and sample options."
+    },
+    {
+      "question_zh": "没有设计稿，也能制作吗？",
+      "answer_zh": "可以提供基础文件检查和简单调整；复杂修改或原创设计会另行报价。",
+      "question_en": "Can you help if I do not have print-ready artwork?",
+      "answer_en": "We can provide basic file checks and simple adjustments. Complex revisions or original design work are quoted separately."
+    },
+    {
+      "question_zh": "如何安排国际运输？",
+      "answer_zh": "我们会根据订单尺寸、重量、包装和目的地协调运输方案，具体费用与交期以项目确认结果为准。",
+      "question_en": "How is international shipping arranged?",
+      "answer_en": "We coordinate shipping based on order dimensions, weight, packing and destination. Costs and timing are confirmed per project."
+    },
+    {
+      "question_zh": "如何处理印刷质量问题？",
+      "answer_zh": "生产前会确认文件和规格。如出现影响使用的生产质量问题，请提供照片和订单信息，我们会核实并协商处理方案。",
+      "question_en": "What if there is a print quality issue?",
+      "answer_en": "Please share photos and order details. We will review the issue against the approved specifications and discuss an appropriate resolution."
+    }
+  ],
+  "hero_title_zh": "全球定制印刷与展示供应，为贸易伙伴而协作。",
+  "module_order": [
+    "trust",
+    "products",
+    "process",
+    "knowledge",
+    "journal",
+    "about",
+    "faq"
+  ],
+  "eyebrow_en": "YOUR GLOBAL PRINT PRODUCTION PARTNER",
   "hero_image": "assets/images/products/banner.jpg",
   "hero_image_alt": "全新机器+原厂油墨",
   "hero_image_alt_en": "Brand new machine + original ink"

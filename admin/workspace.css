@@ -1,0 +1,10 @@
+:root{color-scheme:light}
+#nc-root{min-height:100vh;font-family:Inter,"PingFang SC","Microsoft YaHei",Arial,sans-serif}
+#nc-root .nc-appHeader,#nc-root .nc-entryEditor-toolbar{background:#fff;box-shadow:none}
+#nc-root .nc-sidebar{background:#fff}
+#nc-root .nc-controlPane{max-width:920px}
+#nc-root .yinzaosuo-native-status-hidden,#nc-root .yinzaosuo-native-delete-hidden{display:none!important}
+#nc-root .yinzaosuo-editor-actions{display:inline-flex;align-items:center;gap:8px;margin-left:10px;vertical-align:middle}
+#nc-root .yinzaosuo-editor-actions button{min-height:38px;padding:8px 18px;border:1px solid #d9e4e0;border-radius:7px;background:#17221e;color:#fff;font-size:14px;font-weight:600;cursor:pointer}
+#nc-root .yinzaosuo-editor-actions button[data-action=translate]{background:#eaf5f2;border-color:#d9e4e0;color:#176b60}
+#nc-root .yinzaosuo-editor-actions button:disabled{opacity:.55;cursor:wait}

@@ -2,22 +2,23 @@ const storedProductData = JSON.parse(localStorage.getItem('printData') || 'null'
 const siteProductData = storedProductData
   ? { ...printData, ...storedProductData, products: storedProductData.products || printData.products }
   : printData;
-const managedProducts = (window.CMS_CONTENT?.products || []).map(item => ({
-  ...item,
-  name: item.title,
-  category: item.category_legacy || item.category_title || item.category,
-  intro: item.intro || item.desc,
-  thumb: item.thumb || item.image,
-  options: Array.isArray(item.options) ? item.options : []
-}));
+const legacyProducts = siteProductData.products || [];
+const catalogueProducts = (window.PRODUCTS_DATA?.[localStorage.getItem('site_lang') || 'en']?.categories || [])
+  .flatMap(category => category.items.map(item => ({
+    ...item,
+    category: category.title,
+    intro: item.desc,
+    options: Array.isArray(item.options) ? item.options : []
+  })));
+const managedCatalogue = window.CMS_CONTENT?.catalogue || [];
 const productData = {
   ...siteProductData,
-  products: Array.isArray(window.CMS_CONTENT?.products) ? managedProducts : siteProductData.products || []
+  products: [...catalogueProducts.map(item => { const managed = managedCatalogue.find(entry => entry.id === item.id); const lang = localStorage.getItem('site_lang') || 'en'; return managed ? { ...item, name: managed[lang === 'en' ? 'name_en' : 'name_zh'] || item.name, image: managed.image || item.image, desc: managed[lang === 'en' ? 'desc_en' : 'desc_zh'] || item.desc, detail: managed[lang === 'en' ? 'detail_en' : 'detail_zh'] || item.detail } : item; }), ...legacyProducts.filter(item => !catalogueProducts.some(current => current.id === item.id))]
 };
 const productId = new URLSearchParams(location.search).get('id');
-const product = productData.products.find(item => item.id === productId) || null;
-const language = () => localStorage.getItem('site_lang') || 'zh';
-const productText = field => window.contentText('products', product.id, field, product[field] || product.desc || '');
+let product = productData.products.find(item => item.id === productId) || null;
+const language = () => localStorage.getItem('site_lang') || 'en';
+const productText = field => field === 'name' ? product.name : field === 'intro' ? (product.desc || '') : window.contentText('products', product.id, field, product[field] || product.desc || '');
 let missingProductMessage;
 
 function renderMissingProduct() {
@@ -64,12 +65,8 @@ function optionValue(value) {
 }
 
 function referencePrice() {
-  if (!product.price) return window.t('price_reference');
-  if (language() !== 'en') return `${product.price}｜${window.t('price_reference')}`;
-  const amount = product.price.replace(/^¥\s*/, '').replace(/\s*起$/, '');
-  return `${window.t('template_price_from')} ¥${amount} · ${window.t('price_reference')}`;
+  return window.t('price_quote_only');
 }
-
 function renderProductDetails() {
   if (!product) {
     renderMissingProduct();
@@ -77,8 +74,12 @@ function renderProductDetails() {
   }
   missingProductMessage?.remove();
   document.querySelector('.product-detail-layout').style.display = '';
+  const localizedCategory = (window.PRODUCTS_DATA?.[language()]?.categories || [])
+    .find(category => category.items.some(item => item.id === productId));
+  const localizedItem = localizedCategory?.items.find(item => item.id === productId);
+  if (localizedItem) { const managed = managedCatalogue.find(entry => entry.id === productId); const lang = language(); product = { ...localizedItem, name: managed?.[lang === 'en' ? 'name_en' : 'name_zh'] || localizedItem.name, image: managed?.image || localizedItem.image, desc: managed?.[lang === 'en' ? 'desc_en' : 'desc_zh'] || localizedItem.desc, detail: managed?.[lang === 'en' ? 'detail_en' : 'detail_zh'] || localizedItem.detail, category: localizedCategory.title, intro: localizedItem.desc, options: localizedItem.options || [] }; }
   const currentValues = [...document.querySelectorAll('#detailOptions select')].map(select => select.selectedIndex);
-  const title = `${productText('name')} | Print Atelier`;
+  const title = `${productText('name')} | YINZAOSUO`;
   const description = language() === 'en'
     ? productText('intro')
     : product.seoDescription || product.intro || product.desc || product.name;
@@ -97,7 +98,7 @@ function renderProductDetails() {
 
   const imageContainer = document.querySelector('#productImage');
   imageContainer.replaceChildren();
-  const imageSource = product.image || product.thumb;
+  const imageSource = String(product.image || product.thumb || '').replace(/^\/?new\//, '/');
   imageContainer.classList.remove('is-placeholder');
   if (imageSource) {
     try {
@@ -146,5 +147,52 @@ document.querySelector('#productQuote').addEventListener('click', () => {
   window.location.href = 'index.html#quoteModal';
 });
 
+
+function renderProductInformation() {
+  const root = document.querySelector('#productInformation');
+  if (!root || !product || !product.detail) {
+    if (root) root.hidden = true;
+    return;
+  }
+  const detail = product.detail;
+  root.hidden = false;
+  const labels = language() === 'en'
+    ? { eyebrow: 'PRODUCT DETAILS', title: 'Made around your project requirements.', highlights: 'PRODUCTION OPTIONS', applications: 'TYPICAL APPLICATIONS', finishing: 'FINISHING & PROCESSING', delivery: 'DELIVERY FORMATS', artworkTitle: 'Artwork support', briefTitle: 'What to include in your enquiry', quote: 'Discuss your project ↗' }
+    : { eyebrow: '产品详情', title: '根据项目需求定制生产。', highlights: '生产与定制能力', applications: '适用场景', finishing: '加工与后道处理', delivery: '交付形式', artworkTitle: '设计文件支持', briefTitle: '询价时建议提供的信息', quote: '咨询项目需求 ↗' };
+  document.querySelector('#productInfoEyebrow').textContent = labels.eyebrow;
+  document.querySelector('#productInfoTitle').textContent = labels.title;
+  document.querySelector('#productInfoLead').textContent = detail.lead;
+  document.querySelector('#productHighlightsLabel').textContent = labels.highlights;
+  document.querySelector('#productApplicationsLabel').textContent = labels.applications;
+  document.querySelector('#productFinishingLabel').textContent = labels.finishing;
+  document.querySelector('#productDeliveryLabel').textContent = labels.delivery;
+  document.querySelector('#productArtworkTitle').textContent = labels.artworkTitle;
+  document.querySelector('#productBriefTitle').textContent = labels.briefTitle;
+  document.querySelector('#productInformationQuote').textContent = labels.quote;
+  const renderList = (selector, values) => {
+    const list = document.querySelector(selector);
+    list.replaceChildren();
+    (values || []).forEach(value => {
+      const item = document.createElement('li');
+      item.textContent = value;
+      list.append(item);
+    });
+  };
+  renderList('#productHighlights', detail.highlights);
+  renderList('#productApplications', detail.applications);
+  renderList('#productFinishing', detail.finishing);
+  renderList('#productDelivery', detail.delivery);
+  document.querySelector('#productArtwork').textContent = detail.artwork;
+  document.querySelector('#productBrief').textContent = detail.brief;
+  document.querySelector('#productCaveat').textContent = detail.caveat;
+}
+
+document.querySelector('#productInformationQuote')?.addEventListener('click', () => {
+  if (!product) return;
+  localStorage.setItem('pendingQuote', productText('name'));
+});
+
 window.registerLanguageRenderer(renderProductDetails);
+window.registerLanguageRenderer(renderProductInformation);
 renderProductDetails();
+renderProductInformation();

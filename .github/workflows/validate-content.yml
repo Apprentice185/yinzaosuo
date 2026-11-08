@@ -1,0 +1,86 @@
+name: Validate shared content builds
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Validate Chinese CMS configuration
+        run: |
+          ruby -e "require 'yaml'; YAML.load_file('admin/config.yml')"
+          grep -q 'locale: zh_Hans' admin/config.yml
+          grep -q '英文译文' admin/config.yml
+      - name: Validate CMS preview templates
+        run: |
+          node --check admin/preview.js
+          node --test admin/preview.test.js
+          test -f admin/preview.css
+          grep -q '/admin/preview.js' admin/index.html
+      - name: Validate automatic translation integration
+        run: |
+          node --check admin/translation.js
+          npm run test:admin-translation
+          test -f admin/translation.css
+          grep -q '/admin/translation.js' admin/index.html
+          grep -q '/admin/translation.css' admin/index.html
+          node --check admin/workspace.js
+          test -f admin/workspace.css
+          grep -q '/admin/workspace.js' admin/index.html
+          grep -q '/admin/workspace.css' admin/index.html
+          grep -q 'translateCurrentEntry' admin/translation.js
+      - name: Validate translation Worker
+        run: |
+          node --check services/translation-worker/src/index.js
+          cd services/translation-worker && npm test
+      - name: Check build scripts
+        run: |
+          node --check scripts/generate-content.js
+          node --check zh/scripts/generate-content.js
+      - name: Build international site data
+        run: npm run content:build
+      - name: Build domestic site data from the same source
+        run: node zh/scripts/generate-content.js
+      - name: Verify shared-content outputs
+        run: |
+          test -f assets/js/content-index.js
+          test -f sitemap.xml
+          test -f zh/assets/js/content-index.js
+          test -f zh/sitemap.xml
+          grep -q 'https://yinzaosuo.com/zh/' zh/sitemap.xml
+          grep -q '"image":"assets/images/products/pa001.jpg"' zh/assets/js/content-index.js
+          grep -q '"hero_image":"assets/images/products/banner.jpg"' zh/assets/js/content-index.js
+          test ! -d zh/content
+          test ! -d zh/admin
+          test -f admin/index.html
+          test -f admin/admin.css
+      - name: Verify domestic and international publishing scopes
+        run: |
+          cat > content/products/TEST-DOMESTIC.json <<'EOF'
+          {"id":"TEST-DOMESTIC","title":"国内测试产品","title_en":"Domestic Test Product","category":"commercial","image":"/pic/test.jpg","publish_to":"domestic","status":"published","show_in_archive":true}
+          EOF
+          cat > content/products/TEST-INTERNATIONAL.json <<'EOF'
+          {"id":"TEST-INTERNATIONAL","title":"国际测试产品","title_en":"International Test Product","category":"commercial","image":"/pic/test.jpg","publish_to":"international","status":"published","show_in_archive":true}
+          EOF
+          cat > content/products/TEST-HIDDEN.json <<'EOF'
+          {"id":"TEST-HIDDEN","title":"隐藏测试产品","title_en":"Hidden Test Product","category":"commercial","image":"/pic/test.jpg","publish_to":"both","status":"hidden","show_in_archive":true}
+          EOF
+          npm run content:build
+          node zh/scripts/generate-content.js
+          grep -q '"id":"TEST-INTERNATIONAL"' assets/js/content-index.js
+          ! grep -q '"id":"TEST-DOMESTIC"' assets/js/content-index.js
+          ! grep -q '"id":"TEST-HIDDEN"' assets/js/content-index.js
+          grep -q '"id":"TEST-DOMESTIC"' zh/assets/js/content-index.js
+          ! grep -q '"id":"TEST-INTERNATIONAL"' zh/assets/js/content-index.js
+          ! grep -q '"id":"TEST-HIDDEN"' zh/assets/js/content-index.js
