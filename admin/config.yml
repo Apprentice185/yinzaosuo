@@ -194,6 +194,9 @@ collections:
           - { label: "品牌副标题（中文）", name: "brand_tagline_zh", widget: "string" }
           - { label: "业务邮箱", name: "contact_email", widget: "string" }
           - { label: "联系电话", name: "contact_phone", widget: "string", required: false }
+          - { label: "WhatsApp 联系链接（如 https://wa.me/国家区号手机号）", name: "contact_whatsapp_url", widget: "string", required: false }
+          - { label: "WhatsApp 二维码图片", name: "contact_whatsapp_qr", widget: "image", required: false }
+          - { label: "LinkedIn 公司主页链接", name: "contact_linkedin_url", widget: "string", required: false }
           - label: "导航菜单"
             name: "nav_items"
             widget: "list"

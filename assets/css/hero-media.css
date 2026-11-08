@@ -22,5 +22,29 @@
 .hero-carousel-dots button{width:8px;height:8px;padding:0;border:0;border-radius:99px;background:rgba(255,255,255,.52);transition:width .25s,background .25s}
 .hero-carousel-dots button.is-active{width:27px;background:#fff}
 .hero-fullbleed button:focus-visible,.hero-fullbleed a:focus-visible{outline:3px solid #ffd1bc;outline-offset:4px}
-@media(max-width:800px){.hero.hero-fullbleed{height:600px;min-height:560px}.hero-fullbleed .hero-copy{padding:30px 0 85px}.hero-fullbleed .hero-shade{background:linear-gradient(90deg,rgba(8,20,33,.78),rgba(8,20,33,.34)),linear-gradient(0deg,rgba(8,20,33,.48),transparent 80%)}.hero-fullbleed .hero-carousel-controls{right:22px;bottom:20px}.hero-fullbleed .hero-text{font-size:14px}.hero-fullbleed h1{font-size:clamp(38px,9vw,56px)}}
+@media(max-width:800px){
+  .hero.hero-fullbleed{height:clamp(560px,82svh,720px);min-height:540px;max-height:720px}
+  .hero-fullbleed .hero-copy{padding:24px 0 96px;max-width:620px}
+  .hero-fullbleed .hero-content{align-items:center}
+  .hero-fullbleed .hero-shade{background:linear-gradient(90deg,rgba(8,20,33,.76),rgba(8,20,33,.28)),linear-gradient(0deg,rgba(8,20,33,.52),transparent 82%)}
+  .hero-fullbleed .hero-carousel-controls{right:0;left:0;bottom:18px;justify-content:center;gap:0;pointer-events:none}
+  .hero-fullbleed .hero-carousel-controls>*{pointer-events:auto}
+  .hero-fullbleed .hero-carousel-arrow,.hero-fullbleed .hero-carousel-pause{display:none}
+  .hero-fullbleed .hero-carousel-dots{gap:9px;padding:10px 14px;border-radius:99px;background:rgba(10,20,30,.24);backdrop-filter:blur(8px)}
+  .hero-fullbleed .hero-carousel-dots button{width:7px;height:7px}
+  .hero-fullbleed .hero-carousel-dots button.is-active{width:23px}
+  .hero-fullbleed .hero-text{font-size:14px;line-height:1.7}
+  .hero-fullbleed h1{font-size:clamp(34px,8.5vw,52px);line-height:1.12}
+  .hero-fullbleed .hero-actions{flex-wrap:wrap;gap:10px}
+  .hero-fullbleed .button{min-height:46px}
+  .hero-fullbleed .hero-slides{touch-action:pan-y}
+}
+@media(max-width:480px){
+  .hero.hero-fullbleed{height: min(680px, 84svh);min-height:550px}
+  .hero-fullbleed .hero-copy{padding-top:12px}
+  .hero-fullbleed .eyebrow{font-size:10px}
+  .hero-fullbleed h1{font-size:clamp(32px,8.7vw,42px)}
+  .hero-fullbleed .hero-note{margin-top:22px;font-size:11px}
+  .hero-fullbleed .hero-actions .button{padding-inline:15px;font-size:11px}
+}
 @media(prefers-reduced-motion:reduce){.hero-fullbleed .hero-slide{transition:none}.hero-carousel-dots button{transition:none}}

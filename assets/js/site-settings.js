@@ -25,7 +25,19 @@
   setLocalized('[data-i18n="footer_copyright"]','footer_copyright_zh','footer_copyright_en');
   setLocalized('[data-i18n="footer_region"]','footer_region_zh','footer_region_en');
   const phone=String(settings.contact_phone||'').trim();
-  document.querySelectorAll('.footer-phone').forEach(a=>{if(phone){a.href='tel:'+phone.replace(/[^+\d]/g,'');a.textContent=phone;}});
+  document.querySelectorAll('.footer-phone').forEach(a=>{if(phone){a.href='tel:'+phone.replace(/[^+\\d]/g,'');a.textContent=phone;}});
+  const whatsapp=String(settings.contact_whatsapp_url||'').trim();
+  document.querySelectorAll('.footer-whatsapp-link').forEach(a=>{
+   if(whatsapp){a.href=whatsapp;a.hidden=false;a.target='_blank';a.rel='noopener noreferrer';}
+   else a.hidden=true;
+  });
+  const linkedin=String(settings.contact_linkedin_url||'').trim();
+  document.querySelectorAll('.footer-linkedin-link').forEach(a=>{
+   if(linkedin){a.href=linkedin;a.hidden=false;a.target='_blank';a.rel='noopener noreferrer';}
+   else a.hidden=true;
+  });
+  const qr=String(settings.contact_whatsapp_qr||'/pic/whatsapp-qr-placeholder.svg').trim();
+  document.querySelectorAll('.footer-whatsapp-qr').forEach(img=>{if(qr)img.src=new URL(qr,document.baseURI).href;});
   if(location.pathname === '/' || location.pathname.endsWith('/index.html')){
    const title=settings[zh?'seo_home_title_zh':'seo_home_title_en'],desc=settings[zh?'seo_home_description_zh':'seo_home_description_en'];
    if(title)document.title=title;if(desc){const m=document.querySelector('meta[name="description"]'),o=document.querySelector('meta[property="og:description"]');if(m)m.content=desc;if(o)o.content=desc;}

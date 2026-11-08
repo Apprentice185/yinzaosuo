@@ -50,5 +50,8 @@
   "footer_copyright_en": "© 2026 YINZAOSUO. All Rights Reserved.",
   "footer_copyright_zh": "© 2026 印造所 YINZAOSUO。保留所有权利。",
   "footer_region_en": "Serving print trade buyers worldwide.",
-  "footer_region_zh": "服务全球印刷贸易采购客户。"
+  "footer_region_zh": "服务全球印刷贸易采购客户。",
+  "contact_whatsapp_url": "",
+  "contact_whatsapp_qr": "/pic/whatsapp-qr-placeholder.svg",
+  "contact_linkedin_url": ""
 }
