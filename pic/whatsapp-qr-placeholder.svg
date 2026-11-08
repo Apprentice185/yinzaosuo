@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 320 320" role="img" aria-labelledby="title desc">
+<title id="title">WhatsApp QR code placeholder</title>
+<desc id="desc">Replace this placeholder with your WhatsApp Business QR code.</desc>
+<rect width="320" height="320" rx="18" fill="#ffffff"/>
+<rect x="12" y="12" width="296" height="296" rx="12" fill="#f3faf5" stroke="#1f9d55" stroke-width="3" stroke-dasharray="8 7"/>
+<circle cx="160" cy="112" r="42" fill="#25d366"/>
+<path d="M139 104c7 20 21 33 40 39l10-12-17-9-8 8c-8-4-14-10-18-18l8-8-9-17z" fill="#fff"/>
+<text x="160" y="196" text-anchor="middle" font-family="Arial,sans-serif" font-size="22" font-weight="700" fill="#176b3a">WhatsApp</text>
+<text x="160" y="226" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" fill="#456451">QR CODE PLACEHOLDER</text>
+<text x="160" y="252" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" fill="#607568">Replace with your real QR image</text>
+</svg>
