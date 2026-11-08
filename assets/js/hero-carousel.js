@@ -7,32 +7,40 @@
   const slidesHost = root.querySelector('#heroSlides');
   const dotsHost = root.querySelector('#heroDots');
 
-  // The CMS settings are the source of truth. Keep the HTML slides only as a safe fallback.
-  if (configuredSlides.length >= 3 && slidesHost && dotsHost) {
-    slidesHost.replaceChildren();
-    dotsHost.replaceChildren();
-    configuredSlides.forEach((slide, index) => {
-      const image = String(slide.image || '').trim();
-      if (!image) return;
-      const frame = document.createElement('div');
-      frame.className = `hero-slide${index === 0 ? ' is-active' : ''}`;
-      const img = document.createElement('img');
-      img.src = new URL(image, document.baseURI).href;
-      img.alt = '';
-      img.loading = index === 0 ? 'eager' : 'lazy';
-      if (index === 0) img.fetchPriority = 'high';
-      frame.append(img);
-      slidesHost.append(frame);
+  // CMS images are rooted at the live site; reject stale /new/ paths after the migration.
+  if (configuredSlides.length >= 2 && slidesHost && dotsHost) {
+    const validSlides = configuredSlides
+      .map(slide => String(slide.image || '').trim())
+      .filter(Boolean)
+      .map(image => image.replace(/^\/new\//, '/'));
+    if (validSlides.length >= 2) {
+      slidesHost.replaceChildren();
+      dotsHost.replaceChildren();
+      validSlides.forEach((image, index) => {
+        const frame = document.createElement('div');
+        frame.className = `hero-slide${index === 0 ? ' is-active' : ''}`;
+        const img = document.createElement('img');
+        img.src = new URL(image, document.baseURI).href;
+        img.alt = '';
+        img.loading = index === 0 ? 'eager' : 'lazy';
+        if (index === 0) img.fetchPriority = 'high';
+        img.addEventListener('error', () => {
+          frame.classList.add('is-image-error');
+          console.warn('Homepage banner image could not be loaded:', image);
+        }, { once: true });
+        frame.append(img);
+        slidesHost.append(frame);
 
-      const dot = document.createElement('button');
-      dot.type = 'button';
-      dot.setAttribute('aria-label', `Show banner ${index + 1}`);
-      if (index === 0) {
-        dot.className = 'is-active';
-        dot.setAttribute('aria-current', 'true');
-      }
-      dotsHost.append(dot);
-    });
+        const dot = document.createElement('button');
+        dot.type = 'button';
+        dot.setAttribute('aria-label', `Show banner ${index + 1}`);
+        if (index === 0) {
+          dot.className = 'is-active';
+          dot.setAttribute('aria-current', 'true');
+        }
+        dotsHost.append(dot);
+      });
+    }
   }
 
   const slides = [...root.querySelectorAll('.hero-slide')];
@@ -44,7 +52,8 @@
 
   let index = 0;
   let timer = null;
-  let paused = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let manuallyPaused = false;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const show = n => {
     index = (n + slides.length) % slides.length;
     slides.forEach((slide, i) => slide.classList.toggle('is-active', i === index));
@@ -55,27 +64,58 @@
     });
   };
   const stop = () => {
-    if (timer) window.clearInterval(timer);
+    if (timer) window.clearTimeout(timer);
     timer = null;
   };
-  const start = () => {
+  const schedule = () => {
     stop();
-    if (!paused) timer = window.setInterval(() => show(index + 1), 5500);
+    if (manuallyPaused || reducedMotion || document.hidden || root.matches(':hover')) return;
+    timer = window.setTimeout(() => {
+      show(index + 1);
+      schedule();
+    }, 5000);
   };
-  prev?.addEventListener('click', () => { show(index - 1); start(); });
-  next?.addEventListener('click', () => { show(index + 1); start(); });
-  dots.forEach((dot, i) => dot.addEventListener('click', () => { show(i); start(); }));
+  const interact = action => {
+    action();
+    schedule();
+  };
+
+  prev?.addEventListener('click', () => interact(() => show(index - 1)));
+  next?.addEventListener('click', () => interact(() => show(index + 1)));
+  dots.forEach((dot, i) => dot.addEventListener('click', () => interact(() => show(i))));
   pause?.addEventListener('click', () => {
-    paused = !paused;
-    pause.textContent = paused ? '▶' : 'Ⅱ';
-    pause.setAttribute('aria-label', paused ? 'Resume banner rotation' : 'Pause banner rotation');
-    start();
+    manuallyPaused = !manuallyPaused;
+    pause.textContent = manuallyPaused ? '▶' : 'Ⅱ';
+    pause.setAttribute('aria-label', manuallyPaused ? 'Resume banner rotation' : 'Pause banner rotation');
+    schedule();
   });
+
+  let touchStartX = 0;
+  let touchStartY = 0;
+  root.addEventListener('touchstart', event => {
+    const touch = event.changedTouches[0];
+    touchStartX = touch.clientX;
+    touchStartY = touch.clientY;
+    stop();
+  }, { passive: true });
+  root.addEventListener('touchend', event => {
+    const touch = event.changedTouches[0];
+    const deltaX = touch.clientX - touchStartX;
+    const deltaY = touch.clientY - touchStartY;
+    if (Math.abs(deltaX) > 45 && Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
+      show(index + (deltaX < 0 ? 1 : -1));
+    }
+    schedule();
+  }, { passive: true });
+  root.addEventListener('touchcancel', schedule, { passive: true });
+
   root.addEventListener('mouseenter', stop);
-  root.addEventListener('mouseleave', start);
+  root.addEventListener('mouseleave', schedule);
   root.addEventListener('focusin', stop);
-  root.addEventListener('focusout', start);
-  document.addEventListener('visibilitychange', () => document.hidden ? stop() : start());
+  root.addEventListener('focusout', event => {
+    if (!root.contains(event.relatedTarget)) schedule();
+  });
+  document.addEventListener('visibilitychange', schedule);
   show(0);
-  start();
+  schedule();
 })();
