@@ -25,5 +25,8 @@
       "alt": "印刷成品细节和后道加工",
       "alt_en": "Print finishing and production details"
     }
-  ]
+  ],
+  "hero_image": "/new/pic/banner.png",
+  "hero_image_alt": "高精度写真机",
+  "hero_image_alt_en": "High-precision large-format printer"
 }
