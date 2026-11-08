@@ -7,6 +7,7 @@
   var publishButton = document.getElementById("admin-publish-button");
   var translating = false;
   var pendingProcessed = false;
+  var formDirty = false;
 
   function textOf(node) {
     return (node && (node.innerText || node.textContent) || "").replace(/\s+/g, " ").trim();
@@ -15,16 +16,22 @@
     return Array.prototype.slice.call((scope || document).querySelectorAll("button,[role='menuitem']"))
       .find(function (node) { return matcher(textOf(node)); });
   }
+  function isEditorScreen() {
+    if (!root) return false;
+    return !!root.querySelector(".nc-entryEditor,[class*='EntryEditor'],[data-testid*='entry-editor']");
+  }
   function nativePublishButton() {
-    return findButton(root, function (text) { return /^(发布|已发布|Publish|Published)$/i.test(text); });
+    var toolbar = root && (root.querySelector(".nc-entryEditor-toolbar") || root);
+    return findButton(toolbar, function (text) {
+      return /已发布|发布|Published|Publish/i.test(text) && !/复制|Duplicate/i.test(text);
+    });
   }
   function updateToolbar() {
     var native = nativePublishButton();
-    if (editorActions) editorActions.hidden = !native;
-    if (!native) return;
-    var changed = /^(发布|Publish)$/i.test(textOf(native));
-    if (publishButton) publishButton.disabled = !changed;
-    if (!native.classList.contains("yinzaosuo-native-publish-hidden")) {
+    var visible = !!native || isEditorScreen();
+    if (editorActions) editorActions.hidden = !visible;
+    if (publishButton) publishButton.disabled = !formDirty;
+    if (native && !native.classList.contains("yinzaosuo-native-publish-hidden")) {
       native.classList.add("yinzaosuo-native-publish-hidden");
     }
   }
@@ -33,10 +40,17 @@
     if (!trigger || (publishButton && publishButton.disabled)) return;
     trigger.click();
     window.setTimeout(function () {
-      var option = findButton(document, function (text) { return /^(立即发布|Publish now)$/i.test(text); });
-      if (option) option.click();
-      else window.alert("没有找到“立即发布”选项，请刷新后台后重试。");
-    }, 180);
+      var option = findButton(document, function (text) {
+        return /^(立即)?发布$|^Publish( now)?$/i.test(text);
+      });
+      if (option) {
+        option.click();
+        formDirty = false;
+        updateToolbar();
+      } else {
+        window.alert("已打开发布菜单，但没有找到“发布”选项。请检查菜单文字后告诉我。");
+      }
+    }, 220);
   }
   function setControlValue(control, value) {
     var proto = control.tagName === "TEXTAREA" ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
@@ -187,6 +201,18 @@
   }
   function start() {
     if (!root) return;
+    root.addEventListener("input", function (event) {
+      if (event.target && /^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName)) {
+        formDirty = true;
+        updateToolbar();
+      }
+    }, true);
+    root.addEventListener("change", function (event) {
+      if (event.target && /^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName)) {
+        formDirty = true;
+        updateToolbar();
+      }
+    }, true);
     refreshWorkspace();
     var observer = new MutationObserver(refreshWorkspace);
     observer.observe(root, { childList: true, subtree: true });
