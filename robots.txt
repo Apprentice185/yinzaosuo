@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
 Disallow: /admin/
+Disallow: /zh/admin/
+Disallow: /new/admin/
 Sitemap: https://yinzaosuo.com/sitemap.xml
+Sitemap: https://yinzaosuo.com/zh/sitemap.xml

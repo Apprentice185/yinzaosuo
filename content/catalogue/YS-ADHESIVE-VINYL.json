@@ -1,0 +1,64 @@
+{
+  "id": "YS-ADHESIVE-VINYL",
+  "name_zh": "背胶材料印刷",
+  "name_en": "Self-Adhesive Vinyl Printing",
+  "image": "/new/pic/self-adhesive-vinyl.jpg",
+  "desc_zh": "定制背胶印刷成品，可根据项目需求进行裁切、覆膜，并选择卷装或单张交付。",
+  "desc_en": "Custom printed self-adhesive graphics with trimming and lamination options, supplied in rolls or cut sheets.",
+  "detail_zh": {
+    "lead": "适用于标识、促销和展示项目的定制背胶印刷成品。可安排印刷、裁切和覆膜，并根据订单选择卷装或单张交付。",
+    "highlights": [
+      "按项目尺寸定制印刷",
+      "支持裁切成品尺寸",
+      "可提供覆膜加工",
+      "支持卷装或单张交付"
+    ],
+    "applications": [
+      "广告标识及促销画面",
+      "零售及销售点展示",
+      "项目定制背胶画面"
+    ],
+    "finishing": [
+      "印刷",
+      "按尺寸裁切",
+      "覆膜",
+      "卷装或单张包装"
+    ],
+    "delivery": [
+      "适合时可整卷交付",
+      "按指定尺寸裁切成单张",
+      "根据交付形式和目的地核算包装及运费"
+    ],
+    "artwork": "可接收印刷文件，也可提供文件准备服务。基础文件检查和简单调整可免费提供；较大幅度修改或从零设计需单独报价。",
+    "brief": "请说明成品尺寸、数量、使用场景、覆膜要求、卷装或单张偏好、设计文件及目的地。",
+    "caveat": "胶水类型、底纸、表面效果、厚度以及对特定基材或环境的适用性，需按具体产品要求确认后报价。"
+  },
+  "detail_en": {
+    "lead": "Custom printed self-adhesive vinyl graphics for signage, promotional and display projects. Printing, trimming and lamination can be arranged, with roll or cut-sheet delivery based on the job.",
+    "highlights": [
+      "Custom printed to project dimensions",
+      "Trimming to specified finished sizes",
+      "Lamination available",
+      "Roll or cut-sheet delivery"
+    ],
+    "applications": [
+      "Signage and promotional graphics",
+      "Retail and point-of-sale displays",
+      "Custom adhesive graphics for project use"
+    ],
+    "finishing": [
+      "Printing",
+      "Custom trimming",
+      "Lamination",
+      "Roll or sheet packing"
+    ],
+    "delivery": [
+      "Full-roll delivery where suitable",
+      "Cut sheets to specified dimensions",
+      "Packing and freight assessed by order format and destination"
+    ],
+    "artwork": "Supply a print-ready file or request artwork preparation. Basic file checks and minor adjustments are available at no extra cost; extensive modifications or original design work are quoted separately.",
+    "brief": "Please specify finished dimensions, quantity, intended application, lamination requirement, roll or sheet preference, artwork and destination.",
+    "caveat": "Adhesive type, liner, surface finish, thickness and suitability for a particular substrate or environment must be confirmed for the requested product before quotation."
+  }
+}

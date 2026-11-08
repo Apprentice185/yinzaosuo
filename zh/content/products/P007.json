@@ -1,0 +1,60 @@
+{
+  "id": "P007",
+  "category": "exhibition",
+  "name": "经典易拉宝",
+  "desc": "简练大方，安装便捷",
+  "intro": "适合展会、门店、发布会和线下活动，画面更换方便，运输与安装都简单。",
+  "price": "¥168 起",
+  "tag": "热销",
+  "thumb": "",
+  "sceneImage": "",
+  "options": [
+    {
+      "name": "画面尺寸",
+      "values": [
+        "80 × 200cm",
+        "85 × 200cm",
+        "自定义尺寸"
+      ]
+    },
+    {
+      "name": "数量",
+      "values": [
+        "1 个",
+        "2 个",
+        "5 个"
+      ]
+    },
+    {
+      "name": "画面材料",
+      "values": [
+        "PP 合成纸",
+        "背胶写真"
+      ]
+    },
+    {
+      "name": "配件",
+      "values": [
+        "标准铝合金架",
+        "加厚铝合金架"
+      ]
+    }
+  ],
+  "slug": "p007",
+  "seoTitle": "经典易拉宝????",
+  "seoDescription": "适合展会、门店、发布会和线下活动，画面更换方便，运输与安装都简单。",
+  "title": "经典易拉宝",
+  "title_en": "Classic Roll-Up Banner",
+  "image": "",
+  "desc_en": "A portable display for events, retail spaces, and presentations.",
+  "materials": [],
+  "materials_en": [],
+  "crafts": [],
+  "crafts_en": [],
+  "sort_order": 1007,
+  "show_in_archive": false,
+  "category_legacy_en": "Displays & Posters",
+  "intro_en": "A portable display for events, retail spaces, and presentations.",
+  "category_legacy": "展架与海报",
+  "name_en": "Classic Roll-Up Banner"
+}
