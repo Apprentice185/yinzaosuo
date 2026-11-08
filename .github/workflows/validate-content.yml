@@ -28,6 +28,13 @@ jobs:
           node --test admin/preview.test.js
           test -f admin/preview.css
           grep -q '/admin/preview.js' admin/index.html
+      - name: Validate automatic translation integration
+        run: |
+          node --check admin/translation.js
+          npm run test:admin-translation
+          test -f admin/translation.css
+          grep -q '/admin/translation.js' admin/index.html
+          grep -q '/admin/translation.css' admin/index.html
       - name: Validate translation Worker
         run: |
           node --check services/translation-worker/src/index.js
