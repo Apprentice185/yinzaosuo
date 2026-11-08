@@ -28,3 +28,13 @@
 .editorial-visual-sheet-back{left:42%;top:34%;background:#fff;color:#173b5e;transform:rotate(8deg);border:1px solid #d7e0e8}
 .editorial-visual-sheet-back span{color:#6d7d8d}
 @media(max-width:800px){.hero-production-visual{min-height:350px}.visual-banner-main{left:7%;width:74%;height:52%}.visual-banner-side{right:6%;width:47%;height:31%}.visual-spec{font-size:6px;letter-spacing:.04em}.trade-editorial-visual{min-height:320px}}
+
+
+/* Supplied YINZAOSUO photography */
+.hero-production-visual{background-image:url("pic/brand-visual-board.jpg");background-position:center;background-size:cover;position:relative;overflow:hidden;}
+.hero-production-visual::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,20,38,.08),transparent 55%);pointer-events:none;}
+.hero-production-visual .visual-topline,.hero-production-visual .visual-banner,.hero-production-visual .visual-spec{display:none!important;}
+.editorial-image.trade-editorial-visual{overflow:hidden;background:#eef1f4;}
+.editorial-image.trade-editorial-visual img{width:100%;height:100%;display:block;object-fit:cover;object-position:center;}
+.archive-visual img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .55s cubic-bezier(.2,.7,.2,1);}
+.archive-card:hover .archive-visual img{transform:scale(1.045);}
