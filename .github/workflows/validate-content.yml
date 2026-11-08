@@ -22,6 +22,10 @@ jobs:
           ruby -e "require 'yaml'; YAML.load_file('admin/config.yml')"
           grep -q 'locale: zh_Hans' admin/config.yml
           grep -q '英文译文' admin/config.yml
+      - name: Validate translation Worker
+        run: |
+          node --check services/translation-worker/src/index.js
+          cd services/translation-worker && npm test
       - name: Check build scripts
         run: |
           node --check scripts/generate-content.js
