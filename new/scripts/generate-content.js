@@ -411,11 +411,7 @@ function main() {
     ? homeSettings.hero_slides.map((slide, index) => {
         const image = String(slide?.image || '').trim();
         if (!image || !safeMediaUrl(image)) throw new Error(`Homepage hero slide ${index + 1} has an invalid image URL`);
-        return {
-          image,
-          alt: String(slide.alt || ''),
-          alt_en: String(slide.alt_en || slide.alt || '')
-        };
+        return { image };
       }).filter(slide => slide.image)
     : [];
   if (heroSlides.length && (heroSlides.length < 3 || heroSlides.length > 5)) {
@@ -427,9 +423,6 @@ function main() {
     global: globalSettings,
     home: {
       ...homeSettings,
-      hero_image: heroImage,
-      hero_image_alt: homeSettings.hero_image_alt || '',
-      hero_image_alt_en: homeSettings.hero_image_alt_en || '',
       hero_slides: heroSlides,
       modules: homeSettings.modules || {},
       module_order: Array.isArray(homeSettings.module_order) ? homeSettings.module_order : [],

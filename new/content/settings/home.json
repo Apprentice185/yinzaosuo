@@ -1,31 +1,20 @@
 {
-  "hero_image_alt": "高精度写真机",
   "eyebrow_zh": "面向全球贸易客户的印刷合作伙伴",
   "hero_slides": [
     {
-      "image": "/new/pic/display-stands.jpg",
-      "alt": "YINZAOSUO print and display portfolio",
-      "alt_en": "YINZAOSUO print and display portfolio"
+      "image": "/new/pic/display-stands.jpg"
     },
     {
-      "image": "/new/pic/banner.png",
-      "alt": "定制PVC横幅印刷",
-      "alt_en": "Custom printed PVC banners"
+      "image": "/new/pic/banner.png"
     },
     {
-      "image": "pic/pvc-mesh-banner.jpg",
-      "alt": "户外PVC网格布横幅",
-      "alt_en": "Printed PVC mesh banners for outdoor displays"
+      "image": "pic/pvc-mesh-banner.jpg"
     },
     {
-      "image": "pic/display-stands.jpg",
-      "alt": "展示架和展架画面",
-      "alt_en": "Display stands and printed graphics"
+      "image": "pic/display-stands.jpg"
     },
     {
-      "image": "pic/finishing-details.jpg",
-      "alt": "印刷成品细节和后道加工",
-      "alt_en": "Print finishing and production details"
+      "image": "pic/finishing-details.jpg"
     }
   ],
   "modules": {
@@ -37,11 +26,9 @@
     "about": true,
     "faq": true
   },
-  "hero_image_alt_en": "High-precision large-format printer",
   "hero_note_en": "Custom specifications · Flexible finishing · Global order support",
   "hero_description_en": "Printed graphics and display solutions for print resellers, agencies and trade buyers worldwide.",
   "hero_title_en": "Custom Print Production, Ready for Your Business.",
-  "hero_image": "/new/pic/display-stands.jpg",
   "hero_description_zh": "面向印刷经销商、广告制作商与贸易采购商，提供横幅、网格布、合成纸、背胶印刷及展示架，按订单协调生产与交付。",
   "hero_note_zh": "定制规格 · 灵活加工 · 国际订单协调",
   "faq_items": [

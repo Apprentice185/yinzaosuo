@@ -23,44 +23,24 @@ collections:
     identifier_field: "id"
     slug: "{{id}}"
     fields:
-      - { label: "商品编号(ID)", name: "id", widget: "string" }
-      - { label: "中文品名", name: "title", widget: "string" }
-      - { label: "英文品名", name: "title_en", widget: "string" }
-      - { label: "兼容名称", name: "name", widget: "string", required: false }
-      - { label: "兼容英文名称", name: "name_en", widget: "string", required: false }
-      - label: "分类"
-        name: "category"
-        widget: "select"
-        options: ["commercial", "packaging", "exhibition"]
-      - { label: "实物图", name: "image", widget: "image", required: false }
-      - { label: "中文简介", name: "desc", widget: "text" }
-      - { label: "英文简介", name: "desc_en", widget: "text" }
-      - { label: "可选材质", name: "materials", widget: "list" }
-      - { label: "英文材质", name: "materials_en", widget: "list", required: false }
-      - { label: "可选工艺", name: "crafts", widget: "list" }
-      - { label: "英文工艺", name: "crafts_en", widget: "list", required: false }
-      - { label: "排序权重", name: "sort_order", widget: "number", default: 10, value_type: "int" }
-      - { label: "显示在首页档案库", name: "show_in_archive", widget: "boolean", default: true }
-      - { label: "分类中文名称", name: "category_title", widget: "string", required: false }
-      - { label: "分类英文名称", name: "category_title_en", widget: "string", required: false }
-      - { label: "分类中文说明", name: "category_desc", widget: "text", required: false }
-      - { label: "分类英文说明", name: "category_desc_en", widget: "text", required: false }
-      - { label: "分类序号", name: "category_num", widget: "string", required: false }
-      - { label: "详情页简介", name: "intro", widget: "text", required: false }
-      - { label: "英文详情页简介", name: "intro_en", widget: "text", required: false }
-      - { label: "参考价格", name: "price", widget: "string", required: false }
-      - { label: "场景图", name: "sceneImage", widget: "image", required: false }
-      - { label: "详情选项", name: "options", widget: "list", required: false, fields: [{ label: "选项名称", name: "name", widget: "string" }, { label: "选项值", name: "values", widget: "list" }] }
-      - { label: "原分类名称", name: "category_legacy", widget: "string", required: false }
-      - { label: "原英文分类名称", name: "category_legacy_en", widget: "string", required: false }
-      - { label: "原产品标签", name: "tag", widget: "string", required: false }
-      - { label: "详情页缩略图", name: "thumb", widget: "image", required: false }
-      - { label: "产品链接", name: "slug", widget: "string", required: false }
-      - { label: "SEO 标题", name: "seoTitle", widget: "string", required: false }
-      - { label: "SEO 描述", name: "seoDescription", widget: "text", required: false }
-      - { label: "发布日期", name: "date", widget: "datetime", date_format: "YYYY-MM-DD", time_format: false, required: false }
-
-  - name: "solutions"
+      - { label: "产品编号（系统识别）", name: "id", widget: "string" }
+      - { label: "产品中文名称", name: "title", widget: "string" }
+      - { label: "Product name (English)", name: "title_en", widget: "string" }
+      - { label: "所属首页产品分类", name: "category", widget: "select", options: [{ label: "定制印刷成品", value: "commercial" }, { label: "包装定制类", value: "packaging" }, { label: "广告加工与展示", value: "exhibition" }] }
+      - { label: "产品展示图片", name: "image", widget: "image" }
+      - { label: "产品介绍（中文）", name: "desc", widget: "text" }
+      - { label: "Product description (English)", name: "desc_en", widget: "text" }
+      - { label: "材质标签（中文）", name: "materials", widget: "list", required: false }
+      - { label: "Material tags (English)", name: "materials_en", widget: "list", required: false }
+      - { label: "加工工艺标签（中文）", name: "crafts", widget: "list", required: false }
+      - { label: "Finishing tags (English)", name: "crafts_en", widget: "list", required: false }
+      - { label: "首页展示顺序（数字越小越靠前）", name: "sort_order", widget: "number", default: 10, value_type: "int" }
+      - { label: "在产品展示中显示", name: "show_in_archive", widget: "boolean", default: true }
+      - { label: "分类名称（中文）", name: "category_title", widget: "string", required: false }
+      - { label: "Category title (English)", name: "category_title_en", widget: "string", required: false }
+      - { label: "分类介绍（中文）", name: "category_desc", widget: "text", required: false }
+      - { label: "Category description (English)", name: "category_desc_en", widget: "text", required: false }
+      - { label: "分类序号", name: "category_num", widget: "string", required: false }  - name: "solutions"
     label: "场景方案"
     folder: "new/content/solutions"
     create: true
@@ -188,27 +168,23 @@ collections:
         label: "首页内容与 Banner"
         file: "new/content/settings/home.json"
         fields:
-          - { label: "首页主视觉图", name: "hero_image", widget: "image" }
-          - label: "首页轮播大图（3–5张）"
+          - label: "首页 Banner 轮播图（3–5张）"
             name: "hero_slides"
             widget: "list"
             min: 3
             max: 5
+            summary: "{{fields.image}}"
             fields:
-              - { label: "图片", name: "image", widget: "image" }
-              - { label: "图片说明（中文）", name: "alt", widget: "string", required: false }
-              - { label: "图片说明（英文）", name: "alt_en", widget: "string", required: false }
-          - { label: "图片替代文本（中文）", name: "hero_image_alt", widget: "string" }
-          - { label: "图片替代文本（英文）", name: "hero_image_alt_en", widget: "string" }
-          - { label: "首页眉题（中文）", name: "eyebrow_zh", widget: "string", required: false }
-          - { label: "首页眉题（英文）", name: "eyebrow_en", widget: "string", required: false }
-          - { label: "首页主标题（中文）", name: "hero_title_zh", widget: "string", required: false }
-          - { label: "首页主标题（英文）", name: "hero_title_en", widget: "string", required: false }
-          - { label: "首页介绍（中文）", name: "hero_description_zh", widget: "text", required: false }
-          - { label: "首页介绍（英文）", name: "hero_description_en", widget: "text", required: false }
-          - { label: "首页辅助文案（中文）", name: "hero_note_zh", widget: "string", required: false }
-          - { label: "首页辅助文案（英文）", name: "hero_note_en", widget: "string", required: false }
-          - label: "首页模块显示开关"
+              - { label: "Banner 图片", name: "image", widget: "image" }
+          - { label: "首屏小标题（中文）", name: "eyebrow_zh", widget: "string" }
+          - { label: "Hero eyebrow (English)", name: "eyebrow_en", widget: "string" }
+          - { label: "首页主标题（中文）", name: "hero_title_zh", widget: "string" }
+          - { label: "Main headline (English)", name: "hero_title_en", widget: "string" }
+          - { label: "首页介绍（中文）", name: "hero_description_zh", widget: "text" }
+          - { label: "Intro text (English)", name: "hero_description_en", widget: "text" }
+          - { label: "首页辅助文案（中文）", name: "hero_note_zh", widget: "string" }
+          - { label: "Supporting line (English)", name: "hero_note_en", widget: "string" }
+          - label: "首页模块显示与顺序"
             name: "modules"
             widget: "object"
             fields:
@@ -219,19 +195,12 @@ collections:
               - { label: "品牌资讯", name: "journal", widget: "boolean", default: true }
               - { label: "品牌介绍", name: "about", widget: "boolean", default: true }
               - { label: "常见问题", name: "faq", widget: "boolean", default: true }
-          - label: "首页模块顺序（从上到下）"
-            name: "module_order"
-            widget: "select"
-            multiple: true
-            options: ["trust", "products", "process", "knowledge", "journal", "about", "faq"]
-            required: false
-          - label: "常见问题列表"
+          - { label: "首页模块顺序（从上到下）", name: "module_order", widget: "select", multiple: true, options: ["trust", "products", "process", "knowledge", "journal", "about", "faq"], required: false }
+          - label: "首页常见问题"
             name: "faq_items"
             widget: "list"
-            required: false
             fields:
               - { label: "问题（中文）", name: "question_zh", widget: "string" }
               - { label: "答案（中文）", name: "answer_zh", widget: "text" }
               - { label: "Question (English)", name: "question_en", widget: "string" }
               - { label: "Answer (English)", name: "answer_en", widget: "text" }
-
