@@ -12,8 +12,6 @@
   var baselineTimer = null;
   var baselineRoute = null;
   var publishTimer = null;
-  var observer = null;
-  var refreshTimer = null;
 
   function cleanText(node) {
     return (node && (node.innerText || node.textContent) || "").replace(/\s+/g, " ").trim();
@@ -422,21 +420,11 @@
     });
     registerPublishEvents();
     refreshWorkspace();
-    // React/Decap can emit many DOM mutations during one render. Debounce
-    // workspace discovery and never serialize every form field per mutation.
-    observer = new MutationObserver(function (mutations) {
-      var onlyOurUi = mutations.every(function (mutation) {
-        var target = mutation.target && mutation.target.nodeType === 1 ? mutation.target : mutation.target && mutation.target.parentElement;
-        return target && target.closest && target.closest(".yinzaosuo-editor-actions,.yinzaosuo-entry-actions");
-      });
-      if (onlyOurUi) return;
-      if (refreshTimer) window.clearTimeout(refreshTimer);
-      refreshTimer = window.setTimeout(function () {
-        refreshTimer = null;
-        refreshWorkspace();
-      }, 250);
+    // Avoid a global MutationObserver: it repeatedly scans Decap's large
+    // React tree and can stall the browser during normal editor updates.
+    [500, 1200].forEach(function (delay) {
+      window.setTimeout(refreshWorkspace, delay);
     });
-    observer.observe(root, { childList: true, subtree: true });
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);
