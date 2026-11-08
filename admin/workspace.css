@@ -45,3 +45,12 @@ html,body{margin:0;min-height:100%;background:var(--admin-paper);color:var(--adm
 #nc-root .yinzaosuo-entry-actions button:first-child{color:#a43d32}
 #nc-root .yinzaosuo-entry-actions button:hover{background:#f1f5f2}
 @media(max-width:760px){#admin-editor-actions{width:100%}#admin-editor-actions button{flex:1}#nc-root .yinzaosuo-entry-actions{right:5px;bottom:5px}#nc-root .yinzaosuo-entry-actions button{padding:5px 6px;font-size:10px}}
+
+/* Toolbar controls are placed next to the native Decap publish action */
+#nc-root .yinzaosuo-toolbar-translate,
+#nc-root .yinzaosuo-publish-trigger{height:38px!important;min-width:92px!important;margin:0 6px!important;padding:0 16px!important;border:0!important;border-radius:7px!important;font-size:13px!important;font-weight:650!important;cursor:pointer!important}
+#nc-root .yinzaosuo-toolbar-translate{background:#263c33!important;color:#fff!important}
+#nc-root .yinzaosuo-toolbar-translate:disabled{opacity:.55;cursor:wait}
+#nc-root .yinzaosuo-publish-trigger{background:#bd5939!important;color:#fff!important}
+#nc-root .yinzaosuo-publish-trigger:disabled{background:#e5e8e6!important;color:#87918b!important;cursor:not-allowed!important;opacity:1!important}
+#nc-root .yinzaosuo-publish-wrap>div[role="menu"],#nc-root .yinzaosuo-publish-wrap [role="menu"]{display:none!important}
