@@ -1,170 +1,299 @@
 (function () {
   "use strict";
-  var ACTION_KEY = "yinzaosuo-admin-entry-action";
-  var root = document.getElementById("nc-root");
-  var editorActions = document.getElementById("admin-editor-actions");
-  var translateButton = document.getElementById("admin-translate-button");
-  var publishButton = document.getElementById("admin-publish-button");
-  var translating = false;
-  var pendingProcessed = false;
-  var formDirty = false;
-  var formSnapshot = null;
 
-  function textOf(node) {
+  var root = document.getElementById("nc-root");
+  var ACTION_KEY = "yinzaosuo-admin-entry-action";
+  var injectedActions = null;
+  var nativeStatusButton = null;
+  var formSnapshot = null;
+  var formDirty = false;
+  var publishing = false;
+  var translating = false;
+  var baselineTimer = null;
+  var baselineRoute = null;
+  var publishTimer = null;
+  var observer = null;
+
+  function cleanText(node) {
     return (node && (node.innerText || node.textContent) || "").replace(/\s+/g, " ").trim();
   }
-  function findButton(scope, matcher) {
-    return Array.prototype.slice.call((scope || document).querySelectorAll("button,[role='menuitem']"))
-      .find(function (node) { return matcher(textOf(node)); });
+
+  function isStatusButton(node) {
+    return [cleanText(node), node && node.getAttribute("aria-label"), node && node.getAttribute("title")]
+      .filter(Boolean).some(function (value) {
+        return /^(已发布|未发布|发布|Published|Unpublished|Publish|Draft|草稿)$/i.test(value.trim());
+      });
   }
+
+  function findNativeStatusButton() {
+    if (!root) return null;
+    var candidates = Array.prototype.slice.call(root.querySelectorAll("button,[role='button']"));
+    for (var i = 0; i < candidates.length; i += 1) {
+      var candidate = candidates[i];
+      if (candidate.closest(".yinzaosuo-editor-actions")) continue;
+      if (!isStatusButton(candidate)) continue;
+      var parent = candidate.parentElement;
+      for (var depth = 0; parent && parent !== root && depth < 8; depth += 1, parent = parent.parentElement) {
+        var hasDelete = Array.prototype.slice.call(parent.querySelectorAll("button,[role='button']"))
+          .some(function (node) { return /^(删除内容|删除|Delete)$/i.test(cleanText(node)); });
+        if (hasDelete) return candidate;
+      }
+    }
+    return null;
+  }
+
   function isEditorScreen() {
     if (!root) return false;
-    // Decap versions differ in their internal class names. Detect the editor by
-    // its route and actual editable controls rather than relying on one CSS class.
-    var hash = window.location.hash || "";
-    if (/\/entries\/[^/?#]+/.test(hash)) return true;
-    if (root.querySelector(".nc-entryEditor,[class*='EntryEditor'],[data-testid*='entry-editor']")) return true;
-    return !!root.querySelector("input[name],textarea[name],[contenteditable='true']");
+    var status = findNativeStatusButton();
+    var hasFields = !!root.querySelector("input[name],textarea[name],select[name],[contenteditable='true']");
+    return !!status && hasFields;
   }
-  function nativePublishButton() {
-    var toolbar = root && (root.querySelector(".nc-entryEditor-toolbar") || root);
-    return findButton(toolbar, function (text) {
-      return /^(已发布|发布|Published|Publish|未发布|Unpublished)$/i.test(text);
-    });
-  }
-  function hideNativePublishControl() {
-    var native = nativePublishButton();
-    if (!native) return null;
-    // Hide the complete status/dropdown group, while retaining the hidden trigger for programmatic publishing.
-    var wrapper = native;
-    for (var i = 0; i < 4 && wrapper.parentElement && wrapper.parentElement !== root; i++) {
-      var parent = wrapper.parentElement;
-      var buttons = parent.querySelectorAll("button,[role='button']");
-      if (buttons.length > 2) break;
-      wrapper = parent;
-      if (/已发布|发布|Published|Publish|未发布|Unpublished/i.test(textOf(wrapper))) break;
-    }
-    wrapper.classList.add("yinzaosuo-native-publish-hidden");
-    native.classList.add("yinzaosuo-native-publish-hidden");
-    return native;
-  }
+
   function readFormSnapshot() {
-    return Array.prototype.map.call(root.querySelectorAll("input[name],textarea[name],select[name],[contenteditable='true']"), function (node) {
-      var key = node.name || node.getAttribute("data-testid") || "editable";
-      var value = node.isContentEditable ? node.innerHTML : (node.type === "checkbox" || node.type === "radio" ? String(node.checked) : node.value);
-      return key + "=" + String(value == null ? "" : value);
+    if (!root) return "";
+    var controls = Array.prototype.slice.call(root.querySelectorAll("input:not([type='file']),textarea,select,[contenteditable='true']"));
+    return controls.map(function (node, index) {
+      var value;
+      if (node.isContentEditable) value = node.innerHTML;
+      else if (node.type === "checkbox" || node.type === "radio") value = String(node.checked);
+      else if (node.tagName === "SELECT" && node.multiple) {
+        value = Array.prototype.map.call(node.selectedOptions, function (option) { return option.value; }).join(",");
+      } else value = node.value;
+      return [
+        node.name || node.getAttribute("data-testid") || node.getAttribute("aria-label") || "control",
+        node.type || node.tagName,
+        index,
+        String(value == null ? "" : value)
+      ].join("::");
     }).join("\n");
   }
+
   function updateDirtyState() {
     if (formSnapshot !== null) formDirty = readFormSnapshot() !== formSnapshot;
+    updateButtonStates();
   }
-  function updateToolbar() {
-    if (editorActions) editorActions.hidden = !isEditorScreen();
-    if (publishButton) publishButton.disabled = !formDirty;
-    hideNativePublishControl();
+
+  function updateButtonStates() {
+    if (!injectedActions) return;
+    var translate = injectedActions.querySelector('[data-action="translate"]');
+    var publish = injectedActions.querySelector('[data-action="publish"]');
+    if (translate) {
+      translate.disabled = translating;
+      translate.textContent = translating ? "翻译中…" : "一键翻译";
+    }
+    if (publish) {
+      publish.disabled = !formDirty || publishing;
+      publish.textContent = publishing ? "发布中…" : "发布";
+      publish.setAttribute("aria-disabled", String(publish.disabled));
+    }
   }
-  function captureEditorBaseline() {
+
+  function setBaseline() {
     if (!isEditorScreen()) return;
-    window.setTimeout(function () {
-      formSnapshot = readFormSnapshot();
-      formDirty = false;
-      updateToolbar();
-    }, 600);
+    formSnapshot = readFormSnapshot();
+    formDirty = false;
+    updateButtonStates();
   }
-  function runNativePublish() {
-    var trigger = nativePublishButton();
-    if (!trigger || (publishButton && publishButton.disabled)) return;
-    trigger.click();
-    window.setTimeout(function () {
-      var option = findButton(document, function (text) {
-        return /^(立即)?发布$|^Publish( now)?$/i.test(text);
-      });
-      if (option) {
-        option.click();
-        window.setTimeout(function () {
-          formSnapshot = readFormSnapshot();
-          formDirty = false;
-          updateToolbar();
-        }, 1400);
-      } else {
-        window.alert("没有找到 Decap 的“发布”操作，内容尚未提交。");
-      }
-    }, 180);
+
+  function scheduleBaseline() {
+    var route = window.location.hash || window.location.pathname;
+    if (route === baselineRoute && formSnapshot !== null) return;
+    baselineRoute = route;
+    if (baselineTimer) window.clearTimeout(baselineTimer);
+    formSnapshot = null;
+    formDirty = false;
+    baselineTimer = window.setTimeout(function () {
+      if (isEditorScreen()) setBaseline();
+    }, 900);
   }
-  function setControlValue(control, value) {
-    var proto = control.tagName === "TEXTAREA" ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
-    var descriptor = Object.getOwnPropertyDescriptor(proto, "value");
-    if (!descriptor || !descriptor.set) return;
-    descriptor.set.call(control, value);
-    control.dispatchEvent(new Event("input", { bubbles: true }));
-    control.dispatchEvent(new Event("change", { bubbles: true }));
+
+  function injectEditorActions(statusButton) {
+    if (!statusButton || !statusButton.parentElement) return;
+    if (injectedActions && injectedActions.isConnected && nativeStatusButton === statusButton) {
+      statusButton.classList.add("yinzaosuo-native-status-hidden");
+      updateButtonStates();
+      return;
+    }
+    removeEditorActions();
+    nativeStatusButton = statusButton;
+
+    var group = document.createElement("div");
+    group.className = "yinzaosuo-editor-actions";
+    group.setAttribute("aria-label", "内容操作");
+
+    var translate = document.createElement("button");
+    translate.type = "button";
+    translate.dataset.action = "translate";
+    translate.textContent = "一键翻译";
+    translate.addEventListener("click", runTranslation);
+
+    var publish = document.createElement("button");
+    publish.type = "button";
+    publish.dataset.action = "publish";
+    publish.textContent = "发布";
+    publish.addEventListener("click", runPublish);
+
+    group.appendChild(translate);
+    group.appendChild(publish);
+    statusButton.insertAdjacentElement("afterend", group);
+    statusButton.classList.add("yinzaosuo-native-status-hidden");
+    injectedActions = group;
+    updateButtonStates();
   }
-  function targetName(name) {
-    if (name.slice(-3) === "_zh") return name.slice(0, -3) + "_en";
-    var pairable = ["title","name","desc","materials","crafts","category_title","category_desc","tag","summary","body","type"];
+
+  function removeEditorActions() {
+    if (injectedActions && injectedActions.parentElement) injectedActions.parentElement.removeChild(injectedActions);
+    if (nativeStatusButton) nativeStatusButton.classList.remove("yinzaosuo-native-status-hidden");
+    injectedActions = null;
+    nativeStatusButton = null;
+  }
+
+  function targetName(name, names) {
+    if (name.slice(-3) === "_zh") {
+      var direct = name.slice(0, -3) + "_en";
+      return names.has(direct) ? direct : null;
+    }
     var dot = name.indexOf(".");
     var bracket = name.indexOf("[");
     var cut = dot < 0 ? bracket : (bracket < 0 ? dot : Math.min(dot, bracket));
     var base = cut < 0 ? name : name.slice(0, cut);
     var suffix = cut < 0 ? "" : name.slice(cut);
-    if (base.slice(-3) === "_zh") return base.slice(0, -3) + "_en" + suffix;
-    if (pairable.indexOf(base) !== -1) return base + "_en" + suffix;
-    if (pairable.indexOf(name) !== -1) return name + "_en";
-    return null;
+    var pairable = ["title", "name", "desc", "materials", "crafts", "category", "category_title", "category_desc", "tag", "summary", "body", "type", "announcement", "brand_tagline"];
+    var candidate = base.slice(-3) === "_zh" ? base.slice(0, -3) + "_en" + suffix : pairable.indexOf(base) !== -1 ? base + "_en" + suffix : null;
+    return candidate && names.has(candidate) ? candidate : null;
   }
-  function controlsByName() {
+
+  function setControlValue(control, value) {
+    if (control.isContentEditable) {
+      control.innerHTML = value;
+    } else {
+      var proto = control.tagName === "TEXTAREA" ? HTMLTextAreaElement.prototype :
+        control.tagName === "SELECT" ? HTMLSelectElement.prototype : HTMLInputElement.prototype;
+      var descriptor = Object.getOwnPropertyDescriptor(proto, "value");
+      if (!descriptor || !descriptor.set) return;
+      descriptor.set.call(control, value);
+    }
+    control.dispatchEvent(new Event("input", { bubbles: true }));
+    control.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+
+  function collectTranslatableControls() {
     var map = new Map();
-    root.querySelectorAll("input[name],textarea[name]").forEach(function (control) {
+    root.querySelectorAll("input[name],textarea[name],select[name],[contenteditable='true'][name]").forEach(function (control) {
+      if (control.disabled || control.readOnly || ["hidden", "file", "checkbox", "radio", "number"].indexOf(control.type) !== -1) return;
       if (!map.has(control.name)) map.set(control.name, []);
       map.get(control.name).push(control);
     });
     return map;
   }
-  async function translateForm() {
+
+  async function runTranslation() {
     var api = window.YinzaosuoTranslation;
-    if (!api || typeof api.translateText !== "function") throw new Error("翻译服务尚未加载，请刷新后台后重试。");
-    var controls = controlsByName();
-    var jobs = [];
-    controls.forEach(function (sources, name) {
-      var target = targetName(name);
-      if (!target || !controls.has(target)) return;
-      sources.forEach(function (source, index) {
-        var dest = controls.get(target)[index];
-        var value = (source.value || "").trim();
-        if (value && dest && !(dest.value || "").trim() && !source.disabled) jobs.push({ target: dest, value: value });
-      });
-    });
-    if (!jobs.length) {
-      api.showStatus("没有发现需要补充的英文输入项，已有英文内容不会覆盖。", "success");
+    if (!api || typeof api.translateText !== "function") {
+      window.alert("翻译服务尚未加载，请刷新后台后重试。");
       return;
     }
-    for (var i = 0; i < jobs.length; i++) {
-      api.showStatus("正在翻译（" + (i + 1) + "/" + jobs.length + "）…", "working");
-      setControlValue(jobs[i].target, await api.translateText(jobs[i].value));
-    }
-    api.showStatus("翻译完成，英文已填入对应输入框。请检查后点击发布保存。", "success");
-  }
-  if (translateButton) translateButton.addEventListener("click", async function () {
     if (translating) return;
     translating = true;
-    translateButton.disabled = true;
-    translateButton.textContent = "翻译中…";
-    try { await translateForm(); }
-    catch (error) {
-      if (window.YinzaosuoTranslation) window.YinzaosuoTranslation.showStatus(error.message || "翻译失败", "error");
+    updateButtonStates();
+    try {
+      var controls = collectTranslatableControls();
+      var names = new Set(Array.from(controls.keys()));
+      var jobs = [];
+      controls.forEach(function (sources, sourceName) {
+        var destinationName = targetName(sourceName, names);
+        if (!destinationName) return;
+        var destinations = controls.get(destinationName) || [];
+        sources.forEach(function (source, index) {
+          var destination = destinations[index];
+          var sourceText = (source.value || source.innerText || "").trim();
+          var destinationText = destination ? (destination.value || destination.innerText || "").trim() : "";
+          if (sourceText && destination && !destinationText) jobs.push({ target: destination, text: sourceText });
+        });
+      });
+      if (!jobs.length) {
+        api.showStatus("没有发现需要补充的英文输入项；已有英文内容不会覆盖。", "success");
+        return;
+      }
+      for (var i = 0; i < jobs.length; i += 1) {
+        api.showStatus("正在翻译（" + (i + 1) + "/" + jobs.length + "）…", "working");
+        var translated = await api.translateText(jobs[i].text);
+        setControlValue(jobs[i].target, translated);
+      }
+      updateDirtyState();
+      api.showStatus("翻译完成，英文已填入对应输入框。请检查后点击发布保存。", "success");
+    } catch (error) {
+      if (api && api.showStatus) api.showStatus(error.message || "翻译失败", "error");
       window.alert(error.message || "翻译失败，请稍后重试。");
     } finally {
       translating = false;
-      translateButton.textContent = "一键翻译";
-      updateToolbar();
-      translateButton.disabled = false;
+      updateButtonStates();
     }
-  });
-  if (publishButton) publishButton.addEventListener("click", runNativePublish);
+  }
+
+  function findPublishMenuItem() {
+    var candidates = Array.prototype.slice.call(document.querySelectorAll("[role='menuitem'],button"));
+    return candidates.find(function (node) {
+      if (node.closest(".yinzaosuo-editor-actions") || node.classList.contains("yinzaosuo-native-status-hidden")) return false;
+      return /^(立即)?发布$|^Publish( now)?$/i.test(cleanText(node));
+    });
+  }
+
+  function runPublish() {
+    if (!formDirty || publishing) return;
+    var trigger = nativeStatusButton && nativeStatusButton.isConnected ? nativeStatusButton : findNativeStatusButton();
+    if (!trigger) {
+      window.alert("没有找到 CMS 发布入口，内容尚未提交。");
+      return;
+    }
+    publishing = true;
+    document.body.classList.add("yinzaosuo-publish-menu-suppressed");
+    updateButtonStates();
+    trigger.click();
+    window.setTimeout(function () {
+      var option = findPublishMenuItem();
+      if (!option) {
+        document.body.classList.remove("yinzaosuo-publish-menu-suppressed");
+        publishing = false;
+        updateButtonStates();
+        window.alert("没有找到 CMS 的发布操作，内容尚未提交。");
+        return;
+      }
+      option.click();
+      window.setTimeout(function () {
+        document.body.classList.remove("yinzaosuo-publish-menu-suppressed");
+      }, 350);
+      if (publishTimer) window.clearTimeout(publishTimer);
+      publishTimer = window.setTimeout(function () {
+        if (publishing) {
+          publishing = false;
+          updateButtonStates();
+          window.alert("暂时没有收到 CMS 的发布完成确认。请检查发布状态；内容不会被标记为已保存。");
+        }
+      }, 45000);
+    }, 120);
+  }
+
+  function registerPublishEvents() {
+    if (!window.CMS || typeof window.CMS.registerEventListener !== "function") return;
+    window.CMS.registerEventListener({
+      name: "postPublish",
+      handler: function () {
+        if (publishTimer) window.clearTimeout(publishTimer);
+        window.setTimeout(function () {
+          formSnapshot = readFormSnapshot();
+          formDirty = false;
+          publishing = false;
+          updateButtonStates();
+        }, 500);
+      }
+    });
+  }
 
   function storeAction(action, href, value) {
     sessionStorage.setItem(ACTION_KEY, JSON.stringify({ action: action, href: href, value: value, createdAt: Date.now() }));
   }
+
   function openEntryForAction(action, anchor) {
     var href = anchor.getAttribute("href");
     if (!href) return;
@@ -177,6 +306,7 @@
     storeAction(action, anchor.href, value);
     anchor.click();
   }
+
   function addCardActions() {
     if (!root) return;
     root.querySelectorAll("a[href*='/collections/'][href*='/entries/']").forEach(function (anchor) {
@@ -185,12 +315,13 @@
       card.classList.add("yinzaosuo-entry-card");
       var actions = document.createElement("div");
       actions.className = "yinzaosuo-entry-actions";
-      [["delete","删除"],["duplicate","复制"],["order","调顺序"]].forEach(function (item) {
+      [["delete", "删除"], ["duplicate", "复制"], ["order", "调顺序"]].forEach(function (item) {
         var button = document.createElement("button");
         button.type = "button";
         button.textContent = item[1];
         button.addEventListener("click", function (event) {
-          event.preventDefault(); event.stopPropagation();
+          event.preventDefault();
+          event.stopPropagation();
           openEntryForAction(item[0], anchor);
         });
         actions.appendChild(button);
@@ -198,24 +329,31 @@
       card.appendChild(actions);
     });
   }
+
   function clickNativeEntryAction(action) {
     if (action === "delete") {
-      var del = findButton(root, function (text) { return /^删除(内容|条目)?$|^Delete$/i.test(text); });
-      if (del) del.click(); else window.alert("没有找到删除按钮，请在编辑页面操作。");
+      var del = Array.prototype.slice.call(root.querySelectorAll("button,[role='button']"))
+        .find(function (node) { return /^删除(内容|条目)?$|^Delete$/i.test(cleanText(node)); });
+      if (del) del.click();
+      else window.alert("没有找到删除按钮，请在编辑页面操作。");
     } else if (action === "duplicate") {
-      var trigger = nativePublishButton();
-      if (!trigger) { window.alert("没有找到复制入口，请在编辑页面打开发布菜单。"); return; }
+      var trigger = nativeStatusButton || findNativeStatusButton();
+      if (!trigger) { window.alert("没有找到复制入口。"); return; }
+      document.body.classList.add("yinzaosuo-publish-menu-suppressed");
       trigger.click();
       window.setTimeout(function () {
-        var duplicate = findButton(document, function (text) { return /^(复制|复制内容|Duplicate)$/i.test(text); });
-        if (duplicate) duplicate.click(); else window.alert("没有找到复制选项，请检查发布菜单。");
-      }, 180);
+        var duplicate = Array.prototype.slice.call(document.querySelectorAll("[role='menuitem'],button"))
+          .find(function (node) { return /^(复制|复制内容|Duplicate)$/i.test(cleanText(node)); });
+        document.body.classList.remove("yinzaosuo-publish-menu-suppressed");
+        if (duplicate) duplicate.click();
+        else window.alert("没有找到复制选项。");
+      }, 120);
     }
   }
+
   function processPendingAction() {
-    if (pendingProcessed) return;
     var raw = sessionStorage.getItem(ACTION_KEY);
-    if (!raw) return;
+    if (!raw || !root) return;
     var pending;
     try { pending = JSON.parse(raw); } catch (error) { sessionStorage.removeItem(ACTION_KEY); return; }
     if (!pending || Date.now() - pending.createdAt > 120000) { sessionStorage.removeItem(ACTION_KEY); return; }
@@ -223,42 +361,58 @@
     if (pending.action === "order") {
       var field = root.querySelector('input[name="sort_order"],input[name$=".sort_order"]');
       if (!field) return;
-      pendingProcessed = true;
       sessionStorage.removeItem(ACTION_KEY);
       setControlValue(field, String(pending.value));
-      window.setTimeout(runNativePublish, 350);
+      window.setTimeout(function () { updateDirtyState(); }, 50);
       return;
     }
-    pendingProcessed = true;
     sessionStorage.removeItem(ACTION_KEY);
     clickNativeEntryAction(pending.action);
   }
+
   function refreshWorkspace() {
-    updateToolbar();
+    if (!root) return;
+    var status = findNativeStatusButton();
+    if (status && isEditorScreen()) {
+      injectEditorActions(status);
+      scheduleBaseline();
+    } else {
+      removeEditorActions();
+      if (formSnapshot !== null) {
+        formSnapshot = null;
+        formDirty = false;
+        baselineRoute = null;
+      }
+    }
     addCardActions();
     processPendingAction();
   }
+
   function start() {
     if (!root) return;
-    function handleEdit(event) {
-      if (event.target && (/^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName) || event.target.isContentEditable)) {
-        updateDirtyState();
-        updateToolbar();
+    root.addEventListener("input", function (event) {
+      if (event.target && (event.target.matches("input,textarea,select") || event.target.isContentEditable)) {
+        window.setTimeout(updateDirtyState, 0);
       }
-    }
-    root.addEventListener("input", handleEdit, true);
-    root.addEventListener("change", handleEdit, true);
+    }, true);
+    root.addEventListener("change", function (event) {
+      if (event.target && event.target.matches("input,textarea,select")) window.setTimeout(updateDirtyState, 0);
+    }, true);
     window.addEventListener("hashchange", function () {
       formSnapshot = null;
       formDirty = false;
-      refreshWorkspace();
-      captureEditorBaseline();
+      baselineRoute = null;
+      window.setTimeout(refreshWorkspace, 50);
     });
+    registerPublishEvents();
     refreshWorkspace();
-    captureEditorBaseline();
-    var observer = new MutationObserver(refreshWorkspace);
+    observer = new MutationObserver(function () {
+      refreshWorkspace();
+      updateDirtyState();
+    });
     observer.observe(root, { childList: true, subtree: true });
   }
+
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);
   else start();
 })();
