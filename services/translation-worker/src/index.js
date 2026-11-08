@@ -27,7 +27,7 @@ async function verifyTurnstile(token, secret, ip) {
   });
   if (!response.ok) return false;
   const result = await response.json();
-  return result.success === true && (!result.hostname || result.hostname === "yinzaosuo.com");
+  return result.success === true && result.hostname === "yinzaosuo.com";
 }
 
 function makePrompt(text, sourceLanguage, targetLanguage) {
@@ -49,6 +49,9 @@ export default {
     if (origin !== ALLOWED_ORIGIN) {
       return json({ error: "Origin not allowed." }, 403, ALLOWED_ORIGIN);
     }
+
+    const pathname = new URL(request.url).pathname;
+    if (pathname !== "/translate") return json({ error: "Not found." }, 404);
 
     if (request.method === "OPTIONS") {
       return new Response(null, {
