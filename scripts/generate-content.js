@@ -1,8 +1,13 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const root = path.resolve(__dirname, '..');
-const contentRoot = path.join(root, 'content');
+const repositoryRoot = path.resolve(__dirname, '..');
+const root = process.env.CMS_SITE_ROOT
+  ? path.resolve(repositoryRoot, process.env.CMS_SITE_ROOT)
+  : repositoryRoot;
+const contentRoot = path.join(repositoryRoot, 'content');
+const isChineseBuild = root !== repositoryRoot;
+const sitePrefix = isChineseBuild ? '/zh' : '';
 const outputFile = path.join(root, 'assets', 'js', 'content-index.js');
 const siteUrl = 'https://yinzaosuo.com';
 
@@ -189,7 +194,9 @@ function normalizeProduct(product) {
     id: String(product.id),
     title: product.title || product.name || '',
     title_en: product.title_en || product.name_en || product.title || product.name || '',
-    image: typeof product.image === 'string' ? product.image : product.thumb || '',
+    image: isChineseBuild && typeof product.image_zh === 'string'
+      ? product.image_zh
+      : typeof product.image === 'string' ? product.image : product.thumb || '',
     desc: product.desc || product.intro || '',
     desc_en: product.desc_en || product.intro_en || product.desc || product.intro || '',
     intro: product.intro || product.desc || '',
@@ -389,7 +396,8 @@ function buildSitemap(data) {
     const tags = details
       ? `<changefreq>${details.changefreq}</changefreq><priority>${details.priority}</priority>`
       : '';
-    return `  <url><loc>${escapeHtml(`${siteUrl}${route}`)}</loc>${tags}</url>`;
+    const publicRoute = sitePrefix ? (route === '/' ? `${sitePrefix}/` : `${sitePrefix}${route}`) : route;
+    return `  <url><loc>${escapeHtml(`${siteUrl}${publicRoute}`)}</loc>${tags}</url>`;
   });
   fs.writeFileSync(path.join(root, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>\n`);
 }
