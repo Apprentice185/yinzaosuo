@@ -65,7 +65,7 @@ function renderProductDetails() {
 
   const imageContainer = document.querySelector('#productImage');
   imageContainer.replaceChildren();
-  const imageSource = product.image || product.thumb;
+  const imageSource = String(product.image || product.thumb || '').replace(/^\/?new\//, '/');
   imageContainer.classList.remove('is-placeholder');
   if (imageSource) {
     try {
