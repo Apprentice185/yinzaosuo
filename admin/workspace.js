@@ -93,7 +93,7 @@
       if (value === null || value.trim() === "" || !Number.isFinite(Number(value))) return;
       value = Number(value);
     }
-    storeAction(action, href, value);
+    storeAction(action, anchor.href, value);
     anchor.click();
   }
 
@@ -162,6 +162,7 @@
       sessionStorage.removeItem(ACTION_KEY);
       return;
     }
+    if (pending.href && window.location.href !== pending.href) return;
     if (pending.action === "order") {
       if (!snapshot.fields.some(function (field) { return field.name === "sort_order"; })) {
         sessionStorage.removeItem(ACTION_KEY);
@@ -181,15 +182,24 @@
     clickNativeEntryAction(pending.action);
   }
 
-  function start() {
-    if (window.CMS && window.CMS.editor && typeof window.CMS.editor.onEditorChange === "function") {
-      window.CMS.editor.onEditorChange(function (snapshot) {
-        updateEditorActions(snapshot);
-        if (snapshot) processPendingAction(snapshot);
-      });
-      updateEditorActions(window.CMS.editor.getCurrentEntry());
+  var editorConnected = false;
+  function connectEditorApi() {
+    if (editorConnected) return;
+    var api = window.CMS && window.CMS.editor;
+    if (!api || typeof api.onEditorChange !== "function" || typeof api.getCurrentEntry !== "function") {
+      window.setTimeout(connectEditorApi, 300);
+      return;
     }
+    editorConnected = true;
+    api.onEditorChange(function (snapshot) {
+      updateEditorActions(snapshot);
+      if (snapshot) processPendingAction(snapshot);
+    });
+    updateEditorActions(api.getCurrentEntry());
+  }
 
+  function start() {
+    connectEditorApi();
     addCardActions();
     observer = new MutationObserver(function () {
       addCardActions();
