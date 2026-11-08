@@ -1,0 +1,20 @@
+(() => {
+  const root=document.querySelector('.hero-fullbleed');
+  if(!root)return;
+  const slides=[...root.querySelectorAll('.hero-slide')];
+  const dots=[...root.querySelectorAll('#heroDots button')];
+  const prev=root.querySelector('#heroPrev'),next=root.querySelector('#heroNext'),pause=root.querySelector('#heroPause');
+  if(slides.length<2)return;
+  let index=0,timer=null,paused=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const show=(n)=>{index=(n+slides.length)%slides.length;slides.forEach((s,i)=>s.classList.toggle('is-active',i===index));dots.forEach((d,i)=>{d.classList.toggle('is-active',i===index);if(i===index)d.setAttribute('aria-current','true');else d.removeAttribute('aria-current');});};
+  const stop=()=>{if(timer)window.clearInterval(timer);timer=null;};
+  const start=()=>{stop();if(!paused)timer=window.setInterval(()=>show(index+1),5500);};
+  prev?.addEventListener('click',()=>{show(index-1);start();});
+  next?.addEventListener('click',()=>{show(index+1);start();});
+  dots.forEach((d,i)=>d.addEventListener('click',()=>{show(i);start();}));
+  pause?.addEventListener('click',()=>{paused=!paused;pause.textContent=paused?'▶':'Ⅱ';pause.setAttribute('aria-label',paused?'Resume banner rotation':'Pause banner rotation');start();});
+  root.addEventListener('mouseenter',stop);root.addEventListener('mouseleave',start);
+  root.addEventListener('focusin',stop);root.addEventListener('focusout',start);
+  document.addEventListener('visibilitychange',()=>document.hidden?stop():start());
+  show(0);start();
+})();

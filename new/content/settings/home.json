@@ -1,5 +1,29 @@
 {
-  "hero_image": "/new/pic/brand-visual-board.jpg",
-  "hero_image_alt": "YINZAOSUO printed banners, display stands and print products",
-  "hero_image_alt_en": "YINZAOSUO printed banners, display stands and print products"
+  "hero_slides": [
+    {
+      "image": "pic/brand-visual-board.jpg",
+      "alt": "YINZAOSUO print and display portfolio",
+      "alt_en": "YINZAOSUO print and display portfolio"
+    },
+    {
+      "image": "pic/pvc-banner.jpg",
+      "alt": "定制PVC横幅印刷",
+      "alt_en": "Custom printed PVC banners"
+    },
+    {
+      "image": "pic/pvc-mesh-banner.jpg",
+      "alt": "户外PVC网格布横幅",
+      "alt_en": "Printed PVC mesh banners for outdoor displays"
+    },
+    {
+      "image": "pic/display-stands.jpg",
+      "alt": "展示架和展架画面",
+      "alt_en": "Display stands and printed graphics"
+    },
+    {
+      "image": "pic/finishing-details.jpg",
+      "alt": "印刷成品细节和后道加工",
+      "alt_en": "Print finishing and production details"
+    }
+  ]
 }

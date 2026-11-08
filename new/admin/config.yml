@@ -167,5 +167,14 @@ collections:
         file: "new/content/settings/home.json"
         fields:
           - { label: "首页主视觉图", name: "hero_image", widget: "image" }
+          - label: "首页轮播大图（3–5张）"
+            name: "hero_slides"
+            widget: "list"
+            min: 3
+            max: 5
+            fields:
+              - { label: "图片", name: "image", widget: "image" }
+              - { label: "图片说明（中文）", name: "alt", widget: "string", required: false }
+              - { label: "图片说明（英文）", name: "alt_en", widget: "string", required: false }
           - { label: "图片替代文本（中文）", name: "hero_image_alt", widget: "string" }
           - { label: "图片替代文本（英文）", name: "hero_image_alt_en", widget: "string" }
