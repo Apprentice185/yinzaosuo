@@ -312,6 +312,8 @@
   window.YinzaosuoTranslation = {
     collectTasks: collectTasks,
     pairableFields: Array.from(PAIRABLE_FIELDS),
-    translateCurrentEntry: translateCurrentEntry
+    translateCurrentEntry: translateCurrentEntry,
+    translateText: translateText,
+    showStatus: showStatus
   };
 })();
