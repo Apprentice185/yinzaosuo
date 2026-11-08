@@ -8,6 +8,7 @@
   var translating = false;
   var pendingProcessed = false;
   var formDirty = false;
+  var formSnapshot = null;
 
   function textOf(node) {
     return (node && (node.innerText || node.textContent) || "").replace(/\s+/g, " ").trim();
@@ -28,17 +29,47 @@
   function nativePublishButton() {
     var toolbar = root && (root.querySelector(".nc-entryEditor-toolbar") || root);
     return findButton(toolbar, function (text) {
-      return /已发布|发布|Published|Publish/i.test(text) && !/复制|Duplicate/i.test(text);
+      return /^(已发布|发布|Published|Publish|未发布|Unpublished)$/i.test(text);
     });
   }
-  function updateToolbar() {
+  function hideNativePublishControl() {
     var native = nativePublishButton();
-    var visible = !!native || isEditorScreen();
-    if (editorActions) editorActions.hidden = !visible;
-    if (publishButton) publishButton.disabled = !formDirty;
-    if (native && !native.classList.contains("yinzaosuo-native-publish-hidden")) {
-      native.classList.add("yinzaosuo-native-publish-hidden");
+    if (!native) return null;
+    // Hide the complete status/dropdown group, while retaining the hidden trigger for programmatic publishing.
+    var wrapper = native;
+    for (var i = 0; i < 4 && wrapper.parentElement && wrapper.parentElement !== root; i++) {
+      var parent = wrapper.parentElement;
+      var buttons = parent.querySelectorAll("button,[role='button']");
+      if (buttons.length > 2) break;
+      wrapper = parent;
+      if (/已发布|发布|Published|Publish|未发布|Unpublished/i.test(textOf(wrapper))) break;
     }
+    wrapper.classList.add("yinzaosuo-native-publish-hidden");
+    native.classList.add("yinzaosuo-native-publish-hidden");
+    return native;
+  }
+  function readFormSnapshot() {
+    return Array.prototype.map.call(root.querySelectorAll("input[name],textarea[name],select[name],[contenteditable='true']"), function (node) {
+      var key = node.name || node.getAttribute("data-testid") || "editable";
+      var value = node.isContentEditable ? node.innerHTML : (node.type === "checkbox" || node.type === "radio" ? String(node.checked) : node.value);
+      return key + "=" + String(value == null ? "" : value);
+    }).join("\n");
+  }
+  function updateDirtyState() {
+    if (formSnapshot !== null) formDirty = readFormSnapshot() !== formSnapshot;
+  }
+  function updateToolbar() {
+    if (editorActions) editorActions.hidden = !isEditorScreen();
+    if (publishButton) publishButton.disabled = !formDirty;
+    hideNativePublishControl();
+  }
+  function captureEditorBaseline() {
+    if (!isEditorScreen()) return;
+    window.setTimeout(function () {
+      formSnapshot = readFormSnapshot();
+      formDirty = false;
+      updateToolbar();
+    }, 600);
   }
   function runNativePublish() {
     var trigger = nativePublishButton();
@@ -50,12 +81,15 @@
       });
       if (option) {
         option.click();
-        formDirty = false;
-        updateToolbar();
+        window.setTimeout(function () {
+          formSnapshot = readFormSnapshot();
+          formDirty = false;
+          updateToolbar();
+        }, 1400);
       } else {
-        window.alert("已打开发布菜单，但没有找到“发布”选项。请检查菜单文字后告诉我。");
+        window.alert("没有找到 Decap 的“发布”操作，内容尚未提交。");
       }
-    }, 220);
+    }, 180);
   }
   function setControlValue(control, value) {
     var proto = control.tagName === "TEXTAREA" ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
@@ -123,7 +157,7 @@
       translating = false;
       translateButton.textContent = "一键翻译";
       updateToolbar();
-      translateButton.disabled = !nativePublishButton();
+      translateButton.disabled = false;
     }
   });
   if (publishButton) publishButton.addEventListener("click", runNativePublish);
@@ -206,26 +240,22 @@
   }
   function start() {
     if (!root) return;
-    root.addEventListener("input", function (event) {
+    function handleEdit(event) {
       if (event.target && (/^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName) || event.target.isContentEditable)) {
-        formDirty = true;
+        updateDirtyState();
         updateToolbar();
       }
-    }, true);
-    root.addEventListener("change", function (event) {
-      if (event.target && (/^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName) || event.target.isContentEditable)) {
-        formDirty = true;
-        updateToolbar();
-      }
-    }, true);
-    root.addEventListener("input", function (event) {
-      if (event.target && event.target.isContentEditable) {
-        formDirty = true;
-        updateToolbar();
-      }
-    }, true);
-    window.addEventListener("hashchange", refreshWorkspace);
+    }
+    root.addEventListener("input", handleEdit, true);
+    root.addEventListener("change", handleEdit, true);
+    window.addEventListener("hashchange", function () {
+      formSnapshot = null;
+      formDirty = false;
+      refreshWorkspace();
+      captureEditorBaseline();
+    });
     refreshWorkspace();
+    captureEditorBaseline();
     var observer = new MutationObserver(refreshWorkspace);
     observer.observe(root, { childList: true, subtree: true });
   }
