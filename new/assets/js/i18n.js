@@ -248,8 +248,8 @@ window.I18N = {
   const current = () => ({ ...window.I18N[language], ...quoteLabels[language] });
   window.t = key => current()[key] ?? key;
   const quoteLabels = {
-    en: { quote_product_unsure: 'Not sure yet', quote_message_placeholder: 'Size, quantity, destination or anything you would like us to know…', quote_no_details: 'No specifications yet? That is fine — just send your name and email.', quote_privacy: 'Your details will only be used to respond to this enquiry.' },
-    zh: { quote_product_unsure: '暂时不确定', quote_message_placeholder: '可以填写尺寸、数量、目的地，或其他项目要求……', quote_no_details: '还没有具体规格也没关系，只填写姓名和邮箱即可。', quote_privacy: '你的信息仅用于回复本次询价。' }
+    en: { quote_opt_banner: 'PVC Banners', quote_opt_mesh: 'PVC Mesh Banners', quote_opt_paper: 'Synthetic Paper', quote_opt_vinyl: 'Self-Adhesive Vinyl', quote_opt_stands: 'Display Stands', quote_opt_other: 'Other / mixed order', quote_product_unsure: 'Not sure yet', quote_message_placeholder: 'Size, quantity, destination or anything you would like us to know…', quote_no_details: 'No specifications yet? That is fine — just send your name and email.', quote_privacy: 'Your details will only be used to respond to this enquiry.' },
+    zh: { quote_opt_banner: 'PVC 横幅', quote_opt_mesh: 'PVC 网格布', quote_opt_paper: '合成纸', quote_opt_vinyl: '背胶写真', quote_opt_stands: '展示架', quote_opt_other: '其他 / 混合订单', quote_product_unsure: '暂时不确定', quote_message_placeholder: '可以填写尺寸、数量、目的地，或其他项目要求……', quote_no_details: '还没有具体规格也没关系，只填写姓名和邮箱即可。', quote_privacy: '你的信息仅用于回复本次询价。' }
   };
   window.contentText = (type, id, field, fallback = '') => {
     const managed = window.CMS_CONTENT?.translations?.[language]?.[type]?.[id]?.[field];
