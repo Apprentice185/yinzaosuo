@@ -110,6 +110,10 @@ export default {
       return json({ error: "Invalid JSON body." }, 400);
     }
 
+    if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+      return json({ error: "JSON body must be an object." }, 400);
+    }
+
     const text = typeof payload.text === "string" ? payload.text.trim() : "";
     const sourceLanguage = typeof payload.sourceLanguage === "string" ? payload.sourceLanguage : "Chinese";
     const targetLanguage = typeof payload.targetLanguage === "string" ? payload.targetLanguage : "English";
