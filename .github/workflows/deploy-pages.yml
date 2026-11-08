@@ -37,10 +37,10 @@ jobs:
         run: |
           test -f index.html
           test -f assets/js/content-index.js
-          test -f admin/config.yml
+          test -f admin/index.html
+          test ! -d zh/admin
           test -f zh/index.html
           test -f zh/assets/js/content-index.js
-          test -f zh/admin/config.yml
           test -f zh/sitemap.xml
           test -f new/index.html
           test -f sitemap.xml
