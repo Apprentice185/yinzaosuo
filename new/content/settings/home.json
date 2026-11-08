@@ -1,12 +1,14 @@
 {
+  "hero_image_alt": "高精度写真机",
+  "eyebrow_zh": "面向全球贸易客户的印刷合作伙伴",
   "hero_slides": [
     {
-      "image": "pic/brand-visual-board.jpg",
+      "image": "/new/pic/display-stands.jpg",
       "alt": "YINZAOSUO print and display portfolio",
       "alt_en": "YINZAOSUO print and display portfolio"
     },
     {
-      "image": "pic/pvc-banner.jpg",
+      "image": "/new/pic/banner.png",
       "alt": "定制PVC横幅印刷",
       "alt_en": "Custom printed PVC banners"
     },
@@ -26,9 +28,6 @@
       "alt_en": "Print finishing and production details"
     }
   ],
-  "hero_image": "/new/pic/banner.png",
-  "hero_image_alt": "高精度写真机",
-  "hero_image_alt_en": "High-precision large-format printer",
   "modules": {
     "trust": true,
     "products": true,
@@ -38,23 +37,13 @@
     "about": true,
     "faq": true
   },
-  "module_order": [
-    "trust",
-    "products",
-    "process",
-    "knowledge",
-    "journal",
-    "about",
-    "faq"
-  ],
-  "eyebrow_zh": "面向全球贸易客户的印刷合作伙伴",
-  "eyebrow_en": "YOUR GLOBAL PRINT PRODUCTION PARTNER",
-  "hero_title_zh": "全球定制印刷与展示供应，为贸易伙伴而协作。",
-  "hero_title_en": "Custom Print Production, Ready for Your Business.",
-  "hero_description_zh": "面向印刷经销商、广告制作商与贸易采购商，提供横幅、网格布、合成纸、背胶印刷及展示架，按订单协调生产与交付。",
-  "hero_description_en": "Printed graphics and display solutions for print resellers, agencies and trade buyers worldwide.",
-  "hero_note_zh": "定制规格 · 灵活加工 · 国际订单协调",
+  "hero_image_alt_en": "High-precision large-format printer",
   "hero_note_en": "Custom specifications · Flexible finishing · Global order support",
+  "hero_description_en": "Printed graphics and display solutions for print resellers, agencies and trade buyers worldwide.",
+  "hero_title_en": "Custom Print Production, Ready for Your Business.",
+  "hero_image": "/new/pic/display-stands.jpg",
+  "hero_description_zh": "面向印刷经销商、广告制作商与贸易采购商，提供横幅、网格布、合成纸、背胶印刷及展示架，按订单协调生产与交付。",
+  "hero_note_zh": "定制规格 · 灵活加工 · 国际订单协调",
   "faq_items": [
     {
       "question_zh": "可以先确认材料和生产规格吗？",
@@ -80,5 +69,16 @@
       "question_en": "What if there is a print quality issue?",
       "answer_en": "Please share photos and order details. We will review the issue against the approved specifications and discuss an appropriate resolution."
     }
-  ]
+  ],
+  "hero_title_zh": "全球定制印刷与展示供应，为贸易伙伴而协作。",
+  "module_order": [
+    "trust",
+    "products",
+    "process",
+    "knowledge",
+    "journal",
+    "about",
+    "faq"
+  ],
+  "eyebrow_en": "YOUR GLOBAL PRINT PRODUCTION PARTNER"
 }
