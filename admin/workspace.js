@@ -15,7 +15,7 @@
   var observer = null;
 
   function cleanText(node) {
-    return (node && (node.innerText || node.textContent) || "").replace(/\\s+/g, " ").trim();
+    return (node && (node.innerText || node.textContent) || "").replace(/\s+/g, " ").trim();
   }
 
   function isStatusButton(node) {
