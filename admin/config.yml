@@ -21,7 +21,6 @@ collections:
     summary: "{{title}} · {{category}} · {{status}} · 顺序 {{sort_order}}"
     sortable_fields:
       - { field: sort_order, label: "后台排序", default_sort: asc }
-      - { field: date, label: "发布日期" }
       - title
     create: true
     format: "json"
@@ -57,7 +56,6 @@ collections:
     summary: "{{name_zh}} · {{status}} · {{sort_order}}"
     sortable_fields:
       - { field: sort_order, label: "后台排序", default_sort: asc }
-      - { field: date, label: "发布日期", default_sort: desc }
       - name_zh
     create: false
     format: "json"
@@ -106,7 +104,7 @@ collections:
     summary: "{{title}} · {{tag}} · {{date}} · {{status}}"
     sortable_fields:
       - { field: sort_order, label: "后台排序", default_sort: asc }
-      - { field: date, label: "发布日期", default_sort: desc }
+      - { field: date, label: "发布日期" }
       - title
     create: true
     format: "yaml-frontmatter"
@@ -137,7 +135,7 @@ collections:
     summary: "{{title}} · {{category}} · {{date}} · {{status}}"
     sortable_fields:
       - { field: sort_order, label: "后台排序", default_sort: asc }
-      - { field: date, label: "发布日期", default_sort: desc }
+      - { field: date, label: "发布日期" }
       - title
     create: true
     format: "yaml-frontmatter"
@@ -168,7 +166,7 @@ collections:
     summary: "{{title}} · {{tag}} · {{date}} · {{status}} · 顺序 {{sort_order}}"
     sortable_fields:
       - { field: sort_order, label: "后台排序", default_sort: asc }
-      - { field: date, label: "发布日期", default_sort: desc }
+      - { field: date, label: "发布日期" }
       - title
     create: true
     format: "yaml-frontmatter"
@@ -198,7 +196,7 @@ collections:
     summary: "{{title}} · {{type}} · {{size_spec}} · {{status}}"
     sortable_fields:
       - { field: sort_order, label: "后台排序", default_sort: asc }
-      - { field: date, label: "发布日期", default_sort: desc }
+      - { field: date, label: "发布日期" }
       - title
     create: true
     format: "json"
