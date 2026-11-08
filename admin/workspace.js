@@ -13,6 +13,7 @@
   var baselineRoute = null;
   var publishTimer = null;
   var observer = null;
+  var refreshTimer = null;
 
   function cleanText(node) {
     return (node && (node.innerText || node.textContent) || "").replace(/\s+/g, " ").trim();
@@ -104,7 +105,7 @@
 
   function scheduleBaseline() {
     var route = window.location.hash || window.location.pathname;
-    if (route === baselineRoute && formSnapshot !== null) return;
+    if (route === baselineRoute) return;
     baselineRoute = route;
     if (baselineTimer) window.clearTimeout(baselineTimer);
     formSnapshot = null;
@@ -421,9 +422,19 @@
     });
     registerPublishEvents();
     refreshWorkspace();
-    observer = new MutationObserver(function () {
-      refreshWorkspace();
-      updateDirtyState();
+    // React/Decap can emit many DOM mutations during one render. Debounce
+    // workspace discovery and never serialize every form field per mutation.
+    observer = new MutationObserver(function (mutations) {
+      var onlyOurUi = mutations.every(function (mutation) {
+        var target = mutation.target && mutation.target.nodeType === 1 ? mutation.target : mutation.target && mutation.target.parentElement;
+        return target && target.closest && target.closest(".yinzaosuo-editor-actions,.yinzaosuo-entry-actions");
+      });
+      if (onlyOurUi) return;
+      if (refreshTimer) window.clearTimeout(refreshTimer);
+      refreshTimer = window.setTimeout(function () {
+        refreshTimer = null;
+        refreshWorkspace();
+      }, 250);
     });
     observer.observe(root, { childList: true, subtree: true });
   }
