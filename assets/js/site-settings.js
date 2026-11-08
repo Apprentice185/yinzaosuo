@@ -31,11 +31,6 @@
    if(whatsapp){a.href=whatsapp;a.hidden=false;a.target='_blank';a.rel='noopener noreferrer';}
    else a.hidden=true;
   });
-  const linkedin=String(settings.contact_linkedin_url||'').trim();
-  document.querySelectorAll('.footer-linkedin-link').forEach(a=>{
-   if(linkedin){a.href=linkedin;a.hidden=false;a.target='_blank';a.rel='noopener noreferrer';}
-   else a.hidden=true;
-  });
   const qr=String(settings.contact_whatsapp_qr||'/pic/whatsapp-qr-placeholder.svg').trim();
   document.querySelectorAll('.footer-whatsapp-qr').forEach(img=>{if(qr)img.src=new URL(qr,document.baseURI).href;});
   if(location.pathname === '/' || location.pathname.endsWith('/index.html')){
