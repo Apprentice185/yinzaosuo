@@ -53,6 +53,7 @@
   let index = 0;
   let timer = null;
   let manuallyPaused = false;
+  let isHovered = false;
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const show = n => {
     index = (n + slides.length) % slides.length;
@@ -69,7 +70,7 @@
   };
   const schedule = () => {
     stop();
-    if (manuallyPaused || reducedMotion || document.hidden || root.matches(':hover')) return;
+    if (manuallyPaused || reducedMotion || document.hidden || isHovered) return;
     timer = window.setTimeout(() => {
       show(index + 1);
       schedule();
@@ -109,8 +110,8 @@
   }, { passive: true });
   root.addEventListener('touchcancel', schedule, { passive: true });
 
-  root.addEventListener('mouseenter', stop);
-  root.addEventListener('mouseleave', schedule);
+  root.addEventListener('mouseenter', () => { isHovered = true; stop(); });
+  root.addEventListener('mouseleave', () => { isHovered = false; schedule(); });
   root.addEventListener('focusin', stop);
   root.addEventListener('focusout', event => {
     if (!root.contains(event.relatedTarget)) schedule();
