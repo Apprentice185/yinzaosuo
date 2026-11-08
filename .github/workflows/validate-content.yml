@@ -1,0 +1,36 @@
+name: Validate shared content builds
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Check build scripts
+        run: |
+          node --check scripts/generate-content.js
+          node --check zh/scripts/generate-content.js
+      - name: Build international site data
+        run: npm run content:build
+      - name: Build domestic site data from the same source
+        run: node zh/scripts/generate-content.js
+      - name: Verify shared-content outputs
+        run: |
+          test -f assets/js/content-index.js
+          test -f sitemap.xml
+          test -f zh/assets/js/content-index.js
+          test -f zh/sitemap.xml
+          test ! -d zh/content
+          test ! -d zh/admin
+          test -f admin/index.html
