@@ -421,7 +421,10 @@ function main() {
   if (heroSlides.length && (heroSlides.length < 3 || heroSlides.length > 5)) {
     throw new Error('Homepage hero carousel must contain 3 to 5 slides');
   }
+  const globalSettingsFile = path.join(contentRoot, 'settings', 'site.json');
+  const globalSettings = fs.existsSync(globalSettingsFile) ? JSON.parse(fs.readFileSync(globalSettingsFile, 'utf8')) : {};
   const siteSettings = {
+    global: globalSettings,
     home: {
       ...homeSettings,
       hero_image: heroImage,

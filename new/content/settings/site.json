@@ -1,0 +1,44 @@
+{
+  "announcement_en": "Custom print production & display supply · Global trade enquiries welcome",
+  "announcement_zh": "定制印刷与展示物料 · 欢迎全球贸易询价",
+  "brand_tagline_en": "PRINT PRODUCTION & DISPLAY SUPPLY",
+  "brand_tagline_zh": "全球印刷与展示物料供应",
+  "contact_email": "xiaotanqingqing@outlook.com",
+  "contact_phone": "+86 134 0296 9091",
+  "nav_items": [
+    {
+      "label_zh": "产品中心",
+      "label_en": "Products",
+      "url": "index.html#products",
+      "enabled": true
+    },
+    {
+      "label_zh": "场景方案",
+      "label_en": "Solutions",
+      "url": "solutions.html",
+      "enabled": true
+    },
+    {
+      "label_zh": "印刷知识",
+      "label_en": "Knowledge",
+      "url": "knowledge.html",
+      "enabled": true
+    },
+    {
+      "label_zh": "品牌资讯",
+      "label_en": "Journal",
+      "url": "journal.html",
+      "enabled": true
+    },
+    {
+      "label_zh": "模板素材",
+      "label_en": "Templates",
+      "url": "templates.html",
+      "enabled": true
+    }
+  ],
+  "seo_home_title_en": "Custom Print Production & Display Supply | YINZAOSUO",
+  "seo_home_title_zh": "定制印刷与展示物料供应｜印造所",
+  "seo_home_description_en": "Custom printed graphics, wide-format banners and display solutions for print resellers, agencies and trade buyers.",
+  "seo_home_description_zh": "面向印刷经销商、广告制作商与贸易采购商，提供定制印刷、广告横幅及展示解决方案。"
+}

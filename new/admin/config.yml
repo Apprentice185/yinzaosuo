@@ -162,6 +162,28 @@ collections:
   - name: "site_settings"
     label: "网站设置"
     files:
+      - name: "global"
+        label: "全局网站设置（导航、联系信息、SEO）"
+        file: "new/content/settings/site.json"
+        fields:
+          - { label: "顶部公告（英文）", name: "announcement_en", widget: "string" }
+          - { label: "顶部公告（中文）", name: "announcement_zh", widget: "string" }
+          - { label: "品牌副标题（英文）", name: "brand_tagline_en", widget: "string" }
+          - { label: "品牌副标题（中文）", name: "brand_tagline_zh", widget: "string" }
+          - { label: "业务邮箱", name: "contact_email", widget: "string" }
+          - { label: "联系电话", name: "contact_phone", widget: "string", required: false }
+          - label: "导航菜单"
+            name: "nav_items"
+            widget: "list"
+            fields:
+              - { label: "中文名称", name: "label_zh", widget: "string" }
+              - { label: "英文名称", name: "label_en", widget: "string" }
+              - { label: "链接地址", name: "url", widget: "string" }
+              - { label: "显示此菜单", name: "enabled", widget: "boolean", default: true }
+          - { label: "首页 SEO 标题（英文）", name: "seo_home_title_en", widget: "string" }
+          - { label: "首页 SEO 标题（中文）", name: "seo_home_title_zh", widget: "string" }
+          - { label: "首页 SEO 描述（英文）", name: "seo_home_description_en", widget: "text" }
+          - { label: "首页 SEO 描述（中文）", name: "seo_home_description_zh", widget: "text" }
       - name: "home"
         label: "首页内容与 Banner"
         file: "new/content/settings/home.json"
