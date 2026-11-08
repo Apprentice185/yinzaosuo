@@ -1,0 +1,22 @@
+/* Styles loaded only inside the CMS preview iframe. */
+html, body { min-height: 100%; background: #fff; }
+body { margin: 0; padding: 0; }
+.site-preview { min-height: 100vh; overflow: hidden; background: #fff; color: #17221e; }
+.site-preview .preview-summary { max-width: 760px; margin: 22px auto 0; color: #626b65; line-height: 1.9; }
+.site-preview .preview-tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 28px; }
+.site-preview .preview-tags span { padding: 6px 10px; border: 1px solid #d9ded9; color: #59645d; font-size: 12px; }
+.site-preview .preview-empty { color: #888; font-size: 13px; }
+.site-preview .product-detail-image { background-color: #dbe5dd; background-position: center; background-size: cover; }
+.site-preview .template-detail { padding-top: 64px; padding-bottom: 80px; }
+.site-preview .template-detail h1, .site-preview .global-settings-preview h1 { font-size: clamp(32px, 4vw, 52px); margin: 0 0 30px; }
+.site-preview .global-settings-preview { padding-top: 72px; padding-bottom: 90px; }
+.site-preview .global-settings-preview p { line-height: 1.9; color: #59645d; }
+.site-preview .hero { background-position: center; background-size: cover; }
+.site-preview .hero:not([style*="background-image"]) { background: linear-gradient(120deg, #dce5de, #f1eee6); }
+.site-preview .hero-shade { pointer-events: none; }
+@media (max-width: 800px) {
+  .site-preview .main-nav { display: none; }
+  .site-preview .product-detail-layout, .site-preview .article-detail-layout { grid-template-columns: 1fr; gap: 28px; }
+  .site-preview .article-detail-layout aside { display: none; }
+  .site-preview .detail-gallery { height: auto; min-height: 260px; }
+}
