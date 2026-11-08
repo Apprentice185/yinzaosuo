@@ -6,31 +6,57 @@
   "desc_zh": "门型结构展示架，可提供硬件、印刷画面或完整组合方案。",
   "desc_en": "Door-style display frames supplied as hardware, printed graphics, or a complete display set.",
   "detail_zh": {
-    "lead": "",
-    "highlights": [],
-    "applications": [],
-    "finishing": [
-      "展示架硬件",
-      "印刷画面",
-      "硬件与画面成套供应"
+    "lead": "门型展示架以门框式结构形成独立展示空间，可用于活动入口、背景展示及室内宣传。可按项目需求提供展示架硬件、印刷画面或完整组合。",
+    "highlights": [
+      "门框式独立展示结构",
+      "可按项目分别配置硬件与印刷画面",
+      "可根据选定结构确认画面适配方式",
+      "尺寸、连接方式及配件以具体款式为准"
     ],
-    "delivery": [],
-    "artwork": "",
-    "brief": "",
-    "caveat": ""
+    "applications": [
+      "活动入口及签到区域",
+      "展会、发布会和品牌活动",
+      "室内背景展示与宣传布置"
+    ],
+    "finishing": [
+      "展示架结构及配件供应",
+      "画面印刷与尺寸裁切",
+      "按确认配置组合硬件与画面"
+    ],
+    "delivery": [
+      "硬件与画面可按订单拆分包装",
+      "完整组合按确认的结构和配置交付",
+      "包装及运输费用按订单体积、数量和目的地核算"
+    ],
+    "artwork": "请在结构和画面尺寸确认后提供印刷文件。需要拼接或分幅的画面，应在制作前确认分区及安装方向。基础文件检查和简单调整可协助处理，复杂修改或原创设计另行确认。",
+    "brief": "请提供安装场景、整体外形尺寸或参考图片、数量、是否需要硬件和印刷画面、画面内容、安装方式及交付目的地。",
+    "caveat": "门型展示架可能存在不同框架结构、连接方式和画面固定方式。具体尺寸、稳定性要求、安装条件及运输包装需根据所选款式和使用环境逐项确认。"
   },
   "detail_en": {
-    "lead": "",
-    "highlights": [],
-    "applications": [],
-    "finishing": [
-      "Stand hardware",
-      "Printed graphic",
-      "Complete stand and graphic set"
+    "lead": "A door-type display stand uses a doorway-style frame to create a freestanding display area. It can be used for event entrances, backdrop graphics and indoor promotions. Hardware, printed graphics or a complete configuration can be supplied to suit the project.",
+    "highlights": [
+      "Freestanding doorway-style display structure",
+      "Hardware and printed graphics can be specified separately",
+      "Graphic fit is confirmed against the selected frame design",
+      "Dimensions, connections and accessories depend on the model"
     ],
-    "delivery": [],
-    "artwork": "",
-    "brief": "",
-    "caveat": ""
+    "applications": [
+      "Event entrances and registration areas",
+      "Exhibitions, launches and brand events",
+      "Indoor backdrops and promotional displays"
+    ],
+    "finishing": [
+      "Frame structure and accessory supply",
+      "Graphic printing and size trimming",
+      "Hardware and graphics combined to the confirmed configuration"
+    ],
+    "delivery": [
+      "Hardware and graphics may be packed separately by order",
+      "Complete configurations follow the confirmed frame and component list",
+      "Packing and freight are assessed by order volume, quantity and destination"
+    ],
+    "artwork": "Please provide artwork after the frame and graphic dimensions are confirmed. If the graphic requires panels or sections, confirm the layout and installation orientation before production. Basic file checks and minor adjustments can be assisted; extensive changes or original design are confirmed separately.",
+    "brief": "Please share the installation setting, overall dimensions or a reference image, quantity, whether you need hardware and printed graphics, artwork, installation method and destination.",
+    "caveat": "Door-type stands may use different frame constructions, connectors and graphic attachment methods. Dimensions, stability requirements, installation conditions and transport packing must be confirmed for the selected model and intended environment."
   }
 }
