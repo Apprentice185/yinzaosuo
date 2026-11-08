@@ -37,6 +37,7 @@ jobs:
           test ! -d zh/content
           test ! -d zh/admin
           test -f admin/index.html
+          test -f admin/admin.css
       - name: Verify domestic and international publishing scopes
         run: |
           cat > content/products/TEST-DOMESTIC.json <<'EOF'
