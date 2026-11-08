@@ -193,7 +193,9 @@ const publicationStatuses = new Set(['published', 'hidden']);
 
 function normalizePublication(item) {
   const publishTo = item.publish_to || 'both';
-  const status = item.status || 'published';
+  const status = typeof item.hidden === 'boolean'
+    ? item.hidden ? 'hidden' : 'published'
+    : item.status || 'published';
   if (!publicationTargets.has(publishTo)) {
     throw new Error(`Content ${item.id || item.slug || ''} has an invalid publish_to value: ${publishTo}`);
   }

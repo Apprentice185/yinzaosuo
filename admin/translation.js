@@ -39,9 +39,9 @@
       (typeof value === "string" && value.trim() === "");
   }
 
-  function collectTasks(source, target, sourcePath, targetPath, sameNameFields, tasks) {
+  function collectTasks(source, target, sourcePath, targetPath, sameNameFields, tasks, overwrite) {
     if (typeof source === "string") {
-      if (isBlank(target) && source.trim()) {
+      if ((overwrite || isBlank(target)) && source.trim()) {
         tasks.push({ kind: "text", sourcePath: sourcePath, targetPath: targetPath, text: source });
       }
       return;
@@ -49,7 +49,7 @@
 
     if (Array.isArray(source)) {
       if (source.every(function (item) { return typeof item === "string"; })) {
-        if ((!Array.isArray(target) || target.length === 0) && source.length) {
+        if ((overwrite || !Array.isArray(target) || target.length === 0) && source.length) {
           tasks.push({ kind: "list", sourcePath: sourcePath, targetPath: targetPath, values: source.slice() });
         }
         return;
@@ -57,7 +57,7 @@
       if (source.every(isPlainObject)) {
         source.forEach(function (item, index) {
           var targetItem = Array.isArray(target) ? target[index] : undefined;
-          collectTasks(item, targetItem, sourcePath.concat(index), targetPath.concat(index), false, tasks);
+          collectTasks(item, targetItem, sourcePath.concat(index), targetPath.concat(index), false, tasks, overwrite);
         });
       }
       return;
@@ -66,6 +66,7 @@
     if (!isPlainObject(source)) return;
 
     Object.keys(source).forEach(function (key) {
+      if (!sameNameFields && key.slice(-3) === "_en") return;
       var targetKey = null;
       if (key.slice(-3) === "_zh") {
         targetKey = key.slice(0, -3) + "_en";
@@ -85,7 +86,8 @@
         sourcePath.concat(key),
         targetPath.concat(targetKey),
         nestedPair || (sameNameFields && targetKey === key),
-        tasks
+        tasks,
+        overwrite
       );
     });
   }
@@ -200,7 +202,7 @@
   async function translateEntryData(data) {
     var plain = toPlain(data);
     var tasks = [];
-    collectTasks(plain, plain, [], [], false, tasks);
+    collectTasks(plain, plain, [], [], false, tasks, true);
     if (!tasks.length) return data;
 
     showStatus("正在检查中文内容并补全英文译文…", "working");
@@ -237,7 +239,7 @@
       updated = updated.setIn(task.targetPath, value);
     });
 
-    showStatus("英文译文已填入空白字段，正在保存内容…", "success");
+    showStatus("英文译文已更新，请检查后保存。", "success");
     return updated;
   }
 
@@ -254,7 +256,7 @@
     if (!snapshot || !snapshot.data) throw new Error("请先打开一条内容，再使用一键翻译。");
 
     var tasks = [];
-    collectTasks(snapshot.data, snapshot.data, [], [], false, tasks);
+    collectTasks(snapshot.data, snapshot.data, [], [], false, tasks, true);
     if (!tasks.length) {
       showStatus("没有发现需要补充的英文内容。", "success");
       return { translated: 0, skipped: true };
@@ -284,7 +286,7 @@
     if (result && result.rejected && result.rejected.length) {
       throw new Error("部分英文栏位无法写入：" + result.rejected.map(function (item) { return item.path; }).join("、"));
     }
-    showStatus("翻译完成，英文内容已填入表单；请检查后点击“发布”保存。", "success");
+    showStatus("翻译完成，英文内容已更新；请检查后点击“保存”。", "success");
     return { translated: patches.length, result: result };
   }
 

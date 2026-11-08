@@ -3,7 +3,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const vm = require("node:vm");
 
-test("collects flat Chinese/English field pairs and leaves filled translations alone", () => {
+test("collects flat Chinese/English pairs and skips filled translations by default", () => {
   const source = {
     title: "产品标题",
     title_en: "",
@@ -54,4 +54,22 @@ test("collects nested detail fields and translated list values", () => {
     ["nav_items", 0, "label_en"]
   ]);
   assert.equal(tasks[1].kind, "list");
+});
+
+test("collects existing English values when overwrite is requested", () => {
+  const source = {
+    title: "最新中文标题",
+    title_en: "Old English title",
+    materials: ["新材质"],
+    materials_en: ["Old material"]
+  };
+  const tasks = [];
+  const context = {
+    window: { CMS: { registerEventListener() {} } },
+    document: { createElement() {}, body: { appendChild() {} } },
+    console, Set, Array, Object, Promise, fetch() {}
+  };
+  vm.runInNewContext(fs.readFileSync("admin/translation.js", "utf8"), context);
+  context.window.YinzaosuoTranslation.collectTasks(source, source, [], [], false, tasks, true);
+  assert.deepEqual(tasks.map(item => item.targetPath), [["title_en"], ["materials_en"]]);
 });

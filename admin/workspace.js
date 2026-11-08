@@ -3,121 +3,283 @@
 
   var root = document.getElementById("nc-root");
   var actionBar = null;
-  var statusButton = null;
-  var busy = false;
+  var nativeSaveButton = null;
+  var saveObserver = null;
+  var pendingAction = null;
+  var pendingActionTimer = null;
 
   function text(node) {
     return (node && (node.innerText || node.textContent) || "").replace(/\s+/g, " ").trim();
   }
 
-  function findStatus() {
-    if (!root) return null;
-    var nodes = root.querySelectorAll("button,[role='button']");
+  function findButton(pattern, scope) {
+    var nodes = (scope || root).querySelectorAll("button,[role='button'],[role='menuitem']");
     for (var i = 0; i < nodes.length; i++) {
-      var label = text(nodes[i]);
-      if (/^(已发布|未发布|Published|Unpublished|草稿|Draft)$/.test(label)) return nodes[i];
+      if (pattern.test(text(nodes[i]))) return nodes[i];
     }
     return null;
   }
 
-  function translate() {
-    var api = window.YinzaosuoTranslation;
-    if (!api || typeof api.translateText !== "function" || busy) return;
-    var controls = Array.from(root.querySelectorAll("input[name],textarea[name],[contenteditable='true'][name]"))
-      .filter(function (el) { return !el.disabled && !el.readOnly && !/^(hidden|file|checkbox|radio|number)$/.test(el.type || ""); });
-    var byName = new Map();
-    controls.forEach(function (el) {
-      if (!byName.has(el.name)) byName.set(el.name, []);
-      byName.get(el.name).push(el);
-    });
-    var jobs = [];
-    byName.forEach(function (sources, name) {
-      var targetName = name.replace(/_zh(?=\.|\[|$)/g, "_en");
-      if (targetName === name) {
-        if (!/^(title|name|desc|materials|crafts|category_title|category_desc|tag|summary|body|type)$/.test(name)) return;
-        targetName = name + "_en";
-      }
-      var targets = byName.get(targetName) || [];
-      sources.forEach(function (source, i) {
-        var target = targets[i];
-        var value = (source.value || source.innerText || "").trim();
-        var existing = target && (target.value || target.innerText || "").trim();
-        if (target && value && !existing) jobs.push({ target: target, value: value });
-      });
-    });
-    if (!jobs.length) { api.showStatus("没有需要补充的英文内容；已有译文不会覆盖。", "success"); return; }
-    busy = true;
-    var button = actionBar && actionBar.querySelector("[data-action=translate]");
-    if (button) { button.disabled = true; button.textContent = "翻译中…"; }
-    (async function () {
-      try {
-        for (var i = 0; i < jobs.length; i++) {
-          api.showStatus("正在翻译 " + (i + 1) + "/" + jobs.length, "working");
-          var result = await api.translateText(jobs[i].value);
-          var el = jobs[i].target;
-          var proto = el.tagName === "TEXTAREA" ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
-          Object.getOwnPropertyDescriptor(proto, "value").set.call(el, result);
-          el.dispatchEvent(new Event("input", { bubbles: true }));
-          el.dispatchEvent(new Event("change", { bubbles: true }));
-        }
-        api.showStatus("翻译完成，请检查后保存。", "success");
-      } catch (error) {
-        api.showStatus(error.message || "翻译失败", "error");
-      } finally {
-        busy = false;
-        if (button) { button.disabled = false; button.textContent = "填入翻译内容"; }
-      }
-    })();
+  function findStatus() {
+    return findButton(/^(已发布|未发布|Published|Unpublished|草稿|Draft)$/);
+  }
+
+  function findNativeSave() {
+    return findButton(/^(保存|Save)$/);
+  }
+
+  function syncSaveState() {
+    if (!actionBar || !nativeSaveButton) return;
+    var button = actionBar.querySelector("[data-action=save]");
+    button.disabled = nativeSaveButton.disabled;
+    button.setAttribute("aria-disabled", String(nativeSaveButton.disabled));
   }
 
   function save() {
-    if (!statusButton || !statusButton.isConnected) statusButton = findStatus();
-    if (!statusButton) { window.alert("暂时没有找到保存入口，请稍后重试。"); return; }
-    statusButton.click();
-    window.setTimeout(function () {
-      var items = document.querySelectorAll("[role='menuitem'],[role='option'],button");
-      for (var i = 0; i < items.length; i++) {
-        if (/^(立即)?发布$|^Publish( now)?$/i.test(text(items[i]))) {
-          items[i].click();
-          return;
-        }
+    if (nativeSaveButton && !nativeSaveButton.disabled) nativeSaveButton.click();
+  }
+
+  async function translate() {
+    var api = window.YinzaosuoTranslation;
+    var button = actionBar && actionBar.querySelector("[data-action=translate]");
+    if (!api || typeof api.translateCurrentEntry !== "function" || !button || button.disabled) return;
+    button.disabled = true;
+    button.textContent = "翻译中…";
+    try {
+      await api.translateCurrentEntry();
+    } catch (error) {
+      api.showStatus(error.message || "翻译失败", "error");
+    } finally {
+      button.disabled = false;
+      button.textContent = "填入翻译内容";
+      syncSaveState();
+    }
+  }
+
+  function setRoute(route, action) {
+    pendingAction = action;
+    if (window.location.hash.replace(/^#/, "") === route) {
+      runPendingAction();
+    } else {
+      window.location.hash = route;
+    }
+  }
+
+  function schedulePendingAction(delay, attempt) {
+    if (pendingActionTimer) return;
+    pendingActionTimer = window.setTimeout(function () {
+      pendingActionTimer = null;
+      runPendingAction(attempt);
+    }, delay || 0);
+  }
+
+  function failPendingAction() {
+    pendingAction = null;
+    window.alert("操作暂未完成，请打开条目后重试。");
+  }
+
+  function entryRoute(link) {
+    var href = link.getAttribute("href") || "";
+    var match = href.match(/#?(\/collections\/([^/]+)\/entries\/[^/?#]+)/);
+    return match ? { route: match[1], collection: match[2] } : null;
+  }
+
+  function applyPatch(path, value, callback) {
+    var api = window.CMS && window.CMS.editor;
+    if (!api || typeof api.getCurrentEntry !== "function" || typeof api.applyFieldPatch !== "function") return false;
+    var entry = api.getCurrentEntry();
+    if (!entry || !entry.data) return false;
+    var result = api.applyFieldPatch([{ path: path, value: value }]);
+    if (result && result.rejected && result.rejected.length) {
+      pendingAction = null;
+      window.alert("无法更新字段：" + path);
+      return true;
+    }
+    window.setTimeout(callback || syncSaveState, 150);
+    return true;
+  }
+
+  function finishDuplicate(route) {
+    var collection = route.split("/")[2];
+    var idPrefix = { products: "P", templates: "T", knowledge: "K", news: "N", solutions: "S" }[collection];
+    if (!idPrefix) {
+      pendingAction = null;
+      return;
+    }
+    var id = idPrefix + Date.now().toString(36).toUpperCase();
+    if (applyPatch("id", id, function () {
+      if (collection === "products") syncSaveState();
+      else applyPatch("slug", id);
+    })) {
+      pendingAction = null;
+    }
+  }
+
+  function runPendingAction(attempt) {
+    if (!pendingAction) return;
+    attempt = attempt || 0;
+    var action = pendingAction;
+    if (action.kind === "duplicate") {
+      if (/\/new$/.test(window.location.hash)) {
+        finishDuplicate(action.route);
+        return;
       }
-      window.alert("没有找到保存操作，内容尚未提交。");
-    }, 120);
+      if (window.location.hash.replace(/^#/, "") !== action.route) {
+        schedulePendingAction(250, attempt + 1);
+        return;
+      }
+      if (action.phase === "waiting-menu") {
+        var duplicate = findButton(/^(Duplicate|复制)$/);
+        if (duplicate) {
+          action.phase = "waiting-new";
+          duplicate.click();
+        } else if (attempt < 20) schedulePendingAction(250, attempt + 1);
+        else failPendingAction();
+        return;
+      }
+      if (action.phase === "waiting-new") {
+        if (attempt < 24) schedulePendingAction(250, attempt + 1);
+        else failPendingAction();
+        return;
+      }
+      var status = findStatus();
+      if (status) {
+        action.phase = "waiting-menu";
+        status.click();
+        schedulePendingAction(80);
+        return;
+      }
+    } else if (action.kind === "delete") {
+      if (window.location.hash.replace(/^#/, "") !== action.route) {
+        schedulePendingAction(250, attempt + 1);
+        return;
+      }
+      var remove = findButton(/^(Delete entry|Delete|删除内容|删除)$/);
+      if (remove) {
+        pendingAction = null;
+        remove.click();
+        return;
+      }
+      if (action.phase === "waiting-menu") {
+        if (attempt < 20) schedulePendingAction(250, attempt + 1);
+        else failPendingAction();
+        return;
+      }
+      var deleteStatus = findStatus();
+      if (deleteStatus) {
+        action.phase = "waiting-menu";
+        deleteStatus.click();
+        schedulePendingAction(80);
+        return;
+      }
+    } else if (action.kind === "sort") {
+      if (window.location.hash.replace(/^#/, "") !== action.route) {
+        schedulePendingAction(250, attempt + 1);
+        return;
+      }
+      if (applyPatch("sort_order", action.value)) {
+        pendingAction = null;
+        window.setTimeout(function () {
+          var saveButton = findNativeSave();
+          if (saveButton && !saveButton.disabled) saveButton.click();
+        }, 300);
+        return;
+      }
+    }
+    if (attempt < 24) schedulePendingAction(250, attempt + 1);
+    else failPendingAction();
+  }
+
+  function addRowActions() {
+    var links = root.querySelectorAll("a[href*='/collections/'][href*='/entries/']");
+    Array.prototype.forEach.call(links, function (link) {
+      var route = entryRoute(link);
+      var card = link.parentElement;
+      if (!route || !card || card.querySelector(":scope > .yinzaosuo-entry-actions")) return;
+      var actions = document.createElement("div");
+      actions.className = "yinzaosuo-entry-actions";
+      [
+        ["delete", "删除"],
+        ["duplicate", "复制"],
+        ["sort", "排序"]
+      ].forEach(function (item) {
+        var button = document.createElement("button");
+        button.type = "button";
+        button.textContent = item[1];
+        button.dataset.action = item[0];
+        if (item[0] === "duplicate" && route.collection === "catalogue") {
+          button.disabled = true;
+          button.title = "此产品集合不支持新增条目";
+        }
+        button.addEventListener("click", function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          if (item[0] === "sort") {
+            var value = window.prompt("请输入排序权重（数字越小越靠前）");
+            if (value === null || !value.trim() || !Number.isFinite(Number(value))) return;
+            setRoute(route.route, { kind: "sort", value: Number(value) });
+          } else {
+            setRoute(route.route, { kind: item[0], route: route.route });
+          }
+        });
+        actions.appendChild(button);
+      });
+      card.appendChild(actions);
+    });
+  }
+
+  function mountEditorActions() {
+    var saveButton = findNativeSave();
+    if (!saveButton || !saveButton.parentElement) return;
+    if (actionBar && actionBar.isConnected && nativeSaveButton === saveButton) {
+      syncSaveState();
+      return;
+    }
+    if (actionBar) actionBar.remove();
+    nativeSaveButton = saveButton;
+    if (saveObserver) saveObserver.disconnect();
+    saveObserver = new MutationObserver(syncSaveState);
+    saveObserver.observe(saveButton, { attributes: true, attributeFilter: ["disabled"] });
+    saveButton.classList.add("yinzaosuo-native-save-hidden");
+    actionBar = document.createElement("div");
+    actionBar.className = "yinzaosuo-editor-actions";
+
+    var saveAction = document.createElement("button");
+    saveAction.type = "button";
+    saveAction.dataset.action = "save";
+    saveAction.textContent = "保存";
+    saveAction.addEventListener("click", save);
+
+    var translateAction = document.createElement("button");
+    translateAction.type = "button";
+    translateAction.dataset.action = "translate";
+    translateAction.textContent = "填入翻译内容";
+    translateAction.addEventListener("click", translate);
+
+    actionBar.append(saveAction, translateAction);
+    saveButton.insertAdjacentElement("afterend", actionBar);
+    syncSaveState();
   }
 
   function mount() {
     if (!root) return;
-    var status = findStatus();
-    if (!status || !status.parentElement) return;
-    if (actionBar && actionBar.isConnected && statusButton === status) return;
-    if (actionBar) actionBar.remove();
-    statusButton = status;
-    status.classList.add("yinzaosuo-native-status-hidden");
-    var siblings = Array.from(status.parentElement.querySelectorAll("button,[role='button']"));
-    siblings.forEach(function (node) {
-      if (/^(删除内容|Delete entry|Delete)$/i.test(text(node))) node.classList.add("yinzaosuo-native-delete-hidden");
-    });
-    actionBar = document.createElement("div");
-    actionBar.className = "yinzaosuo-editor-actions";
-    var saveButton = document.createElement("button");
-    saveButton.type = "button";
-    saveButton.textContent = "保存";
-    saveButton.addEventListener("click", save);
-    var translateButton = document.createElement("button");
-    translateButton.type = "button";
-    translateButton.dataset.action = "translate";
-    translateButton.textContent = "填入翻译内容";
-    translateButton.addEventListener("click", translate);
-    actionBar.append(saveButton, translateButton);
-    status.insertAdjacentElement("afterend", actionBar);
+    addRowActions();
+    mountEditorActions();
+    if (pendingAction) schedulePendingAction();
   }
 
-  function retryMount() {
-    [0, 400, 1000, 2200].forEach(function (delay) { window.setTimeout(mount, delay); });
+  if (root) {
+    var observer = new MutationObserver(mount);
+    observer.observe(root, { childList: true, subtree: true });
   }
-
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", retryMount, { once: true });
-  else retryMount();
-  window.addEventListener("hashchange", function () { actionBar = null; statusButton = null; retryMount(); });
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", mount, { once: true });
+  else mount();
+  window.addEventListener("hashchange", function () {
+    actionBar = null;
+    nativeSaveButton = null;
+    if (saveObserver) saveObserver.disconnect();
+    saveObserver = null;
+    window.setTimeout(mount, 0);
+    schedulePendingAction(250);
+  });
 })();

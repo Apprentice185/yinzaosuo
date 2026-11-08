@@ -30,7 +30,7 @@ collections:
     fields:
       - { label: "产品编号（系统识别）", name: "id", widget: "string" }
       - { label: "发布范围", name: "publish_to", widget: "select", default: "both", options: [{ label: "国内站和国际站", value: "both" }, { label: "仅国内站", value: "domestic" }, { label: "仅国际站", value: "international" }] }
-      - { label: "发布状态", name: "status", widget: "select", default: "published", options: [{ label: "正常发布", value: "published" }, { label: "隐藏（不在网站展示）", value: "hidden" }] }
+      - { label: "隐藏内容", name: "hidden", widget: "boolean", default: false }
       - { label: "产品中文名称", name: "title", widget: "string" }
       - { label: "英文译文：标题 / 名称", name: "title_en", widget: "string", required: false }
       - { label: "所属首页产品分类", name: "category", widget: "select", options: [{ label: "定制印刷成品", value: "commercial" }, { label: "包装定制类", value: "packaging" }, { label: "广告加工与展示", value: "exhibition" }] }
@@ -66,7 +66,7 @@ collections:
       - { label: "产品编号（请勿修改）", name: "id", widget: "string" }
       - { label: "后台排序（数字越小越靠前）", name: "sort_order", widget: "number", default: 10, value_type: "int", required: false }
       - { label: "发布范围", name: "publish_to", widget: "select", default: "both", options: [{ label: "国内站和国际站", value: "both" }, { label: "仅国内站", value: "domestic" }, { label: "仅国际站", value: "international" }] }
-      - { label: "发布状态", name: "status", widget: "select", default: "published", options: [{ label: "正常发布", value: "published" }, { label: "隐藏（不在网站展示）", value: "hidden" }] }
+      - { label: "隐藏内容", name: "hidden", widget: "boolean", default: false }
       - { label: "产品中文名称", name: "name_zh", widget: "string" }
       - { label: "英文译文：产品名称", name: "name_en", widget: "string", required: false }
       - { label: "产品主图", name: "image", widget: "image" }
@@ -115,7 +115,7 @@ collections:
       - { label: "内容编号(ID)", name: "id", widget: "string" }
       - { label: "后台排序（数字越小越靠前）", name: "sort_order", widget: "number", default: 10, value_type: "int", required: false }
       - { label: "发布范围", name: "publish_to", widget: "select", default: "both", options: [{ label: "国内站和国际站", value: "both" }, { label: "仅国内站", value: "domestic" }, { label: "仅国际站", value: "international" }] }
-      - { label: "发布状态", name: "status", widget: "select", default: "published", options: [{ label: "正常发布", value: "published" }, { label: "隐藏（不在网站展示）", value: "hidden" }] }
+      - { label: "隐藏内容", name: "hidden", widget: "boolean", default: false }
       - { label: "内容路径", name: "slug", widget: "string" }
       - { label: "方案标题", name: "title", widget: "string" }
       - { label: "英文译文：标题 / 名称", name: "title_en", widget: "string", required: false }
@@ -146,7 +146,7 @@ collections:
       - { label: "内容编号(ID)", name: "id", widget: "string" }
       - { label: "后台排序（数字越小越靠前）", name: "sort_order", widget: "number", default: 10, value_type: "int", required: false }
       - { label: "发布范围", name: "publish_to", widget: "select", default: "both", options: [{ label: "国内站和国际站", value: "both" }, { label: "仅国内站", value: "domestic" }, { label: "仅国际站", value: "international" }] }
-      - { label: "发布状态", name: "status", widget: "select", default: "published", options: [{ label: "正常发布", value: "published" }, { label: "隐藏（不在网站展示）", value: "hidden" }] }
+      - { label: "隐藏内容", name: "hidden", widget: "boolean", default: false }
       - { label: "内容路径", name: "slug", widget: "string" }
       - { label: "文章标题", name: "title", widget: "string" }
       - { label: "英文译文：标题 / 名称", name: "title_en", widget: "string", required: false }
@@ -176,7 +176,7 @@ collections:
     fields:
       - { label: "内容编号(ID)", name: "id", widget: "string" }
       - { label: "发布范围", name: "publish_to", widget: "select", default: "both", options: [{ label: "国内站和国际站", value: "both" }, { label: "仅国内站", value: "domestic" }, { label: "仅国际站", value: "international" }] }
-      - { label: "发布状态", name: "status", widget: "select", default: "published", options: [{ label: "正常发布", value: "published" }, { label: "隐藏（不在网站展示）", value: "hidden" }] }
+      - { label: "隐藏内容", name: "hidden", widget: "boolean", default: false }
       - { label: "内容路径", name: "slug", widget: "string" }
       - { label: "资讯标题", name: "title", widget: "string" }
       - { label: "英文译文：标题 / 名称", name: "title_en", widget: "string", required: false }
@@ -207,7 +207,7 @@ collections:
       - { label: "素材编号(ID)", name: "id", widget: "string" }
       - { label: "后台排序（数字越小越靠前）", name: "sort_order", widget: "number", default: 10, value_type: "int", required: false }
       - { label: "发布范围", name: "publish_to", widget: "select", default: "both", options: [{ label: "国内站和国际站", value: "both" }, { label: "仅国内站", value: "domestic" }, { label: "仅国际站", value: "international" }] }
-      - { label: "发布状态", name: "status", widget: "select", default: "published", options: [{ label: "正常发布", value: "published" }, { label: "隐藏（不在网站展示）", value: "hidden" }] }
+      - { label: "隐藏内容", name: "hidden", widget: "boolean", default: false }
       - { label: "素材标题", name: "title", widget: "string" }
       - { label: "英文译文：标题 / 名称", name: "title_en", widget: "string", required: false }
       - { label: "模板类型", name: "type", widget: "select", options: ["包装盒展开图", "展架刀模", "迎宾牌工程", "VI规范"] }

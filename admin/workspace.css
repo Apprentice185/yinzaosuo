@@ -1,10 +1,90 @@
-:root{color-scheme:light}
-#nc-root{min-height:100vh;font-family:Inter,"PingFang SC","Microsoft YaHei",Arial,sans-serif}
-#nc-root .nc-appHeader,#nc-root .nc-entryEditor-toolbar{background:#fff;box-shadow:none}
-#nc-root .nc-sidebar{background:#fff}
-#nc-root .nc-controlPane{max-width:920px}
-#nc-root .yinzaosuo-native-status-hidden,#nc-root .yinzaosuo-native-delete-hidden{display:none!important}
-#nc-root .yinzaosuo-editor-actions{display:inline-flex;align-items:center;gap:8px;margin-left:10px;vertical-align:middle}
-#nc-root .yinzaosuo-editor-actions button{min-height:38px;padding:8px 18px;border:1px solid #d9e4e0;border-radius:7px;background:#17221e;color:#fff;font-size:14px;font-weight:600;cursor:pointer}
-#nc-root .yinzaosuo-editor-actions button[data-action=translate]{background:#eaf5f2;border-color:#d9e4e0;color:#176b60}
-#nc-root .yinzaosuo-editor-actions button:disabled{opacity:.55;cursor:wait}
+:root {
+  color-scheme: light;
+}
+
+#nc-root {
+  min-height: 100vh;
+  font-family: Inter, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+}
+
+#nc-root .nc-appHeader,
+#nc-root .nc-entryEditor-toolbar,
+#nc-root .nc-sidebar {
+  background: #fff;
+  box-shadow: none;
+}
+
+#nc-root .nc-controlPane {
+  max-width: 920px;
+}
+
+#nc-root .yinzaosuo-native-save-hidden {
+  display: none !important;
+}
+
+#nc-root .yinzaosuo-editor-actions,
+#nc-root .yinzaosuo-entry-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#nc-root .yinzaosuo-editor-actions {
+  margin-left: 10px;
+}
+
+#nc-root .yinzaosuo-entry-actions {
+  padding: 0 16px 12px;
+}
+
+#nc-root .yinzaosuo-editor-actions button,
+#nc-root .yinzaosuo-entry-actions button {
+  min-height: 34px;
+  padding: 6px 12px;
+  border: 1px solid #d9e4e0;
+  border-radius: 7px;
+  background: #17221e;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#nc-root .yinzaosuo-editor-actions button[data-action="translate"] {
+  background: #eaf5f2;
+  color: #176b60;
+}
+
+#nc-root .yinzaosuo-entry-actions button {
+  min-height: 28px;
+  padding: 4px 10px;
+  background: #fff;
+  color: #34413b;
+  font-weight: 500;
+}
+
+#nc-root .yinzaosuo-entry-actions button[data-action="delete"] {
+  border-color: #efcfca;
+  color: #9c3e32;
+}
+
+#nc-root .yinzaosuo-editor-actions button:disabled,
+#nc-root .yinzaosuo-entry-actions button:disabled {
+  opacity: .48;
+  cursor: not-allowed;
+}
+
+#nc-root li:has(> .yinzaosuo-entry-actions) {
+  overflow: visible;
+}
+
+@media (max-width: 640px) {
+  #nc-root .yinzaosuo-editor-actions {
+    gap: 5px;
+    margin-left: 5px;
+  }
+
+  #nc-root .yinzaosuo-editor-actions button {
+    padding-inline: 8px;
+  }
+}
