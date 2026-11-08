@@ -288,26 +288,8 @@
     return { translated: patches.length, result: result };
   }
 
-  if (!window.CMS || typeof window.CMS.registerEventListener !== "function") {
-    console.error("[印造所翻译] Decap CMS 事件接口不可用。");
-    return;
-  }
-
-  window.CMS.registerEventListener({
-    name: "preSave",
-    handler: async function (context) {
-      var entry = context && context.entry;
-      var data = entry && entry.get && entry.get("data");
-      if (!data || typeof data.toJS !== "function" || typeof data.setIn !== "function") return;
-      try {
-        return await translateEntryData(data);
-      } catch (error) {
-        console.error("[印造所翻译]", error);
-        showStatus("自动翻译未完成：" + (error.message || "未知错误") + " 中文内容仍会继续保存；英文可稍后补译。", "error");
-        return data;
-      }
-    }
-  });
+  // Translation runs only when the user clicks the translation button.
+  // Do not hook preSave: network translation must never block ordinary saves.
 
   window.YinzaosuoTranslation = {
     collectTasks: collectTasks,
