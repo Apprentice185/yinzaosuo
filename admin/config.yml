@@ -1,4 +1,5 @@
 local_backend: false
+locale: zh_Hans
 
 backend:
   name: github
@@ -77,6 +78,7 @@ collections:
       - label: "英文详情（AI 翻译后可修改）"
         name: "detail_en"
         widget: "object"
+        required: false
         fields:
           - { label: "英文译文：详情导语", name: "lead", widget: "text", required: false }
           - { label: "英文译文：生产能力", name: "highlights", widget: "list", required: false }
