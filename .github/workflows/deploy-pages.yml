@@ -37,9 +37,12 @@ jobs:
         run: |
           test -f index.html
           test -f assets/js/content-index.js
-          test -f new/assets/js/content-index.js
+          test -f admin/config.yml
+          test -f zh/index.html
+          test -f zh/assets/js/content-index.js
+          test -f zh/admin/config.yml
+          test -f zh/sitemap.xml
           test -f new/index.html
-          test -f new/admin/config.yml
           test -f sitemap.xml
           test "$(tr -d '\r\n' < CNAME)" = "yinzaosuo.com"
       - name: Upload site
