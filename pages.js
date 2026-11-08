@@ -189,9 +189,34 @@ function renderArticle() {
   const requestedType = params.get('type');
   const type = requestedType === 'articles' || requestedType === 'news'
     ? 'articles'
-    : requestedType === 'solutions' ? 'solutions' : 'knowledge';
-  const item = data[type].find(entry => entry.id === params.get('id')) || data[type][0];
-  if (!item) return;
+    : requestedType === 'solutions' ? 'solutions' : requestedType === 'knowledge' ? 'knowledge' : '';
+  const item = type ? data[type].find(entry => entry.id === params.get('id')) : null;
+  const article = document.querySelector('#articlePage article');
+  let message = document.querySelector('#articleNotFound');
+  if (!item) {
+    article.hidden = true;
+    if (!message) {
+      message = document.createElement('section');
+      message.className = 'article-detail container content-not-found';
+      message.id = 'articleNotFound';
+      const heading = document.createElement('h1');
+      const description = document.createElement('p');
+      const link = document.createElement('a');
+      link.className = 'button button-dark';
+      message.append(heading, description, link);
+      document.querySelector('#articlePage').append(message);
+    }
+    message.querySelector('h1').textContent = window.t('content_not_found_title');
+    message.querySelector('p').textContent = window.t('article_not_found');
+    const listPage = type === 'knowledge' ? 'knowledge.html' : type === 'solutions' ? 'solutions.html' : 'journal.html';
+    message.querySelector('a').href = listPage;
+    message.querySelector('a').textContent = window.t('article_back_to_list');
+    message.hidden = false;
+    document.title = window.t('content_not_found_title');
+    return;
+  }
+  article.hidden = false;
+  message?.remove();
   const title = text(type, item, 'title');
   const excerpt = text(type, item, 'excerpt');
   document.title = language() === 'en' ? `${title} | Print Atelier` : item.seoTitle || `${item.title}｜印造所`;

@@ -48,7 +48,7 @@ python -m http.server 8000
 - `assets/js/i18n.js`：全站静态文案的中英文字典和语言切换逻辑。CMS 内容的中英文翻译维护在同一条内容记录中。
 - `assets/js/product-catalog.js`：首页产品档案卡片和分类切换；产品数据由构建生成的去重内容索引提供。
 - `styles.css`、`pages.css`、`assets/css/`：现有站点样式。
-- `admin.html`：旧版浏览器本地内容原型；正式内容管理请使用 `/admin/`。
+- `/admin/`：Decap CMS 内容管理后台；旧版 `/admin.html` 会重定向到正式后台。
 
 SEO 页面描述、Open Graph 与 canonical 由公开页面提供；文章和商品详情会按内容更新标题、描述及 canonical。sitemap 包含公开静态页面、商品详情以及知识、资讯和方案详情地址。
 

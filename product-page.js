@@ -15,9 +15,36 @@ const productData = {
   products: Array.isArray(window.CMS_CONTENT?.products) ? managedProducts : siteProductData.products || []
 };
 const productId = new URLSearchParams(location.search).get('id');
-const product = productData.products.find(item => item.id === productId) || productData.products[0];
+const product = productData.products.find(item => item.id === productId) || null;
 const language = () => localStorage.getItem('site_lang') || 'zh';
 const productText = field => window.contentText('products', product.id, field, product[field] || product.desc || '');
+let missingProductMessage;
+
+function renderMissingProduct() {
+  const section = document.querySelector('.product-detail-page');
+  const layout = document.querySelector('.product-detail-layout');
+  if (!missingProductMessage) {
+    missingProductMessage = document.createElement('div');
+    missingProductMessage.className = 'container content-not-found';
+    const heading = document.createElement('h1');
+    heading.textContent = window.t('content_not_found_title');
+    const message = document.createElement('p');
+    message.textContent = window.t('product_not_found');
+    const link = document.createElement('a');
+    link.className = 'button button-dark';
+    link.href = 'products.html';
+    link.textContent = window.t('products_page_title');
+    missingProductMessage.append(heading, message, link);
+    section.prepend(missingProductMessage);
+  } else {
+    missingProductMessage.querySelector('h1').textContent = window.t('content_not_found_title');
+    missingProductMessage.querySelector('p').textContent = window.t('product_not_found');
+    missingProductMessage.querySelector('a').textContent = window.t('products_page_title');
+  }
+  missingProductMessage.hidden = false;
+  layout.style.display = 'none';
+  document.title = window.t('content_not_found_title');
+}
 
 function optionLabel(name) {
   return window.I18N[language()].optionLabels[name] || name;
@@ -44,6 +71,12 @@ function referencePrice() {
 }
 
 function renderProductDetails() {
+  if (!product) {
+    renderMissingProduct();
+    return;
+  }
+  missingProductMessage?.remove();
+  document.querySelector('.product-detail-layout').style.display = '';
   const currentValues = [...document.querySelectorAll('#detailOptions select')].map(select => select.selectedIndex);
   const title = `${productText('name')} | Print Atelier`;
   const description = language() === 'en'
@@ -103,12 +136,13 @@ function renderProductDetails() {
 }
 
 document.querySelector('#productQuote').addEventListener('click', () => {
+  if (!product) return;
   const selections = [...document.querySelectorAll('#detailOptions select')].map(select => {
     const option = product.options[select.dataset.optionIndex];
     return `${optionLabel(option.name)}: ${select.value}`;
   }).join('; ');
   const productName = productText('name');
-  localStorage.setItem('pendingQuote', window.t('quote_product_format').replace('{product}', `${productName} (${selections})`));
+  localStorage.setItem('pendingQuote', `${productName} (${selections})`);
   window.location.href = 'index.html#quoteModal';
 });
 

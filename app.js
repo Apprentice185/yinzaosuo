@@ -211,19 +211,114 @@ quoteForm?.addEventListener('submit', async event => {
 });
 
 const searchPanel = document.querySelector('#searchPanel');
+const searchInput = document.querySelector('#searchInput');
+const searchResults = document.createElement('div');
+searchResults.className = 'search-results';
+searchResults.id = 'searchResults';
+searchResults.hidden = true;
+searchResults.setAttribute('role', 'list');
+searchResults.setAttribute('aria-live', 'polite');
+searchInput?.insertAdjacentElement('afterend', searchResults);
+searchInput?.setAttribute('aria-controls', searchResults.id);
+
+function searchContent(query) {
+  const term = query.toLocaleLowerCase();
+  const matches = [];
+  for (const product of products) {
+    const title = productText(product, 'name');
+    const description = productText(product, 'intro');
+    const details = [
+      product.id,
+      title,
+      description,
+      ...(product.materials || []),
+      ...(product.crafts || [])
+    ].join(' ').toLocaleLowerCase();
+    if (details.includes(term)) {
+      matches.push({ type: 'product', title, description, href: `product.html?id=${encodeURIComponent(product.id)}` });
+    }
+  }
+  for (const [type, items] of [['knowledge', siteData.knowledge || []], ['articles', siteData.articles || []]]) {
+    for (const item of items) {
+      const title = window.contentText(type, item.id, 'title', item.title);
+      const description = window.contentText(type, item.id, 'excerpt', item.excerpt || item.summary || '');
+      const details = `${item.id} ${title} ${description} ${item.category || ''} ${item.content || ''}`.toLocaleLowerCase();
+      if (details.includes(term)) {
+        matches.push({
+          type,
+          title,
+          description,
+          href: `article.html?type=${type}&id=${encodeURIComponent(item.id)}`
+        });
+      }
+    }
+  }
+  return matches.slice(0, 12);
+}
+
+function renderSearchResults(query) {
+  searchResults.replaceChildren();
+  if (!query) {
+    searchResults.hidden = true;
+    searchInput?.setAttribute('aria-expanded', 'false');
+    return;
+  }
+
+  const matches = searchContent(query.trim());
+  searchResults.hidden = false;
+  searchInput?.setAttribute('aria-expanded', 'true');
+  if (!matches.length) {
+    const empty = document.createElement('p');
+    empty.className = 'search-results-empty';
+    empty.textContent = window.t('search_no_results');
+    searchResults.append(empty);
+    return;
+  }
+
+  const labels = {
+    product: window.t('search_type_product'),
+    knowledge: window.t('search_type_knowledge'),
+    articles: window.t('search_type_article')
+  };
+  matches.forEach(match => {
+    const link = document.createElement('a');
+    link.className = 'search-result';
+    link.href = match.href;
+    link.setAttribute('role', 'listitem');
+    const type = document.createElement('span');
+    type.className = 'search-result-type';
+    type.textContent = labels[match.type];
+    const content = document.createElement('span');
+    const title = document.createElement('span');
+    title.className = 'search-result-title';
+    title.textContent = match.title;
+    content.append(title);
+    if (match.description) {
+      const description = document.createElement('span');
+      description.className = 'search-result-description';
+      description.textContent = match.description;
+      content.append(description);
+    }
+    link.append(type, content);
+    searchResults.append(link);
+  });
+}
+
+searchInput?.addEventListener('input', event => renderSearchResults(event.target.value.trim()));
 document.querySelector('#searchToggle')?.addEventListener('click', () => {
-  searchPanel.classList.add('open');
-  document.querySelector('#searchInput').focus();
+  searchPanel?.classList.add('open');
+  searchInput?.focus();
 });
-document.querySelector('#closeSearch')?.addEventListener('click', () => searchPanel.classList.remove('open'));
-document.querySelector('#menuToggle')?.addEventListener('click', () => document.querySelector('.main-nav').classList.toggle('mobile-open'));
-document.querySelector('#searchInput')?.addEventListener('keydown', event => {
-  if (event.key !== 'Enter' || !event.target.value.trim()) return;
-  searchPanel.classList.remove('open');
-  const toast = document.querySelector('#toast');
-  toast.textContent = `${window.t('search_noted')} ${event.target.value.trim()}`;
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2500);
+document.querySelector('#closeSearch')?.addEventListener('click', () => {
+  searchPanel?.classList.remove('open');
+  if (searchInput) searchInput.value = '';
+  renderSearchResults('');
+});
+searchInput?.addEventListener('keydown', event => {
+  if (event.key === 'Escape') {
+    searchPanel?.classList.remove('open');
+    renderSearchResults('');
+  }
 });
 
 window.registerLanguageRenderer(() => {

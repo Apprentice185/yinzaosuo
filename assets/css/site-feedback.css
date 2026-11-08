@@ -1,0 +1,17 @@
+.content-not-found {
+  min-height: 44vh;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 12px;
+}
+
+.content-not-found h1,
+.content-not-found p {
+  margin: 0;
+}
+
+.content-not-found p {
+  color: var(--muted);
+}
