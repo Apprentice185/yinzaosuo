@@ -18,7 +18,12 @@
   }
   function isEditorScreen() {
     if (!root) return false;
-    return !!root.querySelector(".nc-entryEditor,[class*='EntryEditor'],[data-testid*='entry-editor']");
+    // Decap versions differ in their internal class names. Detect the editor by
+    // its route and actual editable controls rather than relying on one CSS class.
+    var hash = window.location.hash || "";
+    if (/\/entries\/[^/?#]+/.test(hash)) return true;
+    if (root.querySelector(".nc-entryEditor,[class*='EntryEditor'],[data-testid*='entry-editor']")) return true;
+    return !!root.querySelector("input[name],textarea[name],[contenteditable='true']");
   }
   function nativePublishButton() {
     var toolbar = root && (root.querySelector(".nc-entryEditor-toolbar") || root);
@@ -202,17 +207,24 @@
   function start() {
     if (!root) return;
     root.addEventListener("input", function (event) {
-      if (event.target && /^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName)) {
+      if (event.target && (/^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName) || event.target.isContentEditable)) {
         formDirty = true;
         updateToolbar();
       }
     }, true);
     root.addEventListener("change", function (event) {
-      if (event.target && /^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName)) {
+      if (event.target && (/^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName) || event.target.isContentEditable)) {
         formDirty = true;
         updateToolbar();
       }
     }, true);
+    root.addEventListener("input", function (event) {
+      if (event.target && event.target.isContentEditable) {
+        formDirty = true;
+        updateToolbar();
+      }
+    }, true);
+    window.addEventListener("hashchange", refreshWorkspace);
     refreshWorkspace();
     var observer = new MutationObserver(refreshWorkspace);
     observer.observe(root, { childList: true, subtree: true });
