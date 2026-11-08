@@ -42,6 +42,46 @@ collections:
       - { label: "Category description (English)", name: "category_desc_en", widget: "text", required: false }
       - { label: "分类序号", name: "category_num", widget: "string", required: false }
 
+  - name: "catalogue"
+    label: "核心产品详情（7类）"
+    folder: "new/content/catalogue"
+    create: false
+    format: "json"
+    extension: "json"
+    identifier_field: "id"
+    slug: "{{id}}"
+    fields:
+      - { label: "产品编号（请勿修改）", name: "id", widget: "string" }
+      - { label: "产品中文名称", name: "name_zh", widget: "string" }
+      - { label: "Product name (English)", name: "name_en", widget: "string" }
+      - { label: "产品主图", name: "image", widget: "image" }
+      - { label: "产品简介（中文）", name: "desc_zh", widget: "text" }
+      - { label: "Product introduction (English)", name: "desc_en", widget: "text" }
+      - label: "产品详情（中文）"
+        name: "detail_zh"
+        widget: "object"
+        fields:
+          - { label: "详情导语", name: "lead", widget: "text" }
+          - { label: "生产与定制能力", name: "highlights", widget: "list" }
+          - { label: "适用场景", name: "applications", widget: "list" }
+          - { label: "加工与后道处理", name: "finishing", widget: "list" }
+          - { label: "交付形式", name: "delivery", widget: "list" }
+          - { label: "设计文件支持", name: "artwork", widget: "text" }
+          - { label: "询价时建议提供的信息", name: "brief", widget: "text" }
+          - { label: "规格与生产注意事项", name: "caveat", widget: "text" }
+      - label: "Product details (English)"
+        name: "detail_en"
+        widget: "object"
+        fields:
+          - { label: "Detail introduction", name: "lead", widget: "text" }
+          - { label: "Production capabilities", name: "highlights", widget: "list" }
+          - { label: "Typical applications", name: "applications", widget: "list" }
+          - { label: "Finishing & processing", name: "finishing", widget: "list" }
+          - { label: "Delivery formats", name: "delivery", widget: "list" }
+          - { label: "Artwork support", name: "artwork", widget: "text" }
+          - { label: "What to include in your enquiry", name: "brief", widget: "text" }
+          - { label: "Specifications & production notes", name: "caveat", widget: "text" }
+
   - name: "solutions"
     label: "场景方案"
     folder: "new/content/solutions"

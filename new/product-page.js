@@ -10,14 +10,15 @@ const catalogueProducts = (window.PRODUCTS_DATA?.[localStorage.getItem('site_lan
     intro: item.desc,
     options: Array.isArray(item.options) ? item.options : []
   })));
+const managedCatalogue = window.CMS_CONTENT?.catalogue || [];
 const productData = {
   ...siteProductData,
-  products: [...catalogueProducts, ...legacyProducts.filter(item => !catalogueProducts.some(current => current.id === item.id))]
+  products: [...catalogueProducts.map(item => { const managed = managedCatalogue.find(entry => entry.id === item.id); const lang = localStorage.getItem('site_lang') || 'en'; return managed ? { ...item, name: managed[lang === 'en' ? 'name_en' : 'name_zh'] || item.name, image: managed.image || item.image, desc: managed[lang === 'en' ? 'desc_en' : 'desc_zh'] || item.desc, detail: managed[lang === 'en' ? 'detail_en' : 'detail_zh'] || item.detail } : item; }), ...legacyProducts.filter(item => !catalogueProducts.some(current => current.id === item.id))]
 };
 const productId = new URLSearchParams(location.search).get('id');
 let product = productData.products.find(item => item.id === productId) || productData.products[0];
 const language = () => localStorage.getItem('site_lang') || 'en';
-const productText = field => window.contentText('products', product.id, field, product[field] || product.desc || '');
+const productText = field => field === 'name' ? product.name : field === 'intro' ? (product.desc || '') : window.contentText('products', product.id, field, product[field] || product.desc || '');
 
 function optionLabel(name) {
   return window.I18N[language()].optionLabels[name] || name;
@@ -43,7 +44,7 @@ function renderProductDetails() {
   const localizedCategory = (window.PRODUCTS_DATA?.[language()]?.categories || [])
     .find(category => category.items.some(item => item.id === productId));
   const localizedItem = localizedCategory?.items.find(item => item.id === productId);
-  if (localizedItem) product = { ...localizedItem, category: localizedCategory.title, intro: localizedItem.desc, options: localizedItem.options || [] };
+  if (localizedItem) { const managed = managedCatalogue.find(entry => entry.id === productId); const lang = language(); product = { ...localizedItem, name: managed?.[lang === 'en' ? 'name_en' : 'name_zh'] || localizedItem.name, image: managed?.image || localizedItem.image, desc: managed?.[lang === 'en' ? 'desc_en' : 'desc_zh'] || localizedItem.desc, detail: managed?.[lang === 'en' ? 'detail_en' : 'detail_zh'] || localizedItem.detail, category: localizedCategory.title, intro: localizedItem.desc, options: localizedItem.options || [] }; }
   const currentValues = [...document.querySelectorAll('#detailOptions select')].map(select => select.selectedIndex);
   const title = `${productText('name')} | YINZAOSUO`;
   const description = language() === 'en'

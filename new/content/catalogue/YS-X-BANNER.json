@@ -1,0 +1,36 @@
+{
+  "id": "YS-X-BANNER",
+  "name_zh": "X 展架",
+  "name_en": "X-Banner Stands",
+  "image": "/new/pic/display-stands.jpg",
+  "desc_zh": "适用于活动、零售及室内展示的 X 型展示架，可按需求单独或成套供应。",
+  "desc_en": "Portable X-banner display systems for events, retail and indoor promotions, available separately or as a set.",
+  "detail_zh": {
+    "lead": "",
+    "highlights": [],
+    "applications": [],
+    "finishing": [
+      "展示架硬件",
+      "印刷画面",
+      "硬件与画面成套供应"
+    ],
+    "delivery": [],
+    "artwork": "",
+    "brief": "",
+    "caveat": ""
+  },
+  "detail_en": {
+    "lead": "",
+    "highlights": [],
+    "applications": [],
+    "finishing": [
+      "Stand hardware",
+      "Printed graphic",
+      "Complete stand and graphic set"
+    ],
+    "delivery": [],
+    "artwork": "",
+    "brief": "",
+    "caveat": ""
+  }
+}

@@ -429,6 +429,7 @@ function main() {
       faq_items: Array.isArray(homeSettings.faq_items) ? homeSettings.faq_items : []
     }
   };
+  const catalogue = filesIn('catalogue', '.json').map(file => JSON.parse(fs.readFileSync(file, 'utf8'))).filter(item => item && item.id);
   const templates = filesIn('templates', '.json')
     .map(file => normalizeTemplate(JSON.parse(fs.readFileSync(file, 'utf8'))));
   const solutions = readMarkdownCollection('solutions').map(item => normalizeArticle(item, 'solutions'));
@@ -440,6 +441,7 @@ function main() {
     products,
     siteSettings,
     catalog: buildCatalog(products),
+    catalogue,
     solutions,
     knowledge,
     news,
