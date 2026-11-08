@@ -1,29 +1,10 @@
-/* Decap CMS workspace refinements */
-:root{color-scheme:light;--admin-ink:#17221e;--admin-muted:#66736d;--admin-line:#e6eae7;--admin-paper:#f5f7f5;--admin-accent:#bd5939}
-#nc-root{min-height:100vh;background:var(--admin-paper);color:var(--admin-ink);font-family:Inter,"PingFang SC","Microsoft YaHei",Arial,sans-serif}
-#nc-root .nc-appHeader{background:#fff;border-bottom:1px solid var(--admin-line);box-shadow:none}
-#nc-root .nc-appHeader-content{max-width:none}
-#nc-root .nc-sidebar{background:#fff;border-right:1px solid var(--admin-line)}
-#nc-root .nc-collectionPage,#nc-root .nc-entryEditor{background:var(--admin-paper)}
-#nc-root .nc-entryEditor-toolbar{background:#fff;border-bottom:1px solid var(--admin-line)}
-#nc-root button{border-radius:7px}
-#nc-root input,#nc-root textarea{border-radius:7px}
+:root{color-scheme:light}
+#nc-root{min-height:100vh;font-family:Inter,"PingFang SC","Microsoft YaHei",Arial,sans-serif}
+#nc-root .nc-appHeader,#nc-root .nc-entryEditor-toolbar{background:#fff;box-shadow:none}
+#nc-root .nc-sidebar{background:#fff}
 #nc-root .nc-controlPane{max-width:920px}
-#nc-root .nc-previewPane{background:#fff}
-
-/* Put the two custom actions in Decap's actual editor toolbar. */
-#nc-root .yinzaosuo-editor-actions{display:inline-flex!important;align-items:center;gap:8px;margin-left:8px;vertical-align:middle;position:relative;z-index:20}
-#nc-root .yinzaosuo-editor-actions button{min-height:38px;padding:8px 16px;border:1px solid #d9e4e0;border-radius:7px;background:#eaf5f2;color:#176b60;font-size:14px;font-weight:600;white-space:nowrap;cursor:pointer}
-#nc-root .yinzaosuo-editor-actions button[data-action="publish"]{background:#17221e;border-color:#17221e;color:#fff}
-#nc-root .yinzaosuo-editor-actions button:disabled{background:#e5e7eb!important;border-color:#d1d5db!important;color:#9ca3af!important;opacity:1;cursor:not-allowed}
-#nc-root .yinzaosuo-native-status-hidden{display:none!important}
-body.yinzaosuo-publish-menu-suppressed [role="menu"],
-body.yinzaosuo-publish-menu-suppressed [role="menuitem"]{visibility:hidden!important;pointer-events:none!important}
-
-/* Entry list shortcuts */
-#nc-root .yinzaosuo-entry-card{position:relative!important}
-#nc-root .yinzaosuo-entry-actions{position:absolute;right:10px;bottom:8px;z-index:8;display:flex;gap:5px;padding:4px;background:#ffffffed;border:1px solid #e6eae7;border-radius:8px;box-shadow:0 2px 10px #17221e16}
-#nc-root .yinzaosuo-entry-actions button{padding:5px 8px;border:1px solid #dce3de;border-radius:5px;background:#fff;color:#35443c;font-size:11px;cursor:pointer}
-#nc-root .yinzaosuo-entry-actions button:first-child{color:#a43d32}
-#nc-root .yinzaosuo-entry-actions button:hover{background:#f1f5f2}
-@media(max-width:760px){#nc-root .yinzaosuo-editor-actions{gap:5px;margin-left:5px}#nc-root .yinzaosuo-editor-actions button{padding:7px 9px;font-size:12px}#nc-root .yinzaosuo-entry-actions{right:5px;bottom:5px}#nc-root .yinzaosuo-entry-actions button{padding:5px 6px;font-size:10px}}
+#nc-root .yinzaosuo-native-status-hidden,#nc-root .yinzaosuo-native-delete-hidden{display:none!important}
+#nc-root .yinzaosuo-editor-actions{display:inline-flex;align-items:center;gap:8px;margin-left:10px;vertical-align:middle}
+#nc-root .yinzaosuo-editor-actions button{min-height:38px;padding:8px 18px;border:1px solid #d9e4e0;border-radius:7px;background:#17221e;color:#fff;font-size:14px;font-weight:600;cursor:pointer}
+#nc-root .yinzaosuo-editor-actions button[data-action=translate]{background:#eaf5f2;border-color:#d9e4e0;color:#176b60}
+#nc-root .yinzaosuo-editor-actions button:disabled{opacity:.55;cursor:wait}
