@@ -31,5 +31,6 @@
    if(title)document.title=title;if(desc){const m=document.querySelector('meta[name="description"]'),o=document.querySelector('meta[property="og:description"]');if(m)m.content=desc;if(o)o.content=desc;}
   }
  };
- apply();document.querySelector('#languageToggle')?.addEventListener('click',()=>setTimeout(apply,0));
+ document.addEventListener('DOMContentLoaded',apply);
+ document.querySelector('#languageToggle')?.addEventListener('click',()=>setTimeout(apply,0));
 })();
