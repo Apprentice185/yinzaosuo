@@ -19,31 +19,40 @@
   }
 
   function isStatusButton(node) {
-    return [cleanText(node), node && node.getAttribute("aria-label"), node && node.getAttribute("title")]
-      .filter(Boolean).some(function (value) {
-        return /^(已发布|未发布|发布|Published|Unpublished|Publish|Draft|草稿)$/i.test(value.trim());
-      });
+    var values = [cleanText(node), node && node.getAttribute("aria-label"), node && node.getAttribute("title")];
+    return values.filter(Boolean).some(function (value) {
+      var text = value.trim();
+      return /^(已发布|未发布|发布|Published|Unpublished|Publish|Draft|草稿)$/i.test(text) ||
+        /^(已发布|未发布|Published|Unpublished|草稿)\b/i.test(text);
+    });
   }
 
   function findNativeStatusButton() {
     if (!root) return null;
-    var candidates = Array.prototype.slice.call(root.querySelectorAll("button,[role='button']"));
-    for (var i = 0; i < candidates.length; i += 1) {
-      var candidate = candidates[i];
-      if (candidate.closest(".yinzaosuo-editor-actions")) continue;
-      if (candidate.disabled || !isStatusButton(candidate)) continue;
-      // The status control is unique to the entry editor. Do not require the
-      // delete action to share an ancestor: Decap versions render these in
-      // separate toolbar containers, which previously prevented injection.
-      return candidate;
-    }
-    return null;
+    // Decap has moved the entry toolbar between versions. Search the CMS
+    // document as well as #nc-root so a portal-rendered toolbar is discoverable.
+    var candidates = Array.prototype.slice.call(document.querySelectorAll("#nc-root button,#nc-root [role='button'],button,[role='button']"));
+    var matches = candidates.filter(function (candidate) {
+      if (candidate.closest(".yinzaosuo-editor-actions")) return false;
+      if (candidate.closest("[role='menu'],[role='menuitem']")) return false;
+      return isStatusButton(candidate);
+    });
+    if (!matches.length) return null;
+    // Prefer the status control located in the entry editor toolbar.
+    matches.sort(function (a, b) {
+      var aToolbar = a.closest(".nc-entryEditor-toolbar,[class*='Toolbar'],[class*='toolbar']") ? 1 : 0;
+      var bToolbar = b.closest(".nc-entryEditor-toolbar,[class*='Toolbar'],[class*='toolbar']") ? 1 : 0;
+      return bToolbar - aToolbar;
+    });
+    return matches[0];
   }
 
   function isEditorScreen() {
     if (!root) return false;
     var status = findNativeStatusButton();
-    var hasFields = !!root.querySelector("input[name],textarea[name],select[name],[contenteditable='true']");
+    // Decap widgets do not consistently expose a name attribute on their
+    // rendered controls; the editor itself still has ordinary form controls.
+    var hasFields = !!root.querySelector("input:not([type='file']),textarea,select,[contenteditable='true']");
     return !!status && hasFields;
   }
 
