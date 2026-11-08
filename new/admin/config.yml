@@ -40,7 +40,9 @@ collections:
       - { label: "Category title (English)", name: "category_title_en", widget: "string", required: false }
       - { label: "分类介绍（中文）", name: "category_desc", widget: "text", required: false }
       - { label: "Category description (English)", name: "category_desc_en", widget: "text", required: false }
-      - { label: "分类序号", name: "category_num", widget: "string", required: false }  - name: "solutions"
+      - { label: "分类序号", name: "category_num", widget: "string", required: false }
+
+  - name: "solutions"
     label: "场景方案"
     folder: "new/content/solutions"
     create: true
@@ -164,6 +166,16 @@ collections:
           - { label: "首页 SEO 标题（中文）", name: "seo_home_title_zh", widget: "string" }
           - { label: "首页 SEO 描述（英文）", name: "seo_home_description_en", widget: "text" }
           - { label: "首页 SEO 描述（中文）", name: "seo_home_description_zh", widget: "text" }
+          - { label: "页脚品牌介绍（英文）", name: "footer_tagline_en", widget: "text" }
+          - { label: "页脚品牌介绍（中文）", name: "footer_tagline_zh", widget: "text" }
+          - { label: "页脚工作时间（英文）", name: "footer_hours_en", widget: "string" }
+          - { label: "页脚工作时间（中文）", name: "footer_hours_zh", widget: "string" }
+          - { label: "页脚配送说明（英文）", name: "footer_delivery_en", widget: "text" }
+          - { label: "页脚配送说明（中文）", name: "footer_delivery_zh", widget: "text" }
+          - { label: "版权文字（英文）", name: "footer_copyright_en", widget: "string" }
+          - { label: "版权文字（中文）", name: "footer_copyright_zh", widget: "string" }
+          - { label: "页脚地区说明（英文）", name: "footer_region_en", widget: "string" }
+          - { label: "页脚地区说明（中文）", name: "footer_region_zh", widget: "string" }
       - name: "home"
         label: "首页内容与 Banner"
         file: "new/content/settings/home.json"

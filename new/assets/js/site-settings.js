@@ -13,6 +13,17 @@
   }
   const email=String(settings.contact_email||'').trim();
   document.querySelectorAll('.footer-contact a[href^="mailto:"]').forEach(a=>{if(email){a.href='mailto:'+email;a.textContent=email;}});
+  const setLocalized = (selector, zhKey, enKey) => {
+   document.querySelectorAll(selector).forEach(node => {
+    const value=settings[zh?zhKey:enKey];
+    if(typeof value==='string'&&value.trim()) node.textContent=value;
+   });
+  };
+  setLocalized('.footer-brand > p','footer_tagline_zh','footer_tagline_en');
+  setLocalized('[data-i18n="footer_hours"]','footer_hours_zh','footer_hours_en');
+  setLocalized('[data-i18n="footer_delivery_detail"]','footer_delivery_zh','footer_delivery_en');
+  setLocalized('[data-i18n="footer_copyright"]','footer_copyright_zh','footer_copyright_en');
+  setLocalized('[data-i18n="footer_region"]','footer_region_zh','footer_region_en');
   const phone=String(settings.contact_phone||'').trim();
   document.querySelectorAll('.footer-phone').forEach(a=>{if(phone){a.href='tel:'+phone.replace(/[^+\d]/g,'');a.textContent=phone;}});
   if(location.pathname.endsWith('/new/')||location.pathname.endsWith('/new/index.html')){
