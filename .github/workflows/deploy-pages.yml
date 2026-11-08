@@ -31,15 +31,18 @@ jobs:
         uses: actions/configure-pages@v5
       - name: Build CMS content and sitemap
         run: npm run content:build
-      - name: Build /new/ CMS content and sitemap
-        run: node new/scripts/generate-content.js
+      - name: Build Chinese site content and sitemap
+        run: node zh/scripts/generate-content.js
       - name: Verify published site files
         run: |
           test -f index.html
           test -f assets/js/content-index.js
-          test -f new/assets/js/content-index.js
+          test -f admin/config.yml
+          test -f zh/index.html
+          test -f zh/assets/js/content-index.js
+          test -f zh/admin/config.yml
+          test -f zh/sitemap.xml
           test -f new/index.html
-          test -f new/admin/config.yml
           test -f sitemap.xml
           test "$(tr -d '\r\n' < CNAME)" = "yinzaosuo.com"
       - name: Upload site

@@ -26,7 +26,7 @@
   setLocalized('[data-i18n="footer_region"]','footer_region_zh','footer_region_en');
   const phone=String(settings.contact_phone||'').trim();
   document.querySelectorAll('.footer-phone').forEach(a=>{if(phone){a.href='tel:'+phone.replace(/[^+\d]/g,'');a.textContent=phone;}});
-  if(location.pathname.endsWith('/new/')||location.pathname.endsWith('/new/index.html')){
+  if(location.pathname === '/' || location.pathname.endsWith('/index.html')){
    const title=settings[zh?'seo_home_title_zh':'seo_home_title_en'],desc=settings[zh?'seo_home_description_zh':'seo_home_description_en'];
    if(title)document.title=title;if(desc){const m=document.querySelector('meta[name="description"]'),o=document.querySelector('meta[property="og:description"]');if(m)m.content=desc;if(o)o.content=desc;}
   }

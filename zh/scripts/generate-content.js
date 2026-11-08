@@ -351,7 +351,7 @@ function buildSitemap(data) {
   const excludedPages = new Set(['admin.html']);
   for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
     if (!entry.isFile() || !/\.html?$/i.test(entry.name) || excludedPages.has(entry.name)) continue;
-    if (!nonIndexablePages.has(entry.name)) routes.add(`/${entry.name}`);
+    if (!nonIndexablePages.has(entry.name)) routes.add(`/zh/${entry.name}`);
   }
   const queue = ['index.html'];
   const visited = new Set();
@@ -361,7 +361,7 @@ function buildSitemap(data) {
     visited.add(relative);
     const file = path.resolve(root, relative);
     if (!file.startsWith(`${root}${path.sep}`) || !fs.existsSync(file)) continue;
-    if (!nonIndexablePages.has(relative)) routes.add(`/${relative.split(path.sep).join('/')}`);
+    if (!nonIndexablePages.has(relative)) routes.add(`/zh/${relative.split(path.sep).join('/')}`);
     const html = fs.readFileSync(file, 'utf8');
     for (const match of html.matchAll(/href\s*=\s*(['"])(.*?)\1/gi)) {
       const href = match[2].trim();
@@ -375,10 +375,10 @@ function buildSitemap(data) {
       queue.push(relativeTarget);
     }
   }
-  for (const product of data.products) routes.add(`/product.html?id=${encodeURIComponent(product.id)}`);
-  for (const item of data.knowledge) routes.add(`/article.html?type=knowledge&id=${encodeURIComponent(item.id)}`);
-  for (const item of data.news) routes.add(`/article.html?type=articles&id=${encodeURIComponent(item.id)}`);
-  for (const item of data.solutions) routes.add(`/article.html?type=solutions&id=${encodeURIComponent(item.id)}`);
+  for (const product of data.products) routes.add(`/zh/product.html?id=${encodeURIComponent(product.id)}`);
+  for (const item of data.knowledge) routes.add(`/zh/article.html?type=knowledge&id=${encodeURIComponent(item.id)}`);
+  for (const item of data.news) routes.add(`/zh/article.html?type=articles&id=${encodeURIComponent(item.id)}`);
+  for (const item of data.solutions) routes.add(`/zh/article.html?type=solutions&id=${encodeURIComponent(item.id)}`);
   const metadata = {
     '/': { changefreq: 'weekly', priority: '1.0' },
     '/templates.html': { changefreq: 'weekly', priority: '0.8' },
@@ -407,47 +407,13 @@ function main() {
     : {};
   const heroImage = String(homeSettings.hero_image || '').trim();
   if (heroImage && !safeMediaUrl(heroImage)) throw new Error(`Unsupported homepage hero image URL: ${heroImage}`);
-  const heroSlides = Array.isArray(homeSettings.hero_slides)
-    ? homeSettings.hero_slides.map((slide, index) => {
-        const image = String(slide?.image || '').trim();
-        if (!image || !safeMediaUrl(image)) throw new Error(`Homepage hero slide ${index + 1} has an invalid image URL`);
-        return { image };
-      }).filter(slide => slide.image)
-    : [];
-  if (heroSlides.length && (heroSlides.length < 3 || heroSlides.length > 5)) {
-    throw new Error('Homepage hero carousel must contain 3 to 5 slides');
-  }
-  const globalSettingsFile = path.join(contentRoot, 'settings', 'site.json');
-  const globalSettings = fs.existsSync(globalSettingsFile) ? JSON.parse(fs.readFileSync(globalSettingsFile, 'utf8')) : {};
   const siteSettings = {
-    global: globalSettings,
     home: {
-      ...homeSettings,
-      hero_slides: heroSlides,
-      modules: homeSettings.modules || {},
-      module_order: Array.isArray(homeSettings.module_order) ? homeSettings.module_order : [],
-      faq_items: Array.isArray(homeSettings.faq_items) ? homeSettings.faq_items : []
+      hero_image: heroImage,
+      hero_image_alt: homeSettings.hero_image_alt || '',
+      hero_image_alt_en: homeSettings.hero_image_alt_en || ''
     }
   };
-  const catalogue = filesIn('catalogue', '.json').map(file => JSON.parse(fs.readFileSync(file, 'utf8'))).filter(item => item && item.id);
-  const requiredCatalogueIds = ['YS-PVC-BANNER', 'YS-PVC-MESH', 'YS-SYNTHETIC-PAPER', 'YS-ADHESIVE-VINYL', 'YS-ROLL-UP', 'YS-X-BANNER', 'YS-DOOR-STAND'];
-  const catalogueById = new Map(catalogue.map(item => [String(item.id), item]));
-  const missingCatalogueIds = requiredCatalogueIds.filter(id => !catalogueById.has(id));
-  if (missingCatalogueIds.length) throw new Error(`Missing core catalogue records: ${missingCatalogueIds.join(', ')}`);
-  for (const id of requiredCatalogueIds) {
-    const item = catalogueById.get(id);
-    for (const lang of ['zh', 'en']) {
-      const detail = item[`detail_${lang}`];
-      if (!item[`name_${lang}`] || !item[`desc_${lang}`] || !detail || !detail.lead || !detail.artwork || !detail.brief || !detail.caveat) {
-        throw new Error(`Core catalogue record ${id} is missing required ${lang} content`);
-      }
-      for (const field of ['highlights', 'applications', 'finishing', 'delivery']) {
-        if (!Array.isArray(detail[field]) || detail[field].length === 0) {
-          throw new Error(`Core catalogue record ${id} has no ${lang} ${field}`);
-        }
-      }
-    }
-  }
   const templates = filesIn('templates', '.json')
     .map(file => normalizeTemplate(JSON.parse(fs.readFileSync(file, 'utf8'))));
   const solutions = readMarkdownCollection('solutions').map(item => normalizeArticle(item, 'solutions'));
@@ -459,7 +425,6 @@ function main() {
     products,
     siteSettings,
     catalog: buildCatalog(products),
-    catalogue,
     solutions,
     knowledge,
     news,

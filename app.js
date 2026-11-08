@@ -24,7 +24,7 @@ const siteData = {
 };
 const pageDataVersion = localStorage.getItem('printDataVersion') || '';
 const products = siteData.products || [];
-const language = () => localStorage.getItem('site_lang') || 'zh';
+const language = () => localStorage.getItem('site_lang') || 'en';
 const productText = (product, field) => window.contentText('products', product.id, field, product[field] || product.desc || '');
 const resolveContentImage = value => {
   if (typeof value !== 'string' || !value.trim()) return '';
@@ -173,7 +173,7 @@ function openQuote(product = '') {
   quoteStatus.hidden = true;
   quoteStatus.textContent = '';
   quoteStatus.classList.remove('is-error');
-  if (product) document.querySelector('[name="message"]').value = window.t('quote_product_format').replace('{product}', product);
+  if (product) { const message = document.querySelector('[name="message"]'); if (message) message.value = product; }
 }
 function closeQuote() {
   quoteModal.classList.remove('open');

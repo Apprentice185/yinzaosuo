@@ -1,5 +1,5 @@
 (function () {
-  const catalog = window.PRODUCTS_DATA || window.CMS_CONTENT?.catalog;
+  const catalog = window.CMS_CONTENT?.catalog || window.PRODUCTS_DATA;
   const tabList = document.querySelector('#productCategoryTabs');
   const productGrid = document.querySelector('#productGrid');
   const count = document.querySelector('#productCategoryCount');
@@ -10,7 +10,7 @@
   const categories = catalog.zh.categories;
   const params = new URLSearchParams(location.search);
   const requestedCategory = params.get('category');
-  let language = localStorage.getItem('site_lang') || 'en';
+  let language = localStorage.getItem('site_lang') || 'zh';
   let activeCategory = categories.some(category => category.id === requestedCategory)
     ? requestedCategory
     : categories.some(category => category.id === sessionStorage.getItem('productCatalogCategory'))

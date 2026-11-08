@@ -20,5 +20,5 @@
       : settings.hero_image_alt || image.alt;
   };
   window.registerLanguageRenderer(renderAlt);
-  renderAlt(localStorage.getItem('site_lang') || 'en');
+  renderAlt(localStorage.getItem('site_lang') || 'zh');
 })();

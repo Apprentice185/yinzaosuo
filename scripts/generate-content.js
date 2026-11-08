@@ -407,13 +407,47 @@ function main() {
     : {};
   const heroImage = String(homeSettings.hero_image || '').trim();
   if (heroImage && !safeMediaUrl(heroImage)) throw new Error(`Unsupported homepage hero image URL: ${heroImage}`);
+  const heroSlides = Array.isArray(homeSettings.hero_slides)
+    ? homeSettings.hero_slides.map((slide, index) => {
+        const image = String(slide?.image || '').trim();
+        if (!image || !safeMediaUrl(image)) throw new Error(`Homepage hero slide ${index + 1} has an invalid image URL`);
+        return { image };
+      }).filter(slide => slide.image)
+    : [];
+  if (heroSlides.length && (heroSlides.length < 3 || heroSlides.length > 5)) {
+    throw new Error('Homepage hero carousel must contain 3 to 5 slides');
+  }
+  const globalSettingsFile = path.join(contentRoot, 'settings', 'site.json');
+  const globalSettings = fs.existsSync(globalSettingsFile) ? JSON.parse(fs.readFileSync(globalSettingsFile, 'utf8')) : {};
   const siteSettings = {
+    global: globalSettings,
     home: {
-      hero_image: heroImage,
-      hero_image_alt: homeSettings.hero_image_alt || '',
-      hero_image_alt_en: homeSettings.hero_image_alt_en || ''
+      ...homeSettings,
+      hero_slides: heroSlides,
+      modules: homeSettings.modules || {},
+      module_order: Array.isArray(homeSettings.module_order) ? homeSettings.module_order : [],
+      faq_items: Array.isArray(homeSettings.faq_items) ? homeSettings.faq_items : []
     }
   };
+  const catalogue = filesIn('catalogue', '.json').map(file => JSON.parse(fs.readFileSync(file, 'utf8'))).filter(item => item && item.id);
+  const requiredCatalogueIds = ['YS-PVC-BANNER', 'YS-PVC-MESH', 'YS-SYNTHETIC-PAPER', 'YS-ADHESIVE-VINYL', 'YS-ROLL-UP', 'YS-X-BANNER', 'YS-DOOR-STAND'];
+  const catalogueById = new Map(catalogue.map(item => [String(item.id), item]));
+  const missingCatalogueIds = requiredCatalogueIds.filter(id => !catalogueById.has(id));
+  if (missingCatalogueIds.length) throw new Error(`Missing core catalogue records: ${missingCatalogueIds.join(', ')}`);
+  for (const id of requiredCatalogueIds) {
+    const item = catalogueById.get(id);
+    for (const lang of ['zh', 'en']) {
+      const detail = item[`detail_${lang}`];
+      if (!item[`name_${lang}`] || !item[`desc_${lang}`] || !detail || !detail.lead || !detail.artwork || !detail.brief || !detail.caveat) {
+        throw new Error(`Core catalogue record ${id} is missing required ${lang} content`);
+      }
+      for (const field of ['highlights', 'applications', 'finishing', 'delivery']) {
+        if (!Array.isArray(detail[field]) || detail[field].length === 0) {
+          throw new Error(`Core catalogue record ${id} has no ${lang} ${field}`);
+        }
+      }
+    }
+  }
   const templates = filesIn('templates', '.json')
     .map(file => normalizeTemplate(JSON.parse(fs.readFileSync(file, 'utf8'))));
   const solutions = readMarkdownCollection('solutions').map(item => normalizeArticle(item, 'solutions'));
@@ -425,6 +459,7 @@ function main() {
     products,
     siteSettings,
     catalog: buildCatalog(products),
+    catalogue,
     solutions,
     knowledge,
     news,
