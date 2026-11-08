@@ -188,9 +188,30 @@ function readMarkdownCollection(name) {
   });
 }
 
+const publicationTargets = new Set(['both', 'domestic', 'international']);
+const publicationStatuses = new Set(['published', 'hidden']);
+
+function normalizePublication(item) {
+  const publishTo = item.publish_to || 'both';
+  const status = item.status || 'published';
+  if (!publicationTargets.has(publishTo)) {
+    throw new Error(`Content ${item.id || item.slug || ''} has an invalid publish_to value: ${publishTo}`);
+  }
+  if (!publicationStatuses.has(status)) {
+    throw new Error(`Content ${item.id || item.slug || ''} has an invalid status value: ${status}`);
+  }
+  return { ...item, publish_to: publishTo, status };
+}
+
+function isPublishedForCurrentSite(item) {
+  if (item.status !== 'published') return false;
+  if (item.publish_to === 'both') return true;
+  return isChineseBuild ? item.publish_to === 'domestic' : item.publish_to === 'international';
+}
+
 function normalizeProduct(product) {
   return {
-    ...product,
+    ...normalizePublication(product),
     id: String(product.id),
     title: product.title || product.name || '',
     title_en: product.title_en || product.name_en || product.title || product.name || '',
@@ -236,7 +257,7 @@ function deduplicateProducts(products) {
 }
 
 function normalizeTemplate(template) {
-  const item = { ...template, id: String(template.id) };
+  const item = normalizePublication({ ...template, id: String(template.id) });
   if (item.file_url && !/^(https?:\/\/|\/|\.\/|\.\.\/)/i.test(item.file_url)) {
     throw new Error(`Template ${item.id} has an unsupported file_url: ${item.file_url}`);
   }
@@ -267,7 +288,7 @@ function normalizeArticle(item, collection) {
   const body = `${renderMarkdown(item.body)}${gallery}`;
   const bodyEn = `${renderMarkdown(item.body_en)}${gallery}`;
   return {
-    ...item,
+    ...normalizePublication(item),
     id: String(item.id),
     title: item.title || '',
     title_en: item.title_en || item.title || '',
@@ -408,6 +429,7 @@ function main() {
       file,
       product: normalizeProduct(JSON.parse(fs.readFileSync(file, 'utf8')))
     })))
+    .filter(isPublishedForCurrentSite)
     .sort((a, b) => a.sort_order - b.sort_order || a.id.localeCompare(b.id));
   const settingsFile = path.join(contentRoot, 'settings', 'home.json');
   const homeSettings = fs.existsSync(settingsFile)
@@ -437,7 +459,7 @@ function main() {
       faq_items: Array.isArray(homeSettings.faq_items) ? homeSettings.faq_items : []
     }
   };
-  const catalogue = filesIn('catalogue', '.json').map(file => JSON.parse(fs.readFileSync(file, 'utf8'))).filter(item => item && item.id);
+  const catalogue = filesIn('catalogue', '.json').map(file => normalizePublication(JSON.parse(fs.readFileSync(file, 'utf8')))).filter(item => item && item.id).filter(isPublishedForCurrentSite);
   const requiredCatalogueIds = ['YS-PVC-BANNER', 'YS-PVC-MESH', 'YS-SYNTHETIC-PAPER', 'YS-ADHESIVE-VINYL', 'YS-ROLL-UP', 'YS-X-BANNER', 'YS-DOOR-STAND'];
   const catalogueById = new Map(catalogue.map(item => [String(item.id), item]));
   const missingCatalogueIds = requiredCatalogueIds.filter(id => !catalogueById.has(id));
@@ -457,11 +479,13 @@ function main() {
     }
   }
   const templates = filesIn('templates', '.json')
-    .map(file => normalizeTemplate(JSON.parse(fs.readFileSync(file, 'utf8'))));
-  const solutions = readMarkdownCollection('solutions').map(item => normalizeArticle(item, 'solutions'));
-  const knowledge = readMarkdownCollection('knowledge').map(item => normalizeArticle(item, 'knowledge'));
+    .map(file => normalizeTemplate(JSON.parse(fs.readFileSync(file, 'utf8'))))
+    .filter(isPublishedForCurrentSite);
+  const solutions = readMarkdownCollection('solutions').map(item => normalizeArticle(item, 'solutions')).filter(isPublishedForCurrentSite);
+  const knowledge = readMarkdownCollection('knowledge').map(item => normalizeArticle(item, 'knowledge')).filter(isPublishedForCurrentSite);
   const news = readMarkdownCollection('news')
     .map(item => normalizeArticle(item, 'news'))
+    .filter(isPublishedForCurrentSite)
     .sort((a, b) => a.sort_order - b.sort_order || a.id.localeCompare(b.id));
   const data = {
     products,
