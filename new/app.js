@@ -173,7 +173,7 @@ function openQuote(product = '') {
   quoteStatus.hidden = true;
   quoteStatus.textContent = '';
   quoteStatus.classList.remove('is-error');
-  if (product) document.querySelector('[name="message"]').value = window.t('quote_product_format').replace('{product}', product);
+  if (product) { const message = document.querySelector('[name="message"]'); if (message) message.value = product; }
 }
 function closeQuote() {
   quoteModal.classList.remove('open');

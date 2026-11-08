@@ -245,8 +245,12 @@ window.I18N = {
   let language = localStorage.getItem('site_lang');
   if (!['zh', 'en'].includes(language)) language = 'en';
   const renderers = new Set();
-  const current = () => window.I18N[language];
+  const current = () => ({ ...window.I18N[language], ...quoteLabels[language] });
   window.t = key => current()[key] ?? key;
+  const quoteLabels = {
+    en: { quote_product_unsure: 'Not sure yet', quote_message_placeholder: 'Size, quantity, destination or anything you would like us to know…', quote_no_details: 'No specifications yet? That is fine — just send your name and email.', quote_privacy: 'Your details will only be used to respond to this enquiry.' },
+    zh: { quote_product_unsure: '暂时不确定', quote_message_placeholder: '可以填写尺寸、数量、目的地，或其他项目要求……', quote_no_details: '还没有具体规格也没关系，只填写姓名和邮箱即可。', quote_privacy: '你的信息仅用于回复本次询价。' }
+  };
   window.contentText = (type, id, field, fallback = '') => {
     const managed = window.CMS_CONTENT?.translations?.[language]?.[type]?.[id]?.[field];
     if (managed !== undefined && managed !== '') return managed;
