@@ -18,13 +18,11 @@
     return (node && (node.innerText || node.textContent) || "").replace(/\\s+/g, " ").trim();
   }
 
-  function buttonLabel(node) {
+  function isStatusButton(node) {
     return [cleanText(node), node && node.getAttribute("aria-label"), node && node.getAttribute("title")]
-      .filter(Boolean).join(" ").replace(/\\s+/g, " ").trim();
-  }
-
-  function isStatusLabel(value) {
-    return /^(已发布|未发布|发布|Published|Unpublished|Publish|Draft|草稿)$/i.test(value);
+      .filter(Boolean).some(function (value) {
+        return /^(已发布|未发布|发布|Published|Unpublished|Publish|Draft|草稿)$/i.test(value.trim());
+      });
   }
 
   function findNativeStatusButton() {
@@ -33,7 +31,7 @@
     for (var i = 0; i < candidates.length; i += 1) {
       var candidate = candidates[i];
       if (candidate.closest(".yinzaosuo-editor-actions")) continue;
-      if (!isStatusLabel(buttonLabel(candidate))) continue;
+      if (!isStatusButton(candidate)) continue;
       var parent = candidate.parentElement;
       for (var depth = 0; parent && parent !== root && depth < 8; depth += 1, parent = parent.parentElement) {
         var hasDelete = Array.prototype.slice.call(parent.querySelectorAll("button,[role='button']"))
@@ -169,7 +167,8 @@
     if (control.isContentEditable) {
       control.innerHTML = value;
     } else {
-      var proto = control.tagName === "TEXTAREA" ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
+      var proto = control.tagName === "TEXTAREA" ? HTMLTextAreaElement.prototype :
+        control.tagName === "SELECT" ? HTMLSelectElement.prototype : HTMLInputElement.prototype;
       var descriptor = Object.getOwnPropertyDescriptor(proto, "value");
       if (!descriptor || !descriptor.set) return;
       descriptor.set.call(control, value);
@@ -180,7 +179,7 @@
 
   function collectTranslatableControls() {
     var map = new Map();
-    root.querySelectorAll("input[name],textarea[name],[contenteditable='true'][name]").forEach(function (control) {
+    root.querySelectorAll("input[name],textarea[name],select[name],[contenteditable='true'][name]").forEach(function (control) {
       if (control.disabled || control.readOnly || ["hidden", "file", "checkbox", "radio", "number"].indexOf(control.type) !== -1) return;
       if (!map.has(control.name)) map.set(control.name, []);
       map.get(control.name).push(control);
@@ -235,7 +234,7 @@
   function findPublishMenuItem() {
     var candidates = Array.prototype.slice.call(document.querySelectorAll("[role='menuitem'],button"));
     return candidates.find(function (node) {
-      if (node.closest(".yinzaosuo-editor-actions")) return false;
+      if (node.closest(".yinzaosuo-editor-actions") || node.classList.contains("yinzaosuo-native-status-hidden")) return false;
       return /^(立即)?发布$|^Publish( now)?$/i.test(cleanText(node));
     });
   }
