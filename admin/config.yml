@@ -27,7 +27,8 @@ collections:
       - { label: "产品中文名称", name: "title", widget: "string" }
       - { label: "Product name (English)", name: "title_en", widget: "string" }
       - { label: "所属首页产品分类", name: "category", widget: "select", options: [{ label: "定制印刷成品", value: "commercial" }, { label: "包装定制类", value: "packaging" }, { label: "广告加工与展示", value: "exhibition" }] }
-      - { label: "产品展示图片", name: "image", widget: "image" }
+      - { label: "国际站产品图片", name: "image", widget: "image" }
+      - { label: "国内站产品图片（可选）", name: "image_zh", widget: "image", required: false }
       - { label: "产品介绍（中文）", name: "desc", widget: "text" }
       - { label: "Product description (English)", name: "desc_en", widget: "text" }
       - { label: "材质标签（中文）", name: "materials", widget: "list", required: false }
