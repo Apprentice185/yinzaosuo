@@ -58,7 +58,7 @@ collections:
     sortable_fields:
       - { field: sort_order, label: "后台排序", default_sort: asc }
       - { field: date, label: "发布日期", default_sort: desc }
-      - title
+      - name_zh
     create: false
     format: "json"
     extension: "json"
