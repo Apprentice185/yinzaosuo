@@ -1,5 +1,6 @@
 (function () {
   const catalog = window.PRODUCTS_DATA || window.CMS_CONTENT?.catalog;
+  const managedCatalogue = Array.isArray(window.CMS_CONTENT?.catalogue) ? window.CMS_CONTENT.catalogue : [];
   const tabList = document.querySelector('#productCategoryTabs');
   const productGrid = document.querySelector('#productGrid');
   const count = document.querySelector('#productCategoryCount');
@@ -40,7 +41,7 @@
   }
 
   function resolveImageUrl(image) {
-    const value = typeof image === 'string' ? image.trim() : '';
+    const value = typeof image === 'string' ? image.trim().replace(/^\/?new\//, '/') : '';
     if (!value) return '';
     try {
       const url = new URL(value, `${window.location.origin}/`);
@@ -51,6 +52,16 @@
   }
 
   function makeCard(item, index, total) {
+    const managed = managedCatalogue.find(entry => entry.id === item.id);
+    if (managed) {
+      const english = language === 'en';
+      item = {
+        ...item,
+        name: managed[english ? 'name_en' : 'name_zh'] || item.name,
+        desc: managed[english ? 'desc_en' : 'desc_zh'] || item.desc,
+        image: managed.image || item.image
+      };
+    }
     const card = document.createElement('a');
     card.className = 'archive-card';
     card.href = `product.html?id=${encodeURIComponent(item.id)}`;
