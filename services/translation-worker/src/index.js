@@ -1,6 +1,7 @@
 const ALLOWED_ORIGIN = "https://yinzaosuo.com";
 const MODEL = "tencent/Hunyuan-MT-7B";
 const MAX_TEXT_LENGTH = 6000;
+const MAX_BODY_BYTES = 20000;
 
 function json(data, status = 200, origin = ALLOWED_ORIGIN) {
   return new Response(JSON.stringify(data), {
@@ -14,6 +15,34 @@ function json(data, status = 200, origin = ALLOWED_ORIGIN) {
       "vary": "Origin",
     },
   });
+}
+
+async function readJsonLimited(request) {
+  const reader = request.body && request.body.getReader();
+  if (!reader) throw new Error("empty");
+  const chunks = [];
+  let total = 0;
+  try {
+    while (true) {
+      const part = await reader.read();
+      if (part.done) break;
+      total += part.value.byteLength;
+      if (total > MAX_BODY_BYTES) {
+        await reader.cancel();
+        throw new Error("too_large");
+      }
+      chunks.push(part.value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  const bytes = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return JSON.parse(new TextDecoder().decode(bytes));
 }
 
 async function verifyTurnstile(token, secret, ip) {
@@ -71,12 +100,13 @@ export default {
     }
 
     const contentLength = Number(request.headers.get("content-length") || 0);
-    if (contentLength > 20000) return json({ error: "Request too large." }, 413);
+    if (contentLength > MAX_BODY_BYTES) return json({ error: "Request too large." }, 413);
 
     let payload;
     try {
-      payload = await request.json();
-    } catch {
+      payload = await readJsonLimited(request);
+    } catch (error) {
+      if (error && error.message === "too_large") return json({ error: "Request too large." }, 413);
       return json({ error: "Invalid JSON body." }, 400);
     }
 
@@ -96,7 +126,12 @@ export default {
     }
 
     const token = request.headers.get("X-Turnstile-Token") || "";
-    const verified = await verifyTurnstile(token, env.TURNSTILE_SECRET, request.headers.get("CF-Connecting-IP"));
+    let verified = false;
+    try {
+      verified = await verifyTurnstile(token, env.TURNSTILE_SECRET, request.headers.get("CF-Connecting-IP"));
+    } catch {
+      return json({ error: "Security verification service is temporarily unavailable." }, 502);
+    }
     if (!verified) return json({ error: "Security verification failed. Please retry." }, 403);
 
     let upstream;
@@ -140,4 +175,4 @@ export default {
   },
 };
 
-export { makePrompt };
+export { makePrompt, readJsonLimited };
