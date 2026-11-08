@@ -423,10 +423,14 @@ function main() {
   }
   const siteSettings = {
     home: {
+      ...homeSettings,
       hero_image: heroImage,
       hero_image_alt: homeSettings.hero_image_alt || '',
       hero_image_alt_en: homeSettings.hero_image_alt_en || '',
-      hero_slides: heroSlides
+      hero_slides: heroSlides,
+      modules: homeSettings.modules || {},
+      module_order: Array.isArray(homeSettings.module_order) ? homeSettings.module_order : [],
+      faq_items: Array.isArray(homeSettings.faq_items) ? homeSettings.faq_items : []
     }
   };
   const templates = filesIn('templates', '.json')

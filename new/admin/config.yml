@@ -178,3 +178,38 @@ collections:
               - { label: "图片说明（英文）", name: "alt_en", widget: "string", required: false }
           - { label: "图片替代文本（中文）", name: "hero_image_alt", widget: "string" }
           - { label: "图片替代文本（英文）", name: "hero_image_alt_en", widget: "string" }
+          - { label: "首页眉题（中文）", name: "eyebrow_zh", widget: "string", required: false }
+          - { label: "首页眉题（英文）", name: "eyebrow_en", widget: "string", required: false }
+          - { label: "首页主标题（中文）", name: "hero_title_zh", widget: "string", required: false }
+          - { label: "首页主标题（英文）", name: "hero_title_en", widget: "string", required: false }
+          - { label: "首页介绍（中文）", name: "hero_description_zh", widget: "text", required: false }
+          - { label: "首页介绍（英文）", name: "hero_description_en", widget: "text", required: false }
+          - { label: "首页辅助文案（中文）", name: "hero_note_zh", widget: "string", required: false }
+          - { label: "首页辅助文案（英文）", name: "hero_note_en", widget: "string", required: false }
+          - label: "首页模块显示开关"
+            name: "modules"
+            widget: "object"
+            fields:
+              - { label: "信任与服务能力", name: "trust", widget: "boolean", default: true }
+              - { label: "产品展示", name: "products", widget: "boolean", default: true }
+              - { label: "合作流程", name: "process", widget: "boolean", default: true }
+              - { label: "印刷知识", name: "knowledge", widget: "boolean", default: true }
+              - { label: "品牌资讯", name: "journal", widget: "boolean", default: true }
+              - { label: "品牌介绍", name: "about", widget: "boolean", default: true }
+              - { label: "常见问题", name: "faq", widget: "boolean", default: true }
+          - label: "首页模块顺序（从上到下）"
+            name: "module_order"
+            widget: "select"
+            multiple: true
+            options: ["trust", "products", "process", "knowledge", "journal", "about", "faq"]
+            required: false
+          - label: "常见问题列表"
+            name: "faq_items"
+            widget: "list"
+            required: false
+            fields:
+              - { label: "问题（中文）", name: "question_zh", widget: "string" }
+              - { label: "答案（中文）", name: "answer_zh", widget: "text" }
+              - { label: "Question (English)", name: "question_en", widget: "string" }
+              - { label: "Answer (English)", name: "answer_en", widget: "text" }
+
