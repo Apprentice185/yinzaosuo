@@ -3,6 +3,7 @@
   var root = document.getElementById("nc-root");
   var PAIRABLE = new Set(["title","name","desc","materials","crafts","category_title","category_desc","tag","summary","body","type"]);
   var busy = false;
+  var bypassPublishClick = false;
 
   function labelOf(el) { return (el.innerText || el.textContent || "").replace(/\\s+/g," ").trim(); }
   function publishTrigger() {
@@ -13,7 +14,9 @@
   function clickImmediatePublish() {
     var trigger = publishTrigger();
     if (!trigger || trigger.disabled) return;
+    bypassPublishClick = true;
     trigger.click();
+    bypassPublishClick = false;
     window.setTimeout(function () {
       var item = Array.from(document.querySelectorAll("[role='menuitem'],button")).find(function (el) {
         return /^(立即发布|Publish now)$/.test(labelOf(el));
@@ -103,6 +106,7 @@
     if (!trigger.dataset.yinzaosuoBound) {
       trigger.dataset.yinzaosuoBound = "1";
       trigger.addEventListener("click", function (event) {
+        if (bypassPublishClick) return;
         if (!/^(发布|Publish)$/.test(labelOf(trigger))) {
           event.preventDefault(); event.stopImmediatePropagation();
           return;
