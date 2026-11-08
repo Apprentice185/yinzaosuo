@@ -21,7 +21,7 @@ collections:
     summary: "{{title}} · {{category}} · {{status}} · 顺序 {{sort_order}}"
     sortable_fields:
       - { field: sort_order, label: "后台排序", default_sort: asc }
-      - { field: date, label: "发布日期", default_sort: desc }
+      - { field: date, label: "发布日期" }
       - title
     create: true
     format: "json"
