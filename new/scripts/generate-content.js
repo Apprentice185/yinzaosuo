@@ -407,11 +407,26 @@ function main() {
     : {};
   const heroImage = String(homeSettings.hero_image || '').trim();
   if (heroImage && !safeMediaUrl(heroImage)) throw new Error(`Unsupported homepage hero image URL: ${heroImage}`);
+  const heroSlides = Array.isArray(homeSettings.hero_slides)
+    ? homeSettings.hero_slides.map((slide, index) => {
+        const image = String(slide?.image || '').trim();
+        if (!image || !safeMediaUrl(image)) throw new Error(`Homepage hero slide ${index + 1} has an invalid image URL`);
+        return {
+          image,
+          alt: String(slide.alt || ''),
+          alt_en: String(slide.alt_en || slide.alt || '')
+        };
+      }).filter(slide => slide.image)
+    : [];
+  if (heroSlides.length && (heroSlides.length < 3 || heroSlides.length > 5)) {
+    throw new Error('Homepage hero carousel must contain 3 to 5 slides');
+  }
   const siteSettings = {
     home: {
       hero_image: heroImage,
       hero_image_alt: homeSettings.hero_image_alt || '',
-      hero_image_alt_en: homeSettings.hero_image_alt_en || ''
+      hero_image_alt_en: homeSettings.hero_image_alt_en || '',
+      hero_slides: heroSlides
     }
   };
   const templates = filesIn('templates', '.json')

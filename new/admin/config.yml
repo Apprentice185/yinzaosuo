@@ -163,7 +163,7 @@ collections:
     label: "网站设置"
     files:
       - name: "home"
-        label: "首页 Banner"
+        label: "首页内容与 Banner"
         file: "new/content/settings/home.json"
         fields:
           - { label: "首页主视觉图", name: "hero_image", widget: "image" }
