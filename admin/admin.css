@@ -1,0 +1,33 @@
+:root{color-scheme:light;--admin-ink:#17221e;--admin-muted:#66736d;--admin-line:#e6eae7;--admin-paper:#f5f7f5;--admin-accent:#bd5939}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--admin-paper);color:var(--admin-ink);font-family:Inter,"PingFang SC","Microsoft YaHei",Arial,sans-serif}
+.admin-shell{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:72px;padding:12px clamp(16px,4vw,52px);background:#17221e;color:#fff;box-shadow:0 3px 16px #10201920}
+.admin-brand{display:flex;align-items:center;gap:11px;color:#fff;text-decoration:none;flex-shrink:0}
+.admin-brand-mark{display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:#c15e3c;color:white;font-size:21px;font-weight:800}
+.admin-brand strong,.admin-brand small{display:block}
+.admin-brand strong{font-size:16px;letter-spacing:.08em}
+.admin-brand small{margin-top:3px;color:#b9c5bf;font-size:11px;letter-spacing:.08em}
+.admin-shell-actions{display:flex;align-items:center;justify-content:flex-end;gap:9px;flex-wrap:wrap}
+.admin-shell-actions a{padding:8px 11px;border:1px solid #ffffff38;border-radius:7px;color:#edf2ef;text-decoration:none;font-size:12px;transition:.2s}
+.admin-shell-actions a:hover{background:#ffffff16;border-color:#ffffff80}
+.admin-shell-actions .admin-publish-link{background:#bd5939;border-color:#bd5939;color:white}
+.admin-language{margin-right:5px;color:#c9d3ce;font-size:12px}
+.admin-notice{display:flex;align-items:center;gap:12px;padding:12px clamp(16px,4vw,52px);border-bottom:1px solid #ead9ce;background:#fff8f3;color:#77503f;font-size:13px}
+.admin-notice strong{flex-shrink:0;color:#a34c30}
+#nc-root{min-height:calc(100vh - 125px)}
+/* Decap CMS workspace refinements */
+#nc-root .nc-appHeader{background:#fff;border-bottom:1px solid var(--admin-line);box-shadow:none}
+#nc-root .nc-appHeader-content{max-width:none;padding-left:clamp(16px,3vw,38px);padding-right:clamp(16px,3vw,38px)}
+#nc-root .nc-sidebar{background:#fff;border-right:1px solid var(--admin-line)}
+#nc-root .nc-collectionPage,#nc-root .nc-entryEditor{background:var(--admin-paper)}
+#nc-root .nc-entryEditor-toolbar{background:#fff;border-bottom:1px solid var(--admin-line)}
+#nc-root button{border-radius:7px}
+#nc-root input,#nc-root textarea{border-radius:7px}
+#nc-root .nc-controlPane{max-width:920px}
+#nc-root .nc-previewPane{background:#fff}
+@media(max-width:760px){
+ .admin-shell{align-items:flex-start;flex-direction:column;gap:12px}
+ .admin-shell-actions{justify-content:flex-start}
+ .admin-language{width:100%}
+ .admin-notice{align-items:flex-start;flex-direction:column;gap:4px}
+}

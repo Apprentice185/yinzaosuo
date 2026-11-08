@@ -17,6 +17,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: Validate Chinese CMS configuration
+        run: |
+          ruby -e "require 'yaml'; YAML.load_file('admin/config.yml')"
+          grep -q 'locale: zh_Hans' admin/config.yml
+          grep -q '英文译文' admin/config.yml
       - name: Check build scripts
         run: |
           node --check scripts/generate-content.js
@@ -37,6 +42,7 @@ jobs:
           test ! -d zh/content
           test ! -d zh/admin
           test -f admin/index.html
+          test -f admin/admin.css
       - name: Verify domestic and international publishing scopes
         run: |
           cat > content/products/TEST-DOMESTIC.json <<'EOF'
