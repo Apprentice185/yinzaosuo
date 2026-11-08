@@ -9,7 +9,7 @@
   var observer = null;
 
   function textOf(node) {
-    return (node && (node.innerText || node.textContent) || "").replace(/\\s+/g, " ").trim();
+    return (node && (node.innerText || node.textContent) || "").replace(/\s+/g, " ").trim();
   }
 
   function findButton(root, matcher) {
