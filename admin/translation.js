@@ -245,6 +245,49 @@
     return values[index];
   }
 
+
+  async function translateCurrentEntry() {
+    if (!window.CMS || !window.CMS.editor || typeof window.CMS.editor.getCurrentEntry !== "function") {
+      throw new Error("当前后台版本不支持独立翻译，请刷新页面后重试。");
+    }
+    var snapshot = window.CMS.editor.getCurrentEntry();
+    if (!snapshot || !snapshot.data) throw new Error("请先打开一条内容，再使用一键翻译。");
+
+    var tasks = [];
+    collectTasks(snapshot.data, snapshot.data, [], [], false, tasks);
+    if (!tasks.length) {
+      showStatus("没有发现需要补充的英文内容。", "success");
+      return { translated: 0, skipped: true };
+    }
+
+    var patches = [];
+    for (var i = 0; i < tasks.length; i += 1) {
+      var task = tasks[i];
+      var translated;
+      if (task.kind === "text") {
+        showStatus("正在翻译英文内容（" + (i + 1) + "/" + tasks.length + "）…", "working");
+        translated = await translateText(task.text);
+      } else {
+        translated = [];
+        for (var j = 0; j < task.values.length; j += 1) {
+          showStatus("正在翻译列表内容（" + (i + 1) + "/" + tasks.length + "，" + (j + 1) + "/" + task.values.length + "）…", "working");
+          translated.push(await translateText(task.values[j]));
+        }
+      }
+      patches.push({
+        path: task.targetPath.join("."),
+        value: translated
+      });
+    }
+
+    var result = window.CMS.editor.applyFieldPatch(patches);
+    if (result && result.rejected && result.rejected.length) {
+      throw new Error("部分英文栏位无法写入：" + result.rejected.map(function (item) { return item.path; }).join("、"));
+    }
+    showStatus("翻译完成，英文内容已填入表单；请检查后点击“发布”保存。", "success");
+    return { translated: patches.length, result: result };
+  }
+
   if (!window.CMS || typeof window.CMS.registerEventListener !== "function") {
     console.error("[印造所翻译] Decap CMS 事件接口不可用。");
     return;
@@ -268,6 +311,7 @@
 
   window.YinzaosuoTranslation = {
     collectTasks: collectTasks,
-    pairableFields: Array.from(PAIRABLE_FIELDS)
+    pairableFields: Array.from(PAIRABLE_FIELDS),
+    translateCurrentEntry: translateCurrentEntry
   };
 })();

@@ -18,6 +18,10 @@ collections:
   - name: "products"
     label: "产品中心"
     folder: "content/products"
+    summary: "{{title}} · {{category}} · {{status}} · 顺序 {{sort_order}}"
+    sortable_fields:
+      - { field: sort_order, label: "后台排序", default_sort: asc }
+      - title
     create: true
     format: "json"
     extension: "json"
@@ -49,6 +53,10 @@ collections:
   - name: "catalogue"
     label: "核心产品详情（7类）"
     folder: "content/catalogue"
+    summary: "{{name_zh}} · {{status}} · {{sort_order}}"
+    sortable_fields:
+      - { field: sort_order, label: "后台排序", default_sort: asc }
+      - name_zh
     create: false
     format: "json"
     extension: "json"
@@ -56,6 +64,7 @@ collections:
     slug: "{{id}}"
     fields:
       - { label: "产品编号（请勿修改）", name: "id", widget: "string" }
+      - { label: "后台排序（数字越小越靠前）", name: "sort_order", widget: "number", default: 10, value_type: "int", required: false }
       - { label: "发布范围", name: "publish_to", widget: "select", default: "both", options: [{ label: "国内站和国际站", value: "both" }, { label: "仅国内站", value: "domestic" }, { label: "仅国际站", value: "international" }] }
       - { label: "发布状态", name: "status", widget: "select", default: "published", options: [{ label: "正常发布", value: "published" }, { label: "隐藏（不在网站展示）", value: "hidden" }] }
       - { label: "产品中文名称", name: "name_zh", widget: "string" }
@@ -92,6 +101,11 @@ collections:
   - name: "solutions"
     label: "场景方案"
     folder: "content/solutions"
+    summary: "{{title}} · {{tag}} · {{date}} · {{status}}"
+    sortable_fields:
+      - { field: sort_order, label: "后台排序", default_sort: asc }
+      - { field: date, label: "发布日期" }
+      - title
     create: true
     format: "yaml-frontmatter"
     extension: "md"
@@ -99,6 +113,7 @@ collections:
     slug: "{{slug}}"
     fields:
       - { label: "内容编号(ID)", name: "id", widget: "string" }
+      - { label: "后台排序（数字越小越靠前）", name: "sort_order", widget: "number", default: 10, value_type: "int", required: false }
       - { label: "发布范围", name: "publish_to", widget: "select", default: "both", options: [{ label: "国内站和国际站", value: "both" }, { label: "仅国内站", value: "domestic" }, { label: "仅国际站", value: "international" }] }
       - { label: "发布状态", name: "status", widget: "select", default: "published", options: [{ label: "正常发布", value: "published" }, { label: "隐藏（不在网站展示）", value: "hidden" }] }
       - { label: "内容路径", name: "slug", widget: "string" }
@@ -117,6 +132,11 @@ collections:
   - name: "knowledge"
     label: "印刷知识"
     folder: "content/knowledge"
+    summary: "{{title}} · {{category}} · {{date}} · {{status}}"
+    sortable_fields:
+      - { field: sort_order, label: "后台排序", default_sort: asc }
+      - { field: date, label: "发布日期" }
+      - title
     create: true
     format: "yaml-frontmatter"
     extension: "md"
@@ -124,6 +144,7 @@ collections:
     slug: "{{slug}}"
     fields:
       - { label: "内容编号(ID)", name: "id", widget: "string" }
+      - { label: "后台排序（数字越小越靠前）", name: "sort_order", widget: "number", default: 10, value_type: "int", required: false }
       - { label: "发布范围", name: "publish_to", widget: "select", default: "both", options: [{ label: "国内站和国际站", value: "both" }, { label: "仅国内站", value: "domestic" }, { label: "仅国际站", value: "international" }] }
       - { label: "发布状态", name: "status", widget: "select", default: "published", options: [{ label: "正常发布", value: "published" }, { label: "隐藏（不在网站展示）", value: "hidden" }] }
       - { label: "内容路径", name: "slug", widget: "string" }
@@ -142,6 +163,11 @@ collections:
   - name: "news"
     label: "品牌资讯"
     folder: "content/news"
+    summary: "{{title}} · {{tag}} · {{date}} · {{status}} · 顺序 {{sort_order}}"
+    sortable_fields:
+      - { field: sort_order, label: "后台排序", default_sort: asc }
+      - { field: date, label: "发布日期" }
+      - title
     create: true
     format: "yaml-frontmatter"
     extension: "md"
@@ -167,6 +193,11 @@ collections:
   - name: "templates"
     label: "模板素材"
     folder: "content/templates"
+    summary: "{{title}} · {{type}} · {{size_spec}} · {{status}}"
+    sortable_fields:
+      - { field: sort_order, label: "后台排序", default_sort: asc }
+      - { field: date, label: "发布日期" }
+      - title
     create: true
     format: "json"
     extension: "json"
@@ -174,6 +205,7 @@ collections:
     slug: "{{id}}"
     fields:
       - { label: "素材编号(ID)", name: "id", widget: "string" }
+      - { label: "后台排序（数字越小越靠前）", name: "sort_order", widget: "number", default: 10, value_type: "int", required: false }
       - { label: "发布范围", name: "publish_to", widget: "select", default: "both", options: [{ label: "国内站和国际站", value: "both" }, { label: "仅国内站", value: "domestic" }, { label: "仅国际站", value: "international" }] }
       - { label: "发布状态", name: "status", widget: "select", default: "published", options: [{ label: "正常发布", value: "published" }, { label: "隐藏（不在网站展示）", value: "hidden" }] }
       - { label: "素材标题", name: "title", widget: "string" }

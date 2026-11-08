@@ -35,6 +35,11 @@ jobs:
           test -f admin/translation.css
           grep -q '/admin/translation.js' admin/index.html
           grep -q '/admin/translation.css' admin/index.html
+          node --check admin/workspace.js
+          test -f admin/workspace.css
+          grep -q '/admin/workspace.js' admin/index.html
+          grep -q '/admin/workspace.css' admin/index.html
+          grep -q 'translateCurrentEntry' admin/translation.js
       - name: Validate translation Worker
         run: |
           node --check services/translation-worker/src/index.js
