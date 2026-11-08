@@ -31,8 +31,7 @@
     return fallback || "";
   }
 
-  function imageUrl(props, key) {
-    var path = value(props, key, "");
+  function assetUrl(props, path) {
     if (!path) return "";
     try {
       var asset = props.getAsset(path);
@@ -43,6 +42,10 @@
       /* Keep the saved path as a fallback for existing media. */
     }
     return String(path);
+  }
+
+  function imageUrl(props, key) {
+    return assetUrl(props, value(props, key, ""));
   }
 
   function header() {
@@ -258,7 +261,7 @@
       var description = first(p, ["hero_description_zh"], "填写首页介绍后，这里将展示真实首屏文案。");
       var slides = value(p, "hero_slides", []);
       var firstSlide = Array.isArray(slides) && slides.length ? slides[0].image : "";
-      var image = firstSlide ? (p.getAsset(firstSlide).url || p.getAsset(firstSlide).toString()) : "";
+      var image = firstSlide ? assetUrl(p, firstSlide) : "";
       return h("div", { className: "site-preview" },
         announcement("首页内容与 Banner"),
         header(),
