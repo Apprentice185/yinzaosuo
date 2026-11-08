@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "cms": "npx decap-server",
-    "content:build": "node scripts/generate-content.js"
+    "content:build": "node scripts/generate-content.js",
+    "test:admin-translation": "node --test admin/translation.test.js"
   }
 }
