@@ -37,3 +37,22 @@ jobs:
           test ! -d zh/content
           test ! -d zh/admin
           test -f admin/index.html
+      - name: Verify domestic and international publishing scopes
+        run: |
+          cat > content/products/TEST-DOMESTIC.json <<'EOF'
+          {"id":"TEST-DOMESTIC","title":"国内测试产品","title_en":"Domestic Test Product","category":"commercial","image":"/pic/test.jpg","publish_to":"domestic","status":"published","show_in_archive":true}
+          EOF
+          cat > content/products/TEST-INTERNATIONAL.json <<'EOF'
+          {"id":"TEST-INTERNATIONAL","title":"国际测试产品","title_en":"International Test Product","category":"commercial","image":"/pic/test.jpg","publish_to":"international","status":"published","show_in_archive":true}
+          EOF
+          cat > content/products/TEST-HIDDEN.json <<'EOF'
+          {"id":"TEST-HIDDEN","title":"隐藏测试产品","title_en":"Hidden Test Product","category":"commercial","image":"/pic/test.jpg","publish_to":"both","status":"hidden","show_in_archive":true}
+          EOF
+          npm run content:build
+          node zh/scripts/generate-content.js
+          grep -q '"id":"TEST-INTERNATIONAL"' assets/js/content-index.js
+          ! grep -q '"id":"TEST-DOMESTIC"' assets/js/content-index.js
+          ! grep -q '"id":"TEST-HIDDEN"' assets/js/content-index.js
+          grep -q '"id":"TEST-DOMESTIC"' zh/assets/js/content-index.js
+          ! grep -q '"id":"TEST-INTERNATIONAL"' zh/assets/js/content-index.js
+          ! grep -q '"id":"TEST-HIDDEN"' zh/assets/js/content-index.js
