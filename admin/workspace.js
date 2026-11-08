@@ -32,7 +32,7 @@
     });
     var jobs = [];
     byName.forEach(function (sources, name) {
-      var targetName = name.replace(/_zh$/, "_en");
+      var targetName = name.replace(/_zh(?=\\.|\\[|$)/g, "_en");
       if (targetName === name) {
         if (!/^(title|name|desc|materials|crafts|category_title|category_desc|tag|summary|body|type)$/.test(name)) return;
         targetName = name + "_en";
