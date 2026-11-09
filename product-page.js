@@ -30,7 +30,7 @@ const productData = {
   ...siteProductData,
   products: [...catalogueProducts.map(item => { const managed = managedCatalogue.find(entry => entry.id === item.id); const lang = localStorage.getItem('site_lang') || 'en'; return managed ? { ...item, name: managed[lang === 'en' ? 'name_en' : 'name_zh'] || item.name, image: managed.image || item.image, desc: managed[lang === 'en' ? 'desc_en' : 'desc_zh'] || item.desc, detail: managed[lang === 'en' ? 'detail_en' : 'detail_zh'] || item.detail, seoTitle: managed[lang === 'en' ? 'seo_title_en' : 'seo_title_zh'] || item.seoTitle, seoDescription: managed[lang === 'en' ? 'seo_description_en' : 'seo_description_zh'] || item.seoDescription } : item; }), ...legacyProducts.filter(item => !catalogueProducts.some(current => current.id === item.id))]
 };
-const productId = new URLSearchParams(location.search).get('id');
+const productId = new URLSearchParams(location.search).get('id') || document.querySelector('.product-detail-page')?.dataset.productId;
 let product = productData.products.find(item => item.id === productId) || null;
 const language = () => localStorage.getItem('site_lang') || 'en';
 const productText = field => field === 'name' ? product.name : field === 'intro' ? (product.desc || '') : window.contentText('products', product.id, field, product[field] || product.desc || '');
@@ -105,12 +105,12 @@ function renderProductDetails() {
   document.querySelector('meta[property="og:title"]').content = document.title;
   document.querySelector('meta[property="og:description"]').content = description;
 
-  const url = new URL(`product.html?id=${encodeURIComponent(product.id)}`, 'https://yinzaosuo.com/');
+  const url = new URL(`/products/${String(product.id).toLowerCase()}/`, 'https://yinzaosuo.com/');
   document.querySelector('link[rel="canonical"]').href = url.href;
   document.querySelector('meta[property="og:url"]').content = url.href;
   const alternates = [
     ['en', url.href],
-    ['zh-CN', `https://yinzaosuo.com/zh/product.html?id=${encodeURIComponent(product.id)}`],
+    ['zh-CN', `https://yinzaosuo.com/zh/products/${String(product.id).toLowerCase()}/`],
     ['x-default', url.href]
   ];
   for (const [locale, href] of alternates) {
