@@ -29,6 +29,8 @@ jobs:
           node-version: 20
       - name: Configure Pages
         uses: actions/configure-pages@v5
+      - name: Test content generation and translations
+        run: npm test
       - name: Build CMS content and sitemap
         run: npm run content:build
       - name: Build Chinese site content and sitemap

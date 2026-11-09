@@ -116,7 +116,7 @@ collections:
       - { label: "后台排序（数字越小越靠前）", name: "sort_order", widget: "number", default: 10, value_type: "int", required: false }
       - { label: "发布范围", name: "publish_to", widget: "select", default: "both", options: [{ label: "国内站和国际站", value: "both" }, { label: "仅国内站", value: "domestic" }, { label: "仅国际站", value: "international" }] }
       - { label: "隐藏内容", name: "hidden", widget: "boolean", default: false }
-      - { label: "内容路径", name: "slug", widget: "string" }
+      - { label: "文章网址（英文小写字母、数字和连字符）", name: "slug", widget: "string" }
       - { label: "方案标题", name: "title", widget: "string" }
       - { label: "英文译文：标题 / 名称", name: "title_en", widget: "string", required: false }
       - { label: "场景标签", name: "tag", widget: "string" }
@@ -124,6 +124,10 @@ collections:
       - { label: "封面图", name: "cover_image", widget: "image" }
       - { label: "方案简述", name: "summary", widget: "text" }
       - { label: "英文译文：摘要", name: "summary_en", widget: "text", required: false }
+      - { label: "SEO 标题（可选，默认使用方案标题）", name: "seo_title", widget: "string", required: false }
+      - { label: "英文译文：SEO 标题", name: "seo_title_en", widget: "string", required: false }
+      - { label: "SEO 描述（可选，默认使用方案摘要）", name: "seo_description", widget: "text", required: false }
+      - { label: "英文译文：SEO 描述", name: "seo_description_en", widget: "text", required: false }
       - { label: "发布日期", name: "date", widget: "datetime", date_format: "YYYY-MM-DD", time_format: false }
       - { label: "实景图集", name: "gallery", widget: "list", required: false, fields: [{ label: "图片", name: "image", widget: "image" }] }
       - { label: "方案详细内容", name: "body", widget: "markdown" }
@@ -147,7 +151,7 @@ collections:
       - { label: "后台排序（数字越小越靠前）", name: "sort_order", widget: "number", default: 10, value_type: "int", required: false }
       - { label: "发布范围", name: "publish_to", widget: "select", default: "both", options: [{ label: "国内站和国际站", value: "both" }, { label: "仅国内站", value: "domestic" }, { label: "仅国际站", value: "international" }] }
       - { label: "隐藏内容", name: "hidden", widget: "boolean", default: false }
-      - { label: "内容路径", name: "slug", widget: "string" }
+      - { label: "文章网址（英文小写字母、数字和连字符）", name: "slug", widget: "string" }
       - { label: "文章标题", name: "title", widget: "string" }
       - { label: "英文译文：标题 / 名称", name: "title_en", widget: "string", required: false }
       - { label: "知识分类", name: "category", widget: "select", options: ["材质科普", "工艺解析", "避坑指南"] }
@@ -155,8 +159,12 @@ collections:
       - { label: "旧分类记录", name: "legacy_category", widget: "string", required: false }
       - { label: "发布日期", name: "date", widget: "datetime", date_format: "YYYY-MM-DD", time_format: false }
       - { label: "封面图", name: "cover", widget: "image", required: false }
-      - { label: "SEO 摘要", name: "summary", widget: "text" }
+      - { label: "文章摘要（默认作为 SEO 描述）", name: "summary", widget: "text" }
       - { label: "英文译文：摘要", name: "summary_en", widget: "text", required: false }
+      - { label: "SEO 标题（可选，默认使用文章标题）", name: "seo_title", widget: "string", required: false }
+      - { label: "英文译文：SEO 标题", name: "seo_title_en", widget: "string", required: false }
+      - { label: "SEO 描述（可选，默认使用文章摘要）", name: "seo_description", widget: "text", required: false }
+      - { label: "英文译文：SEO 描述", name: "seo_description_en", widget: "text", required: false }
       - { label: "正文内容", name: "body", widget: "markdown" }
       - { label: "英文译文：正文", name: "body_en", widget: "markdown", required: false }
 
@@ -177,15 +185,19 @@ collections:
       - { label: "内容编号(ID)", name: "id", widget: "string" }
       - { label: "发布范围", name: "publish_to", widget: "select", default: "both", options: [{ label: "国内站和国际站", value: "both" }, { label: "仅国内站", value: "domestic" }, { label: "仅国际站", value: "international" }] }
       - { label: "隐藏内容", name: "hidden", widget: "boolean", default: false }
-      - { label: "内容路径", name: "slug", widget: "string" }
+      - { label: "文章网址（英文小写字母、数字和连字符）", name: "slug", widget: "string" }
       - { label: "资讯标题", name: "title", widget: "string" }
       - { label: "英文译文：标题 / 名称", name: "title_en", widget: "string", required: false }
       - { label: "发布日期", name: "date", widget: "datetime", date_format: "YYYY-MM-DD", time_format: false }
       - { label: "封面图", name: "cover", widget: "image", required: false }
       - { label: "标签", name: "tag", widget: "string" }
       - { label: "英文译文：标签", name: "tag_en", widget: "string", required: false }
-      - { label: "资讯摘要", name: "summary", widget: "text", required: false }
+      - { label: "资讯摘要（默认作为 SEO 描述）", name: "summary", widget: "text" }
       - { label: "英文译文：摘要", name: "summary_en", widget: "text", required: false }
+      - { label: "SEO 标题（可选，默认使用资讯标题）", name: "seo_title", widget: "string", required: false }
+      - { label: "英文译文：SEO 标题", name: "seo_title_en", widget: "string", required: false }
+      - { label: "SEO 描述（可选，默认使用资讯摘要）", name: "seo_description", widget: "text", required: false }
+      - { label: "英文译文：SEO 描述", name: "seo_description_en", widget: "text", required: false }
       - { label: "排序权重", name: "sort_order", widget: "number", default: 10, value_type: "int", required: false }
       - { label: "资讯正文", name: "body", widget: "markdown" }
       - { label: "英文译文：正文", name: "body_en", widget: "markdown", required: false }

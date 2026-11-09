@@ -9,6 +9,8 @@ test("collects flat Chinese/English pairs and skips filled translations by defau
     title_en: "",
     desc: "产品介绍",
     desc_en: "Existing English",
+    seo_title: "产品 SEO 标题",
+    seo_title_en: "",
     hero_title_zh: "首页标题",
     hero_title_en: "",
     publish_to: "both"
@@ -31,7 +33,25 @@ test("collects flat Chinese/English pairs and skips filled translations by defau
   };
   vm.runInNewContext(fs.readFileSync("admin/translation.js", "utf8"), context);
   context.window.YinzaosuoTranslation.collectTasks(source, source, [], [], false, tasks);
-  assert.deepEqual(tasks.map(item => item.targetPath), [["title_en"], ["hero_title_en"]]);
+  assert.deepEqual(tasks.map(item => item.targetPath), [["title_en"], ["seo_title_en"], ["hero_title_en"]]);
+});
+
+test("collects optional SEO title and description translations", () => {
+  const source = {
+    seo_title: "高品质定制印刷",
+    seo_title_en: "",
+    seo_description: "面向品牌与企业的定制印刷服务。",
+    seo_description_en: ""
+  };
+  const tasks = [];
+  const context = {
+    window: { CMS: { registerEventListener() {} } },
+    document: { createElement() {}, body: { appendChild() {} } },
+    console, Set, Array, Object, Promise, fetch() {}
+  };
+  vm.runInNewContext(fs.readFileSync("admin/translation.js", "utf8"), context);
+  context.window.YinzaosuoTranslation.collectTasks(source, source, [], [], false, tasks);
+  assert.deepEqual(tasks.map(item => item.targetPath), [["seo_title_en"], ["seo_description_en"]]);
 });
 
 test("collects nested detail fields and translated list values", () => {

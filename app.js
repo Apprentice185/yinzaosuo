@@ -26,6 +26,7 @@ const pageDataVersion = localStorage.getItem('printDataVersion') || '';
 const products = siteData.products || [];
 const language = () => localStorage.getItem('site_lang') || 'en';
 const productText = (product, field) => window.contentText('products', product.id, field, product[field] || product.desc || '');
+const articleUrl = (type, item) => item.url || `article.html?type=${type}&id=${encodeURIComponent(item.id)}`;
 const escapeContent = window.ContentSanitizer.escape;
 const setSanitizedHtml = (target, html) => target.replaceChildren(window.ContentSanitizer.sanitize(html));
 const resolveContentImage = value => {
@@ -50,7 +51,7 @@ function renderHomeContent() {
   const homeKnowledgeList = document.querySelector('#homeKnowledgeList');
   if (homeKnowledgeList) {
     setSanitizedHtml(homeKnowledgeList, (siteData.knowledge || []).slice(0, 3).map((item, index) =>
-      `<a href="article.html?type=knowledge&id=${encodeURIComponent(item.id)}" class="knowledge-item"><span>${String(index + 1).padStart(2, '0')}</span><strong>${escapeContent(window.contentText('knowledge', item.id, 'title', item.title))}</strong><span>↗</span></a>`
+      `<a href="${escapeContent(articleUrl('knowledge', item))}" class="knowledge-item"><span>${String(index + 1).padStart(2, '0')}</span><strong>${escapeContent(window.contentText('knowledge', item.id, 'title', item.title))}</strong><span>↗</span></a>`
     ).join(''));
   }
   const homeArticleGrid = document.querySelector('#homeArticleGrid');
@@ -58,7 +59,7 @@ function renderHomeContent() {
     const cards = (siteData.articles || []).slice(0, 3).map((item, index) => {
       const title = window.contentText('articles', item.id, 'title', item.title);
       const category = window.contentText('articles', item.id, 'category', item.category);
-      const href = `article.html?type=articles&id=${encodeURIComponent(item.id)}`;
+      const href = articleUrl('articles', item);
       const coverUrl = resolveContentImage(item.cover || item.thumbnail || item.thumb || item.image);
       const fallbackCover = !coverUrl;
       const coverSource = coverUrl || resolveContentImage('assets/images/products/pa003.jpg');
@@ -251,7 +252,7 @@ function searchContent(query) {
           type,
           title,
           description,
-          href: `article.html?type=${type}&id=${encodeURIComponent(item.id)}`
+          href: articleUrl(type, item)
         });
       }
     }

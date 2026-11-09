@@ -6,7 +6,8 @@
   var MAX_CONCURRENT_REQUESTS = 3;
   var PAIRABLE_FIELDS = new Set([
     "title", "name", "desc", "materials", "crafts", "category_title",
-    "category_desc", "tag", "summary", "body", "type"
+    "category_desc", "tag", "summary", "seo_title", "seo_description",
+    "body", "type"
   ]);
   var statusNode = null;
 

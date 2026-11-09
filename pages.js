@@ -16,7 +16,10 @@ const data = {
 const pageDataVersion = localStorage.getItem('printDataVersion') || '';
 const language = () => localStorage.getItem('site_lang') || 'en';
 const text = (type, item, field) => window.contentText(type, item.id, field, item[field] || '');
-const articleUrl = (type, id) => `article.html?type=${type}&id=${encodeURIComponent(id)}`;
+const articleUrl = (type, id) => {
+  const item = (data[type] || []).find(entry => entry.id === id);
+  return item?.url || `article.html?type=${type}&id=${encodeURIComponent(id)}`;
+};
 const escapeContent = window.ContentSanitizer.escape;
 const safeContentUrl = value => window.ContentSanitizer.safeUrl(value, false);
 const setSanitizedHtml = (target, html) => target.replaceChildren(window.ContentSanitizer.sanitize(html));
@@ -189,11 +192,13 @@ function openTemplate(id) {
 function renderArticle() {
   if (!document.querySelector('#articlePage')) return;
   const params = new URLSearchParams(location.search);
-  const requestedType = params.get('type');
+  const articlePage = document.querySelector('#articlePage');
+  const requestedType = params.get('type') || articlePage.dataset.articleType;
   const type = requestedType === 'articles' || requestedType === 'news'
     ? 'articles'
     : requestedType === 'solutions' ? 'solutions' : requestedType === 'knowledge' ? 'knowledge' : '';
-  const item = type ? data[type].find(entry => entry.id === params.get('id')) : null;
+  const itemId = params.get('id') || articlePage.dataset.articleId;
+  const item = type ? data[type].find(entry => entry.id === itemId) : null;
   const article = document.querySelector('#articlePage article');
   let message = document.querySelector('#articleNotFound');
   if (!item) {
@@ -222,11 +227,17 @@ function renderArticle() {
   message?.remove();
   const title = text(type, item, 'title');
   const excerpt = text(type, item, 'excerpt');
-  document.title = language() === 'en' ? `${title} | YINZAOSUO` : item.seoTitle || `${item.title}｜印造所`;
-  document.querySelector('meta[name="description"]').content = language() === 'en' ? excerpt : item.seoDescription || item.excerpt || item.title;
+  const pageTitle = language() === 'en'
+    ? item.seo_title_en || `${title} | YINZAOSUO`
+    : item.seo_title || `${title}｜印造所`;
+  const description = language() === 'en'
+    ? item.seo_description_en || item.summary_en || item.description_en || item.title_en || excerpt
+    : item.seo_description || excerpt || title;
+  document.title = pageTitle;
+  document.querySelector('meta[name="description"]').content = description;
   document.querySelector('meta[property="og:title"]').content = document.title;
-  document.querySelector('meta[property="og:description"]').content = language() === 'en' ? excerpt : item.seoDescription || item.excerpt || item.title;
-  const url = new URL(`article.html?type=${encodeURIComponent(type)}&id=${encodeURIComponent(item.id)}`, 'https://yinzaosuo.com/');
+  document.querySelector('meta[property="og:description"]').content = description;
+  const url = new URL(item.url || `article.html?type=${encodeURIComponent(type)}&id=${encodeURIComponent(item.id)}`, 'https://yinzaosuo.com/');
   document.querySelector('link[rel="canonical"]').href = url.href;
   document.querySelector('meta[property="og:url"]').content = url.href;
   document.querySelector('#articleCategory').textContent = text(type, item, 'category');
