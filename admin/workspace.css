@@ -69,6 +69,12 @@
   opacity: 1;
 }
 
+#nc-root .yinzaosuo-editor-actions button[data-action="save"]:not(:disabled) {
+  border-color: #176b60;
+  background: #176b60;
+  color: #fff;
+}
+
 #nc-root .yinzaosuo-entry-actions button {
   min-height: 28px;
   padding: 4px 10px;

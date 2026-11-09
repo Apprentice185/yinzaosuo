@@ -73,3 +73,74 @@ test("collects existing English values when overwrite is requested", () => {
   context.window.YinzaosuoTranslation.collectTasks(source, source, [], [], false, tasks, true);
   assert.deepEqual(tasks.map(item => item.targetPath), [["title_en"], ["materials_en"]]);
 });
+
+test("translates all entry fields with one Turnstile token and one batch request", async () => {
+  const patches = [];
+  let turnstileRenders = 0;
+  let turnstileExecutions = 0;
+  let requests = 0;
+  let turnstileOptions;
+  const context = {
+    window: {
+      CMS: {
+        editor: {
+          getCurrentEntry: () => ({
+            data: {
+              title: "产品标题",
+              title_en: "Old title",
+              materials: ["特种纸", "烫金"],
+              materials_en: ["Old paper", "Old foil"]
+            }
+          }),
+          applyFieldPatch: value => {
+            patches.push(...value);
+            return {};
+          }
+        }
+      },
+      turnstile: {
+        render: (_container, options) => {
+          turnstileRenders += 1;
+          turnstileOptions = options;
+          return "widget";
+        },
+        execute: () => {
+          turnstileExecutions += 1;
+          turnstileOptions.callback("verified-token");
+        },
+        reset() {}
+      },
+      setTimeout,
+      clearTimeout
+    },
+    document: {
+      head: { appendChild() {} },
+      body: { appendChild() {} },
+      getElementById() { return null; },
+      createElement() {
+        return { style: {}, setAttribute() {} };
+      }
+    },
+    console, Set, Array, Object, Promise,
+    fetch: async (_url, options) => {
+      requests += 1;
+      assert.equal(options.headers["X-Turnstile-Token"], "verified-token");
+      assert.deepEqual(JSON.parse(options.body).texts, ["产品标题", "特种纸", "烫金"]);
+      return {
+        ok: true,
+        json: async () => ({ translatedTexts: ["Product title", "Special paper", "Foil stamping"] })
+      };
+    }
+  };
+  vm.runInNewContext(fs.readFileSync("admin/translation.js", "utf8"), context);
+
+  await context.window.YinzaosuoTranslation.translateCurrentEntry();
+
+  assert.equal(turnstileRenders, 1);
+  assert.equal(turnstileExecutions, 1);
+  assert.equal(requests, 1);
+  assert.deepEqual(JSON.parse(JSON.stringify(patches)), [
+    { path: "title_en", value: "Product title" },
+    { path: "materials_en", value: ["Special paper", "Foil stamping"] }
+  ]);
+});

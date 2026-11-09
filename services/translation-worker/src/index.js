@@ -1,7 +1,9 @@
 const ALLOWED_ORIGIN = "https://yinzaosuo.com";
 const MODEL = "tencent/Hunyuan-MT-7B";
 const MAX_TEXT_LENGTH = 6000;
-const MAX_BODY_BYTES = 20000;
+const MAX_BATCH_TEXTS = 30;
+const MAX_BATCH_CHARACTERS = 12000;
+const MAX_BODY_BYTES = 50000;
 
 function json(data, status = 200, origin = ALLOWED_ORIGIN) {
   return new Response(JSON.stringify(data), {
@@ -72,6 +74,39 @@ function makePrompt(text, sourceLanguage, targetLanguage) {
   ].join("\n");
 }
 
+function makeBatchPrompt(texts, sourceLanguage, targetLanguage) {
+  return [
+    "You are a professional commercial printing industry translator.",
+    "Translate every string in the JSON array from " + sourceLanguage + " to " + targetLanguage + ".",
+    "Preserve product specifications, measurements, units, numbers, URLs, model names, proper nouns, Markdown, and HTML structure.",
+    "Use natural, concise B2B website language. Do not add explanations, notes, or facts that are not in the source.",
+    "Return only a valid JSON object with one property named translations. Its value must be an array of translated strings in the same order and with exactly the same number of items as the input.",
+    "",
+    "INPUT:",
+    JSON.stringify(texts),
+  ].join("\n");
+}
+
+function parseBatchTranslations(content, expectedCount) {
+  let parsed;
+  try {
+    parsed = JSON.parse(content);
+  } catch {
+    const start = content.indexOf("{");
+    const end = content.lastIndexOf("}");
+    if (start < 0 || end <= start) return null;
+    try {
+      parsed = JSON.parse(content.slice(start, end + 1));
+    } catch {
+      return null;
+    }
+  }
+  const translations = parsed && parsed.translations;
+  if (!Array.isArray(translations) || translations.length !== expectedCount) return null;
+  if (translations.some(value => typeof value !== "string" || !value.trim())) return null;
+  return translations.map(value => value.trim());
+}
+
 export default {
   async fetch(request, env) {
     const origin = request.headers.get("Origin") || "";
@@ -114,13 +149,22 @@ export default {
       return json({ error: "JSON body must be an object." }, 400);
     }
 
-    const text = typeof payload.text === "string" ? payload.text.trim() : "";
+    const isBatch = Array.isArray(payload.texts);
+    const texts = isBatch
+      ? payload.texts.map(value => typeof value === "string" ? value.trim() : "")
+      : [typeof payload.text === "string" ? payload.text.trim() : ""];
     const sourceLanguage = typeof payload.sourceLanguage === "string" ? payload.sourceLanguage : "Chinese";
     const targetLanguage = typeof payload.targetLanguage === "string" ? payload.targetLanguage : "English";
 
-    if (!text) return json({ error: "Please enter text to translate." }, 400);
-    if (text.length > MAX_TEXT_LENGTH) {
+    if (isBatch && (texts.length === 0 || texts.length > MAX_BATCH_TEXTS)) {
+      return json({ error: "A batch must contain between 1 and " + MAX_BATCH_TEXTS + " texts." }, 400);
+    }
+    if (texts.some(text => !text)) return json({ error: "Please enter text to translate." }, 400);
+    if (texts.some(text => text.length > MAX_TEXT_LENGTH)) {
       return json({ error: "Text is too long. Maximum length is " + MAX_TEXT_LENGTH + " characters." }, 413);
+    }
+    if (isBatch && texts.reduce((total, text) => total + text.length, 0) > MAX_BATCH_CHARACTERS) {
+      return json({ error: "Batch text is too long. Maximum combined length is " + MAX_BATCH_CHARACTERS + " characters." }, 413);
     }
     if (!["Chinese", "English"].includes(sourceLanguage) || !["Chinese", "English"].includes(targetLanguage) || sourceLanguage === targetLanguage) {
       return json({ error: "Unsupported translation direction." }, 400);
@@ -138,6 +182,9 @@ export default {
     }
     if (!verified) return json({ error: "Security verification failed. Please retry." }, 403);
 
+    const prompt = isBatch
+      ? makeBatchPrompt(texts, sourceLanguage, targetLanguage)
+      : makePrompt(texts[0], sourceLanguage, targetLanguage);
     let upstream;
     try {
       upstream = await fetch("https://api.siliconflow.cn/v1/chat/completions", {
@@ -148,9 +195,9 @@ export default {
         },
         body: JSON.stringify({
           model: MODEL,
-          messages: [{ role: "user", content: makePrompt(text, sourceLanguage, targetLanguage) }],
+          messages: [{ role: "user", content: prompt }],
           temperature: 0.1,
-          max_tokens: 4096,
+          max_tokens: isBatch ? 8192 : 4096,
         }),
         signal: AbortSignal.timeout(30000),
       });
@@ -175,8 +222,14 @@ export default {
       return json({ error: "Translation provider returned empty content." }, 502);
     }
 
+    if (isBatch) {
+      const translatedTexts = parseBatchTranslations(translatedText, texts.length);
+      if (!translatedTexts) return json({ error: "Translation provider returned an invalid batch response." }, 502);
+      return json({ translatedTexts, model: MODEL });
+    }
+
     return json({ translatedText: translatedText.trim(), model: MODEL });
   },
 };
 
-export { makePrompt, readJsonLimited };
+export { makePrompt, makeBatchPrompt, parseBatchTranslations, readJsonLimited };

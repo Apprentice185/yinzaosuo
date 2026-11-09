@@ -20,10 +20,12 @@
 2. 点击 **Add widget**。
 3. 名称填写 `印造所后台翻译`。
 4. 域名只添加 `yinzaosuo.com`。
-5. Widget Mode 选择 Managed，保存。
+5. Widget Mode 选择 **Non-Interactive**，这样翻译时不会要求人工勾选；保存后继续使用当前显示的 Site Key 和 Secret Key。
 6. 页面会显示 **Site Key** 和 **Secret Key**：
-   - Site Key 是公开值，后续需要提供给我写入后台配置。
+   - Site Key 是公开值，配置在 `admin/translation.js` 中。
    - Secret Key 是私密值，只放进 Worker Secret，不能发给我。
+
+如果已有 Widget 是 Managed 模式，请编辑它并切换到 **Non-Interactive**。如果控制台不允许修改模式，就新建 Non-Interactive Widget；将新 Site Key 更新到 `admin/translation.js`，并将新 Secret Key 更新到 Worker 的 `TURNSTILE_SECRET` Secret，然后重新部署 Worker 和网站。
 
 ### B. 创建并连接 Worker
 
@@ -48,15 +50,7 @@
 
 SiliconFlow 账号/API Key 需要你本人创建和管理；免费模型不代表平台永远保证免费或无限调用。
 
-### D. 把两个公开配置值发给我
-
-完成 A、B 后，只需把以下两项发在当前对话：
-- Worker URL（形如 `https://yinzaosuo-translation.<你的账户子域>.workers.dev`）
-- Turnstile Site Key（公开值）
-
-**不要发送** SiliconFlow API Key、Turnstile Secret Key、Cloudflare Global API Key 或其他密码。
-
-收到这两个公开值后，我可以继续把后台翻译按钮接入，并完成浏览器端联调。当前 Worker 只开放 `POST /translate`，限制来源、Turnstile 校验、请求体 20 KB、单条文本 6000 字符，并固定上游模型和地址。
+当前后台已配置 Worker URL 和 Site Key。若创建了新 Widget，更新 `admin/translation.js` 中的公开 Site Key 并重新部署网站；Worker 只开放 `POST /translate`，限制来源、Turnstile 校验、请求体 50 KB、单条文本 6000 字符；批量翻译最多 30 项、合计 12000 字符，并固定上游模型和地址。一次点击会将内容作为一个批次发送，只执行一次 Turnstile 验证。
 
 ## 本地部署（可选）
 
@@ -85,11 +79,11 @@ wrangler secret put TURNSTILE_SECRET
 - `X-Turnstile-Token: <Turnstile response token>`
 - `Origin: https://yinzaosuo.com`
 
-请求体：
+请求体（批量，后台按钮使用；一次验证翻译多项）：
 
 ```json
 {
-  "text": "需要翻译的中文内容",
+  "texts": ["产品名称", "产品介绍"],
   "sourceLanguage": "Chinese",
   "targetLanguage": "English"
 }
@@ -99,10 +93,12 @@ wrangler secret put TURNSTILE_SECRET
 
 ```json
 {
-  "translatedText": "Translated content",
+  "translatedTexts": ["Product name", "Product description"],
   "model": "tencent/Hunyuan-MT-7B"
 }
 ```
+
+兼容单条请求时，使用 `text` 字段并返回 `translatedText`。
 
 ## 安全措施
 
@@ -110,7 +106,7 @@ wrangler secret put TURNSTILE_SECRET
 - 要求 Turnstile 服务端验证，避免把公开接口变成无门槛代理。
 - API Key 和 Turnstile Secret 仅从 Worker Secret 读取。
 - 通过流式读取限制整个请求体大小，不能只依赖可能缺失的 Content-Length。
-- 限制单次文本长度。
+- 限制单条文本、批次数量和批次总长度。
 - 固定模型和上游 API 地址，不允许客户端指定任意 URL 或模型。
 - 不记录原文、译文或密钥。
 - 正式上线仍建议结合 Cloudflare Rate Limiting 规则限制单 IP 请求频率。

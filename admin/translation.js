@@ -124,7 +124,7 @@
         var timeout = window.setTimeout(function () {
           tokenResolver = null;
           tokenRejecter = null;
-          reject(new Error("安全验证超时，请再次点击保存。"));
+          reject(new Error("安全验证超时，请再次点击“填入翻译内容”重试。"));
         }, 120000);
 
         tokenResolver = function (token) {
@@ -144,7 +144,8 @@
           widgetId = window.turnstile.render(container, {
             sitekey: TURNSTILE_SITE_KEY,
             execution: "execute",
-            appearance: "interaction-only",
+            appearance: "execute",
+            action: "cms-translation",
             callback: function (token) {
               if (tokenResolver) tokenResolver(token);
             },
@@ -163,7 +164,7 @@
     });
   }
 
-  async function translateText(text) {
+  async function translateTexts(texts) {
     var token = await getTurnstileToken();
     var response;
     try {
@@ -174,7 +175,7 @@
           "X-Turnstile-Token": token
         },
         body: JSON.stringify({
-          text: text,
+          texts: texts,
           sourceLanguage: "Chinese",
           targetLanguage: "English"
         })
@@ -189,10 +190,15 @@
     } catch (error) {
       throw new Error("翻译服务返回了无法识别的响应。");
     }
-    if (!response.ok || !payload.translatedText) {
+    if (!response.ok || !Array.isArray(payload.translatedTexts) || payload.translatedTexts.length !== texts.length) {
       throw new Error(payload.error || "翻译失败，请稍后重试。");
     }
-    return payload.translatedText;
+    return payload.translatedTexts;
+  }
+
+  async function translateText(text) {
+    var translated = await translateTexts([text]);
+    return translated[0];
   }
 
   function toPlain(value) {
@@ -262,25 +268,28 @@
       return { translated: 0, skipped: true };
     }
 
-    var patches = [];
-    for (var i = 0; i < tasks.length; i += 1) {
-      var task = tasks[i];
+    var texts = [];
+    tasks.forEach(function (task) {
+      if (task.kind === "text") texts.push(task.text);
+      else texts = texts.concat(task.values);
+    });
+    showStatus("正在一次性翻译 " + texts.length + " 项英文内容…", "working");
+    var translatedTexts = await translateTexts(texts);
+    var translatedIndex = 0;
+    var patches = tasks.map(function (task) {
       var translated;
       if (task.kind === "text") {
-        showStatus("正在翻译英文内容（" + (i + 1) + "/" + tasks.length + "）…", "working");
-        translated = await translateText(task.text);
+        translated = translatedTexts[translatedIndex];
+        translatedIndex += 1;
       } else {
-        translated = [];
-        for (var j = 0; j < task.values.length; j += 1) {
-          showStatus("正在翻译列表内容（" + (i + 1) + "/" + tasks.length + "，" + (j + 1) + "/" + task.values.length + "）…", "working");
-          translated.push(await translateText(task.values[j]));
-        }
+        translated = translatedTexts.slice(translatedIndex, translatedIndex + task.values.length);
+        translatedIndex += task.values.length;
       }
-      patches.push({
+      return {
         path: task.targetPath.join("."),
         value: translated
-      });
-    }
+      };
+    });
 
     var result = window.CMS.editor.applyFieldPatch(patches);
     if (result && result.rejected && result.rejected.length) {

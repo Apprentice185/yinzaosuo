@@ -5,6 +5,7 @@
   var actionBar = null;
   var nativeSaveButton = null;
   var saveObserver = null;
+  var editorChangeUnsubscribe = null;
   var pendingAction = null;
   var pendingActionTimer = null;
 
@@ -27,7 +28,7 @@
   function findNativeSave() {
     var nodes = root.querySelectorAll("button,[role='button']");
     for (var i = 0; i < nodes.length; i++) {
-      if ((!actionBar || !actionBar.contains(nodes[i])) && /^(保存|Save|Save changes|保存更改)$/i.test(text(nodes[i]))) {
+      if ((!actionBar || !actionBar.contains(nodes[i])) && /^(保存|保存中…?|正在保存…?|Save|Saving…?|Save changes|保存更改)$/i.test(text(nodes[i]))) {
         return nodes[i];
       }
     }
@@ -76,13 +77,26 @@
   function syncSaveState() {
     if (!actionBar) return;
     var button = actionBar.querySelector("[data-action=save]");
-    var disabled = !nativeSaveButton || nativeSaveButton.disabled;
+    var editor = window.CMS && window.CMS.editor;
+    var snapshot = editor && typeof editor.getCurrentEntry === "function" ? editor.getCurrentEntry() : null;
+    var disabled = !nativeSaveButton || !snapshot || snapshot.hasChanged !== true;
     button.disabled = disabled;
     button.setAttribute("aria-disabled", String(disabled));
   }
 
   function save() {
-    if (nativeSaveButton && !nativeSaveButton.disabled) nativeSaveButton.click();
+    var editor = window.CMS && window.CMS.editor;
+    var snapshot = editor && typeof editor.getCurrentEntry === "function" ? editor.getCurrentEntry() : null;
+    if (!snapshot || snapshot.hasChanged !== true || !nativeSaveButton) return;
+    if (nativeSaveButton.disabled) nativeSaveButton.disabled = false;
+    nativeSaveButton.click();
+  }
+
+  function bindEditorChanges() {
+    var editor = window.CMS && window.CMS.editor;
+    if (!editorChangeUnsubscribe && editor && typeof editor.onEditorChange === "function") {
+      editorChangeUnsubscribe = editor.onEditorChange(syncSaveState);
+    }
   }
 
   async function translate() {
@@ -276,6 +290,7 @@
 
   function mountEditorActions() {
     if (!/\/collections\/[^/]+\/entries\//.test(window.location.hash)) return;
+    bindEditorChanges();
     var toolbar = findEditorToolbar();
     if (!toolbar) return;
     hideNativeEditorActions(toolbar);
@@ -331,6 +346,8 @@
     nativeSaveButton = null;
     if (saveObserver) saveObserver.disconnect();
     saveObserver = null;
+    if (editorChangeUnsubscribe) editorChangeUnsubscribe();
+    editorChangeUnsubscribe = null;
     window.setTimeout(mount, 0);
     schedulePendingAction(250);
   });
