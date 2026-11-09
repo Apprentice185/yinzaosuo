@@ -1,0 +1,73 @@
+{
+  "id": "YS-SATIN-PHOTO-PAPER",
+  "name_zh": "绸面写真相纸",
+  "name_en": "Satin Photo Paper",
+  "image": "",
+  "desc_zh": "用于海报、广告画面及零售展示的绸面写真相纸，整卷50米，适合大幅面喷绘项目。",
+  "desc_en": "Satin photo paper for posters, advertising graphics and retail displays. Supplied in 50 m rolls for large-format print projects.",
+  "sort_order": 2,
+  "publish_to": "international",
+  "hidden": false,
+  "seo_title_zh": "绸面写真相纸｜规格与批量供应｜YINZAOSUO",
+  "seo_title_en": "Satin Photo Paper | Specifications & Trade Supply | YINZAOSUO",
+  "seo_description_zh": "用于海报、广告画面及零售展示的绸面写真相纸，整卷50米，适合大幅面喷绘项目。 支持批量采购、覆膜及国际运输询价。",
+  "seo_description_en": "Satin photo paper for posters, advertising graphics and retail displays. Supplied in 50 m rolls for large-format print projects. Enquire about trade quantities, lamination and international shipping.",
+  "detail_zh": {
+    "lead": "绸面写真相纸适用于希望减少强烈镜面反光、呈现柔和表面效果的海报和展示画面。",
+    "highlights": [
+      "卷宽1520mm",
+      "纸张克重200gsm",
+      "每卷长度50m",
+      "参考价格USD 18.60/m²"
+    ],
+    "applications": [
+      "海报与促销画面",
+      "零售展示及室内广告",
+      "活动宣传画面"
+    ],
+    "finishing": [
+      "喷绘印刷",
+      "按项目尺寸裁切",
+      "可选冷裱膜（亮膜或哑膜）",
+      "默认采用卷装交付，具体包装按订单确认"
+    ],
+    "delivery": [
+      "默认卷装，内置硬质纸筒保护",
+      "可按需求另行确认纸箱包装",
+      "生产通常约2天，工厂备货及发出一般不超过一周",
+      "海运运输时间约40天，实际以航线、货代及清关安排为准"
+    ],
+    "artwork": "请提供印刷文件、成品尺寸、数量、卷装或裁切要求及目的地。可先核对文件尺寸和出血设置。",
+    "brief": "请提供材料类型、宽度、数量或面积、是否覆膜、油墨选择、包装要求及收货国家/地区。",
+    "caveat": "产品规格以本页面列出的已确认参数为准。空运时效、运费、税费及最终交付时间需按目的地和货代方案单独确认。最低起订条件为100平方米，或订单货值超过USD 2,000（满足其中一项即可）。"
+  },
+  "detail_en": {
+    "lead": "Satin photo paper is suited to posters and display graphics where a softer surface appearance than a high-gloss finish is preferred.",
+    "highlights": [
+      "Roll width: 1520 mm",
+      "Paper weight: 200 gsm",
+      "Roll length: 50 m",
+      "Reference price: USD 18.60/m²"
+    ],
+    "applications": [
+      "Posters and promotional graphics",
+      "Retail displays and indoor advertising",
+      "Event graphics"
+    ],
+    "finishing": [
+      "Large-format inkjet printing",
+      "Custom trimming to project dimensions",
+      "Optional cold lamination in gloss or matte",
+      "Roll delivery is the standard format; confirm any special packing requirements"
+    ],
+    "delivery": [
+      "Standard roll packing with a rigid paper tube inside",
+      "Carton packing can be discussed as an alternative",
+      "Typical production is around 2 days; factory preparation and dispatch generally take no more than one week",
+      "Sea freight is approximately 40 days; actual transit depends on route, forwarder and customs arrangements"
+    ],
+    "artwork": "Please provide print-ready artwork, finished dimensions, quantity, roll or cut-sheet requirements and destination. File dimensions and bleed can be checked before production.",
+    "brief": "Please specify the media type, width, quantity or area, lamination, ink option, packing requirements and destination country or region.",
+    "caveat": "Specifications are limited to the confirmed parameters listed on this page. Air-freight timing, freight charges, duties and final delivery dates must be confirmed for the destination and shipping arrangement. MOQ is 100 m², or an order goods value above USD 2,000; either condition is sufficient."
+  }
+}
