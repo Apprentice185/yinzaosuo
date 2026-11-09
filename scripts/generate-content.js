@@ -18,7 +18,7 @@ const categoryDefaults = {
     en: 'Photo & Wide-Format Print Media',
     desc: '面向印刷贸易商、广告制作商与标识供应商的写真相纸、合成纸、背胶及PVC喷绘材料。',
     desc_en: 'Photo papers, PP synthetic paper, self-adhesive vinyl and PVC print media for trade printers and sign makers.'
-  }
+  },
   commercial: {
     num: '01',
     zh: '商务印制类',
