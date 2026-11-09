@@ -36,6 +36,7 @@ collections:
       - { label: "国内站产品图片（可选）", name: "image_zh", widget: "image", required: false }
       - { label: "产品介绍（中文）", name: "desc", widget: "text" }
       - { label: "英文译文：内容介绍", name: "desc_en", widget: "text", required: false }
+      - { label: "参考价格（USD/m²）", name: "price", widget: "string", required: false }
       - { label: "SEO 标题（中文）", name: "seo_title_zh", widget: "string", required: false }
       - { label: "SEO 标题（英文）", name: "seo_title_en", widget: "string", required: false }
       - { label: "SEO 描述（中文）", name: "seo_description_zh", widget: "text", required: false }
