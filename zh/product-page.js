@@ -2,14 +2,21 @@ const storedProductData = JSON.parse(localStorage.getItem('printData') || 'null'
 const siteProductData = storedProductData
   ? { ...printData, ...storedProductData, products: storedProductData.products || printData.products }
   : printData;
-const managedProducts = (window.CMS_CONTENT?.products || []).map(item => ({
-  ...item,
-  name: item.title,
-  category: item.category_legacy || item.category_title || item.category,
-  intro: item.intro || item.desc,
-  thumb: item.thumb || item.image,
-  options: Array.isArray(item.options) ? item.options : []
-}));
+const managedCatalogue = window.CMS_CONTENT?.catalogue || [];
+const managedProducts = (window.CMS_CONTENT?.products || []).map(item => {
+  const detail = managedCatalogue.find(entry => entry.id === item.id);
+  return {
+    ...item,
+    name: item.title,
+    category: item.category_legacy || item.category_title || item.category,
+    intro: item.intro || item.desc,
+    thumb: item.thumb || item.image,
+    options: Array.isArray(item.options) ? item.options : [],
+    detail: detail?.detail_zh,
+    seoTitle: item.seo_title_zh || detail?.seo_title_zh || '',
+    seoDescription: item.seo_description_zh || detail?.seo_description_zh || ''
+  };
+});
 const productData = {
   ...siteProductData,
   products: Array.isArray(window.CMS_CONTENT?.products) ? managedProducts : siteProductData.products || []
@@ -47,11 +54,11 @@ function referencePrice() {
 
 function renderProductDetails() {
   const currentValues = [...document.querySelectorAll('#detailOptions select')].map(select => select.selectedIndex);
-  const title = `${productText('name')} | Print Atelier`;
+  const title = `${product.seoTitle || productText('name')} | 印造所`;
   const description = language() === 'en'
     ? productText('intro')
     : product.seoDescription || product.intro || product.desc || product.name;
-  document.title = language() === 'en' ? title : product.seoTitle || `${product.name}｜印造所`;
+  document.title = title;
   document.querySelector('meta[name="description"]').content = description;
   document.querySelector('meta[property="og:title"]').content = document.title;
   document.querySelector('meta[property="og:description"]').content = description;
@@ -63,6 +70,10 @@ function renderProductDetails() {
   document.querySelector('#productName').textContent = productText('name');
   document.querySelector('#productIntro').textContent = productText('intro') || product.desc;
   document.querySelector('#productPrice').textContent = referencePrice();
+  const structuredData = { '@context': 'https://schema.org', '@type': 'Product', name: productText('name'), description, brand: { '@type': 'Brand', name: 'YINZAOSUO' }, image: product.image || product.thumb || undefined };
+  let schema = document.querySelector('#productStructuredData');
+  if (!schema) { schema = document.createElement('script'); schema.id = 'productStructuredData'; schema.type = 'application/ld+json'; document.head.append(schema); }
+  schema.textContent = JSON.stringify(structuredData);
 
   const imageContainer = document.querySelector('#productImage');
   imageContainer.replaceChildren();
@@ -114,5 +125,32 @@ document.querySelector('#productQuote').addEventListener('click', () => {
   window.location.href = 'index.html#quoteModal';
 });
 
-window.registerLanguageRenderer(renderProductDetails);
+window.registerLanguageRenderer(() => { renderProductDetails(); renderProductInformation(); });
 renderProductDetails();
+renderProductInformation();
+
+
+function renderProductInformation() {
+  const root = document.querySelector('#productInformation');
+  if (!root || !product || !product.detail) { if (root) root.hidden = true; return; }
+  const detail = product.detail;
+  root.hidden = false;
+  document.querySelector('#productInfoTitle').textContent = '产品详情与采购信息';
+  document.querySelector('#productInfoLead').textContent = detail.lead || '';
+  const groups = [
+    ['productHighlights','生产规格与选项','highlights'],
+    ['productApplications','适用场景','applications'],
+    ['productFinishing','加工与覆膜','finishing'],
+    ['productDelivery','包装与交付','delivery']
+  ];
+  for (const [id,label,key] of groups) {
+    const list = document.getElementById(id);
+    list.replaceChildren();
+    const heading = document.querySelector('[data-info-label="'+id+'"]');
+    if (heading) heading.textContent = label;
+    for (const value of detail[key] || []) { const li = document.createElement('li'); li.textContent = value; list.append(li); }
+  }
+  document.querySelector('#productArtwork').textContent = detail.artwork || '';
+  document.querySelector('#productBrief').textContent = detail.brief || '';
+  document.querySelector('#productCaveat').textContent = detail.caveat || '';
+}
