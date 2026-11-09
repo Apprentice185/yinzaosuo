@@ -1,0 +1,36 @@
+.home-featured-materials{background:#f4f3f0;color:#151515;padding-top:clamp(64px,8vw,108px);padding-bottom:clamp(64px,8vw,108px)}
+.home-featured-materials .section-heading{margin-bottom:34px}
+.home-featured-materials .section-heading h2{max-width:680px;font-size:clamp(32px,4.4vw,58px);line-height:1.08;letter-spacing:-.055em}
+.home-featured-materials .heading-description{max-width:390px;color:#666;font-size:13px;line-height:1.8}
+.home-material-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.home-material-card{display:flex;min-width:0;flex-direction:column;background:#fff;color:inherit;text-decoration:none;border:1px solid #dedbd5;transition:transform .25s ease,border-color .25s ease}
+.home-material-card:hover{transform:translateY(-4px);border-color:#aaa}
+.home-material-card:focus-visible{outline:2px solid #333;outline-offset:4px}
+.home-material-visual{position:relative;display:grid;place-items:center;min-height:178px;overflow:hidden;background:#e7e4df}
+.home-material-visual:before,.home-material-visual:after{content:"";position:absolute;display:block}
+.home-material-visual:before{width:72%;height:66%;left:14%;top:17%;transform:rotate(-7deg);border-radius:2px;box-shadow:0 16px 26px #0002}
+.home-material-visual:after{width:62%;height:54%;left:19%;top:23%;transform:rotate(5deg);border:1px solid #ffffff99}
+.home-material-visual>span{position:relative;z-index:1;color:#34312d;font-family:Georgia,serif;font-size:clamp(25px,3vw,40px);letter-spacing:.12em}
+.home-material-visual.gloss{background:linear-gradient(135deg,#f5f2ed,#d7d2c9)}
+.home-material-visual.gloss:before{background:linear-gradient(135deg,#fff 0%,#e9e5dc 38%,#fff 53%,#d9d4cb 100%)}
+.home-material-visual.satin{background:linear-gradient(135deg,#e7e6e1,#c9c8c2)}
+.home-material-visual.satin:before{background:linear-gradient(135deg,#f8f7f3,#d9d8d2 65%,#efeee9)}
+.home-material-visual.synthetic{background:linear-gradient(135deg,#dce5e2,#b7c8c2)}
+.home-material-visual.synthetic:before{background:linear-gradient(135deg,#f6faf7,#d6e3dd 60%,#c5d5ce)}
+.home-material-visual.vinyl{background:linear-gradient(135deg,#e4e2e8,#c7c2d1)}
+.home-material-visual.vinyl:before{background:linear-gradient(135deg,#fff,#dcd9e5 52%,#bdb8cb)}
+.home-material-visual.pvc{background:linear-gradient(135deg,#e5e1d9,#c8c0b2)}
+.home-material-visual.pvc:before{background:linear-gradient(135deg,#f5f2eb,#d5cec0 58%,#bdb5a7)}
+.home-material-copy{display:flex;flex:1;flex-direction:column;padding:20px 20px 22px}
+.home-material-kicker{color:#888;font-size:9px;font-weight:700;letter-spacing:.14em}
+.home-material-copy h3{margin:10px 0 7px;font-size:19px;line-height:1.35;letter-spacing:-.025em}
+.home-material-copy p{min-height:46px;margin:0 0 14px;color:#666;font-size:12px;line-height:1.7}
+.home-material-copy strong{display:block;margin-top:auto;color:#242424;font-size:11px;line-height:1.65;font-weight:650}
+.home-material-link{display:block;margin-top:15px;color:#555;font-size:10px;font-weight:700;letter-spacing:.02em}
+.home-material-footer{display:flex;justify-content:space-between;align-items:center;gap:18px;margin-top:24px;padding-top:18px;border-top:1px solid #d5d2cc}
+.home-material-footer>span{color:#777;font-size:10px;line-height:1.6}
+.home-material-footer .text-link{white-space:nowrap}
+@media(max-width:900px){.home-material-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.home-featured-materials .section-heading{margin-bottom:24px}.home-material-grid{grid-template-columns:1fr;gap:13px}.home-material-card{display:grid;grid-template-columns:112px minmax(0,1fr)}.home-material-visual{min-height:100%;min-height:172px}.home-material-visual>span{font-size:22px}.home-material-copy{padding:15px 14px}.home-material-copy h3{font-size:16px;margin:7px 0 5px}.home-material-copy p{min-height:0;font-size:11px;margin-bottom:10px}.home-material-copy strong{font-size:10px}.home-material-link{margin-top:10px}.home-material-footer{align-items:flex-start;flex-direction:column;gap:8px}}
+
+/* Keep the homepage material showcase styles isolated from the legacy archive. */
