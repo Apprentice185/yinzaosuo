@@ -32,3 +32,5 @@
 .home-material-footer .text-link{white-space:nowrap}
 @media(max-width:900px){.home-material-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:560px){.home-featured-materials .section-heading{margin-bottom:24px}.home-material-grid{grid-template-columns:1fr;gap:13px}.home-material-card{display:grid;grid-template-columns:112px minmax(0,1fr)}.home-material-visual{min-height:100%;min-height:172px}.home-material-visual>span{font-size:22px}.home-material-copy{padding:15px 14px}.home-material-copy h3{font-size:16px;margin:7px 0 5px}.home-material-copy p{min-height:0;font-size:11px;margin-bottom:10px}.home-material-copy strong{font-size:10px}.home-material-link{margin-top:10px}.home-material-footer{align-items:flex-start;flex-direction:column;gap:8px}}
+
+/* Keep the homepage material showcase styles isolated from the legacy archive. */
