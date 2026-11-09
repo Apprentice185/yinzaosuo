@@ -79,7 +79,9 @@
     var button = actionBar.querySelector("[data-action=save]");
     var editor = window.CMS && window.CMS.editor;
     var snapshot = editor && typeof editor.getCurrentEntry === "function" ? editor.getCurrentEntry() : null;
-    var disabled = !nativeSaveButton || !snapshot || snapshot.hasChanged !== true;
+    var changed = snapshot && snapshot.hasChanged === true;
+    var nativeSaveEnabled = nativeSaveButton && !nativeSaveButton.disabled;
+    var disabled = !changed && !nativeSaveEnabled;
     button.disabled = disabled;
     button.setAttribute("aria-disabled", String(disabled));
   }
@@ -87,8 +89,10 @@
   function save() {
     var editor = window.CMS && window.CMS.editor;
     var snapshot = editor && typeof editor.getCurrentEntry === "function" ? editor.getCurrentEntry() : null;
-    if (!snapshot || snapshot.hasChanged !== true || !nativeSaveButton) return;
-    if (nativeSaveButton.disabled) nativeSaveButton.disabled = false;
+    var changed = snapshot && snapshot.hasChanged === true;
+    var nativeSaveEnabled = nativeSaveButton && !nativeSaveButton.disabled;
+    if ((!changed && !nativeSaveEnabled) || !nativeSaveButton) return;
+    if (changed && nativeSaveButton.disabled) nativeSaveButton.disabled = false;
     nativeSaveButton.click();
   }
 
