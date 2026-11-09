@@ -26,6 +26,8 @@ const pageDataVersion = localStorage.getItem('printDataVersion') || '';
 const products = siteData.products || [];
 const language = () => localStorage.getItem('site_lang') || 'zh';
 const productText = (product, field) => window.contentText('products', product.id, field, product[field] || product.desc || '');
+const escapeContent = window.ContentSanitizer.escape;
+const setSanitizedHtml = (target, html) => target.replaceChildren(window.ContentSanitizer.sanitize(html));
 const resolveContentImage = value => {
   if (typeof value !== 'string' || !value.trim()) return '';
   try {
@@ -47,9 +49,9 @@ window.addEventListener('pageshow', reloadWhenPublished);
 function renderHomeContent() {
   const homeKnowledgeList = document.querySelector('#homeKnowledgeList');
   if (homeKnowledgeList) {
-    homeKnowledgeList.innerHTML = (siteData.knowledge || []).slice(0, 3).map((item, index) =>
-      `<a href="article.html?type=knowledge&id=${encodeURIComponent(item.id)}" class="knowledge-item"><span>${String(index + 1).padStart(2, '0')}</span><strong>${window.contentText('knowledge', item.id, 'title', item.title)}</strong><span>↗</span></a>`
-    ).join('');
+    setSanitizedHtml(homeKnowledgeList, (siteData.knowledge || []).slice(0, 3).map((item, index) =>
+      `<a href="article.html?type=knowledge&id=${encodeURIComponent(item.id)}" class="knowledge-item"><span>${String(index + 1).padStart(2, '0')}</span><strong>${escapeContent(window.contentText('knowledge', item.id, 'title', item.title))}</strong><span>↗</span></a>`
+    ).join(''));
   }
   const homeArticleGrid = document.querySelector('#homeArticleGrid');
   if (homeArticleGrid) {
@@ -121,9 +123,10 @@ function openScene(id) {
   if (!product) return;
   const name = productText(product, 'name');
   const visual = document.querySelector('#sceneVisual');
-  visual.style.backgroundImage = product.sceneImage ? `url("${product.sceneImage}")` : '';
-  visual.classList.toggle('is-placeholder', !product.sceneImage);
-  visual.innerHTML = product.sceneImage ? '' : `<span>${productText(product, 'category')}<br><strong>${name}</strong></span>`;
+  const sceneImage = window.ContentSanitizer.safeUrl(product.sceneImage, false);
+  visual.style.backgroundImage = sceneImage ? `url("${sceneImage}")` : '';
+  visual.classList.toggle('is-placeholder', !sceneImage);
+  setSanitizedHtml(visual, sceneImage ? '' : `<span>${escapeContent(productText(product, 'category'))}<br><strong>${escapeContent(name)}</strong></span>`);
   document.querySelector('#sceneTitle').textContent = name;
   document.querySelector('#sceneDesc').textContent = productText(product, 'intro');
   document.querySelector('#sceneDetail').href = `product.html?id=${encodeURIComponent(product.id)}`;
@@ -142,9 +145,9 @@ function openProduct(id) {
   document.querySelector('#optionTitle').textContent = productText(activeProduct, 'name');
   document.querySelector('#optionDesc').textContent = productText(activeProduct, 'intro');
   document.querySelector('#optionPrice').textContent = `${activeProduct.price} · ${window.t('price_reference')}`;
-  document.querySelector('#optionGrid').innerHTML = (activeProduct.options || []).map((option, index) =>
-    `<label>${window.t(`option_${option.name}`)}<select data-option-index="${index}">${option.values.map(value => `<option>${value}</option>`).join('')}</select></label>`
-  ).join('');
+  setSanitizedHtml(document.querySelector('#optionGrid'), (activeProduct.options || []).map((option, index) =>
+    `<label>${escapeContent(window.t(`option_${option.name}`))}<select data-option-index="${index}">${option.values.map(value => `<option>${escapeContent(value)}</option>`).join('')}</select></label>`
+  ).join(''));
   productModal.classList.add('open');
 }
 function closeProduct() {

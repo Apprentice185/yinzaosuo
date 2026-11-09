@@ -19,6 +19,8 @@ const productId = new URLSearchParams(location.search).get('id');
 let product = productData.products.find(item => item.id === productId) || null;
 const language = () => localStorage.getItem('site_lang') || 'en';
 const productText = field => field === 'name' ? product.name : field === 'intro' ? (product.desc || '') : window.contentText('products', product.id, field, product[field] || product.desc || '');
+const escapeContent = window.ContentSanitizer.escape;
+const setSanitizedHtml = (target, html) => target.replaceChildren(window.ContentSanitizer.sanitize(html));
 let missingProductMessage;
 
 function renderMissingProduct() {
@@ -128,9 +130,9 @@ function renderProductDetails() {
   }
 
   const options = product.options || [];
-  document.querySelector('#detailOptions').innerHTML = options.map((option, index) =>
-    `<label>${optionLabel(option.name)}<select data-option-index="${index}">${option.values.map(value => `<option>${optionValue(value)}</option>`).join('')}</select></label>`
-  ).join('');
+  setSanitizedHtml(document.querySelector('#detailOptions'), options.map((option, index) =>
+    `<label>${escapeContent(optionLabel(option.name))}<select data-option-index="${index}">${option.values.map(value => `<option>${escapeContent(optionValue(value))}</option>`).join('')}</select></label>`
+  ).join(''));
   document.querySelectorAll('#detailOptions select').forEach((select, index) => {
     select.selectedIndex = currentValues[index] || 0;
   });

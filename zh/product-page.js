@@ -18,6 +18,8 @@ const productId = new URLSearchParams(location.search).get('id');
 const product = productData.products.find(item => item.id === productId) || productData.products[0];
 const language = () => localStorage.getItem('site_lang') || 'zh';
 const productText = field => window.contentText('products', product.id, field, product[field] || product.desc || '');
+const escapeContent = window.ContentSanitizer.escape;
+const setSanitizedHtml = (target, html) => target.replaceChildren(window.ContentSanitizer.sanitize(html));
 
 function optionLabel(name) {
   return window.I18N[language()].optionLabels[name] || name;
@@ -94,9 +96,9 @@ function renderProductDetails() {
   }
 
   const options = product.options || [];
-  document.querySelector('#detailOptions').innerHTML = options.map((option, index) =>
-    `<label>${optionLabel(option.name)}<select data-option-index="${index}">${option.values.map(value => `<option>${optionValue(value)}</option>`).join('')}</select></label>`
-  ).join('');
+  setSanitizedHtml(document.querySelector('#detailOptions'), options.map((option, index) =>
+    `<label>${escapeContent(optionLabel(option.name))}<select data-option-index="${index}">${option.values.map(value => `<option>${escapeContent(optionValue(value))}</option>`).join('')}</select></label>`
+  ).join(''));
   document.querySelectorAll('#detailOptions select').forEach((select, index) => {
     select.selectedIndex = currentValues[index] || 0;
   });

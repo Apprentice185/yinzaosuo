@@ -17,6 +17,9 @@ const pageDataVersion = localStorage.getItem('printDataVersion') || '';
 const language = () => localStorage.getItem('site_lang') || 'zh';
 const text = (type, item, field) => window.contentText(type, item.id, field, item[field] || '');
 const articleUrl = (type, id) => `article.html?type=${type}&id=${encodeURIComponent(id)}`;
+const escapeContent = window.ContentSanitizer.escape;
+const safeContentUrl = value => window.ContentSanitizer.safeUrl(value, false);
+const setSanitizedHtml = (target, html) => target.replaceChildren(window.ContentSanitizer.sanitize(html));
 const filterState = { knowledge: '全部', articles: '全部' };
 let templateFilter = '全部';
 let activeTemplateId = '';
@@ -38,20 +41,20 @@ function renderContent(type) {
   const target = document.querySelector(type === 'knowledge' ? '#knowledgeGrid' : '#articleGrid');
   if (!target) return;
   const items = data[type].filter(item => filterState[type] === '全部' || item.category === filterState[type]);
-  target.innerHTML = items.map((item, index) => {
+  setSanitizedHtml(target, items.map((item, index) => {
     const category = text(type, item, 'category');
-    return `<article class="long-card"><div class="long-card-visual visual-${index % 4}${item.cover ? ' has-image' : ' is-placeholder'}" ${item.cover ? `style="background-image:url('${item.cover}')"` : ''}>${item.cover ? '' : `<span>${category}</span>`}</div><div class="article-meta">${category} · ${item.date || window.t('date_source')}</div><h2>${text(type, item, 'title')}</h2><p>${text(type, item, 'excerpt')}</p><a class="text-link" href="${articleUrl(type, item.id)}">${window.t('read_article')} <span>↗</span></a></article>`;
-  }).join('');
+    return `<article class="long-card"><div class="long-card-visual visual-${index % 4}${item.cover ? ' has-image' : ' is-placeholder'}" ${item.cover ? `style="background-image:url('${escapeContent(item.cover)}')"` : ''}>${item.cover ? '' : `<span>${escapeContent(category)}</span>`}</div><div class="article-meta">${escapeContent(category)} · ${escapeContent(item.date || window.t('date_source'))}</div><h2>${escapeContent(text(type, item, 'title'))}</h2><p>${escapeContent(text(type, item, 'excerpt'))}</p><a class="text-link" href="${articleUrl(type, item.id)}">${escapeContent(window.t('read_article'))} <span>↗</span></a></article>`;
+  }).join(''));
 }
 
 function renderSolutions() {
   const target = document.querySelector('#solutionsGrid');
   if (!target) return;
-  target.innerHTML = data.solutions.map((item, index) => {
+  setSanitizedHtml(target, data.solutions.map((item, index) => {
     const category = window.contentText('solutions', item.id, 'category', item.tag || '');
     const summary = window.contentText('solutions', item.id, 'excerpt', item.summary || '');
-    return `<article class="long-card"><div class="long-card-visual visual-${index % 4}${item.cover ? ' has-image' : ' is-placeholder'}" ${item.cover ? `style="background-image:url('${item.cover}')"` : ''}>${item.cover ? '' : `<span>${category}</span>`}</div><div class="article-meta">${category} · ${item.date || window.t('date_source')}</div><h2>${window.contentText('solutions', item.id, 'title', item.title)}</h2><p>${summary}</p><a class="text-link" href="${articleUrl('solutions', item.id)}">${window.t('read_article')} <span>↗</span></a></article>`;
-  }).join('');
+    return `<article class="long-card"><div class="long-card-visual visual-${index % 4}${item.cover ? ' has-image' : ' is-placeholder'}" ${item.cover ? `style="background-image:url('${escapeContent(item.cover)}')"` : ''}>${item.cover ? '' : `<span>${escapeContent(category)}</span>`}</div><div class="article-meta">${escapeContent(category)} · ${escapeContent(item.date || window.t('date_source'))}</div><h2>${escapeContent(window.contentText('solutions', item.id, 'title', item.title))}</h2><p>${escapeContent(summary)}</p><a class="text-link" href="${articleUrl('solutions', item.id)}">${escapeContent(window.t('read_article'))} <span>↗</span></a></article>`;
+  }).join(''));
 }
 
 function renderContentFilters(type) {
@@ -108,7 +111,8 @@ function renderTemplateFilters() {
 }
 
 function imageOrPlaceholder(url, className, label) {
-  return url ? `<img class="${className}" src="${url}" alt="">` : `<div class="${className} image-placeholder"><span class="placeholder-label">${label}</span><span class="placeholder-frame" aria-hidden="true"></span><small class="placeholder-spec">PROTOTYPE / SPEC PENDING</small><small class="placeholder-dimensions">— × — mm</small></div>`;
+  const safeUrl = safeContentUrl(url);
+  return safeUrl ? `<img class="${className}" src="${escapeContent(safeUrl)}" alt="">` : `<div class="${className} image-placeholder"><span class="placeholder-label">${escapeContent(label)}</span><span class="placeholder-frame" aria-hidden="true"></span><small class="placeholder-spec">PROTOTYPE / SPEC PENDING</small><small class="placeholder-dimensions">— × — mm</small></div>`;
 }
 
 function renderTemplates() {
@@ -120,7 +124,7 @@ function renderTemplates() {
     return (templateFilter === '全部' || item.style === templateFilter)
       && `${item.id}${templateField(item, 'title')}${templateField(item, 'style')}${tags.join('')}`.toLowerCase().includes(search);
   });
-  target.innerHTML = items.map(item => `<article class="template-card" data-id="${item.id}">${imageOrPlaceholder(item.thumb, 'template-thumb', window.t('image_pending'))}<div class="template-info"><div><span>${templateField(item, 'category')} · ${templateField(item, 'style')}</span><h2>${templateField(item, 'title')}</h2></div><strong>${templatePrice(item)}</strong><p>${templateSize(item)}</p></div></article>`).join('');
+  setSanitizedHtml(target, items.map(item => `<article class="template-card" data-id="${escapeContent(item.id)}">${imageOrPlaceholder(item.thumb, 'template-thumb', window.t('image_pending'))}<div class="template-info"><div><span>${escapeContent(templateField(item, 'category'))} · ${escapeContent(templateField(item, 'style'))}</span><h2>${escapeContent(templateField(item, 'title'))}</h2></div><strong>${escapeContent(templatePrice(item))}</strong><p>${escapeContent(templateSize(item))}</p></div></article>`).join(''));
   target.querySelectorAll('.template-card').forEach(card => card.addEventListener('click', () => openTemplate(card.dataset.id)));
 }
 
@@ -134,9 +138,9 @@ function openTemplate(id) {
   const tags = templateField(item, 'tags') || item.tags || [];
   const gallery = document.querySelector('#detailGallery');
   const galleryItems = [item.designImage, item.sizeImage, item.sceneImage];
-  gallery.innerHTML = galleryItems.map((url, index) => url
-    ? `<img class="detail-image ${index === 0 ? 'active' : ''}" src="${url}" alt="${title}">`
-    : `<div class="detail-image image-placeholder ${index === 0 ? 'active' : ''}"><span class="placeholder-label">${window.t('image_detail_pending').replace('{n}', index + 1)}</span><span class="placeholder-frame" aria-hidden="true"></span><small class="placeholder-spec">PROTOTYPE / SPEC PENDING</small><small class="placeholder-dimensions">— × — mm</small></div>`).join('');
+  setSanitizedHtml(gallery, galleryItems.map((url, index) => url
+    ? `<img class="detail-image ${index === 0 ? 'active' : ''}" src="${escapeContent(url)}" alt="${escapeContent(title)}">`
+    : `<div class="detail-image image-placeholder ${index === 0 ? 'active' : ''}"><span class="placeholder-label">${escapeContent(window.t('image_detail_pending').replace('{n}', index + 1))}</span><span class="placeholder-frame" aria-hidden="true"></span><small class="placeholder-spec">PROTOTYPE / SPEC PENDING</small><small class="placeholder-dimensions">— × — mm</small></div>`).join(''));
   document.querySelector('#detailTitle').textContent = title;
   document.querySelector('#detailMeta').textContent = language() === 'en'
     ? `${item.id} · ${category} · ${window.t('template_style')}: ${style} · ${templateSize(item)}`
@@ -148,10 +152,11 @@ function openTemplate(id) {
     element.textContent = tag;
     detailTags.append(element);
   });
-  if (item.file_url) {
+  const fileUrl = safeContentUrl(item.file_url);
+  if (fileUrl) {
     const wrapper = document.createElement('span');
     const link = document.createElement('a');
-    link.href = item.file_url;
+    link.href = fileUrl;
     link.target = '_blank';
     link.rel = 'noopener noreferrer';
     link.textContent = window.t('template_download');
@@ -207,9 +212,10 @@ function renderArticle() {
     ? `${text(type, item, 'category')} · ${item.date || 'Print Atelier'}`
     : `${item.category}　·　${item.date || '印造所知识库'}`;
   const cover = document.querySelector('#articleCover');
-  cover.hidden = !item.cover;
-  cover.src = item.cover || '';
-  document.querySelector('#articleBody').innerHTML = text(type, item, 'content');
+  const coverUrl = safeContentUrl(item.cover);
+  cover.hidden = !coverUrl;
+  cover.src = coverUrl;
+  setSanitizedHtml(document.querySelector('#articleBody'), text(type, item, 'content'));
 }
 
 function renderAll() {
