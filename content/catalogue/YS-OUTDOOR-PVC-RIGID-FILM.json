@@ -1,0 +1,77 @@
+{
+  "id": "YS-OUTDOOR-PVC-RIGID-FILM",
+  "name_zh": "户外PVC硬质喷绘膜",
+  "name_en": "Outdoor PVC Rigid Printing Film",
+  "image": "",
+  "desc_zh": "PVC基材，防水哑面涂层，卷宽1270mm、240gsm、每卷50米，适用于户外喷绘展示。",
+  "desc_en": "Outdoor PVC printing film with a waterproof matte coating, supplied in 1270 mm width, 240 gsm and 50 m rolls.",
+  "sort_order": 5,
+  "publish_to": "international",
+  "hidden": false,
+  "seo_title_zh": "户外PVC硬质喷绘膜｜规格与批量供应｜YINZAOSUO",
+  "seo_title_en": "Outdoor PVC Rigid Printing Film | Specifications & Trade Supply | YINZAOSUO",
+  "seo_description_zh": "PVC基材，防水哑面涂层，卷宽1270mm、240gsm、每卷50米，适用于户外喷绘展示。 支持批量采购、覆膜及国际运输询价。",
+  "seo_description_en": "Outdoor PVC printing film with a waterproof matte coating, supplied in 1270 mm width, 240 gsm and 50 m rolls. Enquire about trade quantities, lamination and international shipping.",
+  "detail_zh": {
+    "lead": "户外PVC喷绘膜采用PVC基材及防水哑面涂层，已确认具备防水和抗氧化特性。当前规格为1270mm卷宽、240gsm、每卷50米。",
+    "highlights": [
+      "PVC基材",
+      "防水哑面涂层",
+      "卷宽1270mm",
+      "材料克重240gsm",
+      "每卷长度50m",
+      "参考价格USD 25.90/m²"
+    ],
+    "applications": [
+      "户外广告画面",
+      "户外展示及标识项目",
+      "需要防水哑面效果的喷绘项目"
+    ],
+    "finishing": [
+      "喷绘印刷",
+      "按项目尺寸裁切",
+      "可选冷裱膜（亮膜或哑膜）",
+      "默认采用卷装交付，具体包装按订单确认"
+    ],
+    "delivery": [
+      "默认卷装，内置硬质纸筒保护",
+      "可按需求另行确认纸箱包装",
+      "生产通常约2天，工厂备货及发出一般不超过一周",
+      "海运运输时间约40天，实际以航线、货代及清关安排为准"
+    ],
+    "artwork": "请提供印刷文件、成品尺寸、数量、卷装或裁切要求及目的地。可先核对文件尺寸和出血设置。",
+    "brief": "请提供材料类型、宽度、数量或面积、是否覆膜、油墨选择、包装要求及收货国家/地区。",
+    "caveat": "产品规格以本页面列出的已确认参数为准。空运时效、运费、税费及最终交付时间需按目的地和货代方案单独确认。最低起订条件为100平方米，或订单货值超过USD 2,000（满足其中一项即可）。"
+  },
+  "detail_en": {
+    "lead": "Outdoor PVC printing film uses a PVC substrate with a waterproof matte coating. The confirmed product characteristics include waterproofing and oxidation resistance. The current specification is 1270 mm width, 240 gsm and 50 m per roll.",
+    "highlights": [
+      "PVC substrate",
+      "Waterproof matte coating",
+      "Roll width: 1270 mm",
+      "Media weight: 240 gsm",
+      "Roll length: 50 m",
+      "Reference price: USD 25.90/m²"
+    ],
+    "applications": [
+      "Outdoor advertising graphics",
+      "Outdoor display and signage projects",
+      "Print projects requiring a waterproof matte surface"
+    ],
+    "finishing": [
+      "Large-format inkjet printing",
+      "Custom trimming to project dimensions",
+      "Optional cold lamination in gloss or matte",
+      "Roll delivery is the standard format; confirm any special packing requirements"
+    ],
+    "delivery": [
+      "Standard roll packing with a rigid paper tube inside",
+      "Carton packing can be discussed as an alternative",
+      "Typical production is around 2 days; factory preparation and dispatch generally take no more than one week",
+      "Sea freight is approximately 40 days; actual transit depends on route, forwarder and customs arrangements"
+    ],
+    "artwork": "Please provide print-ready artwork, finished dimensions, quantity, roll or cut-sheet requirements and destination. File dimensions and bleed can be checked before production.",
+    "brief": "Please specify the media type, width, quantity or area, lamination, ink option, packing requirements and destination country or region.",
+    "caveat": "Specifications are limited to the confirmed parameters listed on this page. Air-freight timing, freight charges, duties and final delivery dates must be confirmed for the destination and shipping arrangement. MOQ is 100 m², or an order goods value above USD 2,000; either condition is sufficient."
+  }
+}
