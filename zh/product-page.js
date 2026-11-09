@@ -19,7 +19,7 @@ const managedProducts = (window.CMS_CONTENT?.products || []).map(item => {
 });
 const productData = {
   ...siteProductData,
-  products: Array.isArray(window.CMS_CONTENT?.products) ? managedProducts : siteProductData.products || []
+  products: [...managedProducts, ...(siteProductData.products || []).filter(item => !managedProducts.some(managed => managed.id === item.id))]
 };
 const productId = new URLSearchParams(location.search).get('id');
 const product = productData.products.find(item => item.id === productId) || productData.products[0];
@@ -55,7 +55,7 @@ function referencePrice() {
 
 function renderProductDetails() {
   const currentValues = [...document.querySelectorAll('#detailOptions select')].map(select => select.selectedIndex);
-  const title = `${product.seoTitle || productText('name')} | 印造所`;
+  const title = language() === 'en' ? `${product.seo_title_en || productText('name')} | YINZAOSUO` : `${product.seoTitle || productText('name')}｜印造所`;
   const description = language() === 'en'
     ? productText('intro')
     : product.seoDescription || product.intro || product.desc || product.name;
@@ -144,15 +144,16 @@ renderProductInformation();
 function renderProductInformation() {
   const root = document.querySelector('#productInformation');
   if (!root || !product || !product.detail) { if (root) root.hidden = true; return; }
-  const detail = product.detail;
+  const catalogueEntry = managedCatalogue.find(entry => entry.id === product.id);
+  const detail = language() === 'en' ? catalogueEntry?.detail_en || product.detail : catalogueEntry?.detail_zh || product.detail;
   root.hidden = false;
-  document.querySelector('#productInfoTitle').textContent = '产品详情与采购信息';
+  document.querySelector('#productInfoTitle').textContent = language() === 'en' ? 'Product specifications & ordering' : '产品详情与采购信息';
   document.querySelector('#productInfoLead').textContent = detail.lead || '';
   const groups = [
-    ['productHighlights','生产规格与选项','highlights'],
-    ['productApplications','适用场景','applications'],
-    ['productFinishing','加工与覆膜','finishing'],
-    ['productDelivery','包装与交付','delivery']
+    ['productHighlights',language() === 'en' ? 'Specifications & options' : '生产规格与选项','highlights'],
+    ['productApplications',language() === 'en' ? 'Applications' : '适用场景','applications'],
+    ['productFinishing',language() === 'en' ? 'Finishing & lamination' : '加工与覆膜','finishing'],
+    ['productDelivery',language() === 'en' ? 'Packing & delivery' : '包装与交付','delivery']
   ];
   for (const [id,label,key] of groups) {
     const list = document.getElementById(id);
@@ -163,5 +164,7 @@ function renderProductInformation() {
   }
   document.querySelector('#productArtwork').textContent = detail.artwork || '';
   document.querySelector('#productBrief').textContent = detail.brief || '';
+  root.querySelector('.product-information-notes article:first-child h3').textContent = language() === 'en' ? 'Artwork support' : '设计文件支持';
+  root.querySelector('.product-information-notes article:last-child h3').textContent = language() === 'en' ? 'What to include in your enquiry' : '询价时请提供';
   document.querySelector('#productCaveat').textContent = detail.caveat || '';
 }
