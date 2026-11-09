@@ -82,7 +82,7 @@ function optionValue(value) {
 }
 
 function referencePrice() {
-  return /^USD\\s/i.test(product.price || '') ? product.price : window.t('price_quote_only');
+  return /^USD\s/i.test(product.price || '') ? product.price : window.t('price_quote_only');
 }
 function renderProductDetails() {
   if (!product) {
