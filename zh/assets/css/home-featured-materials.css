@@ -35,3 +35,37 @@
 
 .home-image-note{margin:12px 0 0;color:#777;font-size:10px;line-height:1.6}
 .home-material-visual-label{top:10px;bottom:auto;left:auto;right:10px}
+
+/* Product photography must remain fully visible: no geometric pseudo-elements or image overlays. */
+.home-material-visual{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:240px;
+  overflow:hidden;
+  background:#fff !important;
+}
+.home-material-visual::before,
+.home-material-visual::after{
+  display:none !important;
+  content:none !important;
+}
+.home-material-visual > img{
+  position:relative !important;
+  inset:auto !important;
+  display:block;
+  width:100%;
+  height:240px;
+  min-height:240px;
+  padding:12px;
+  object-fit:contain;
+  object-position:center;
+  z-index:0 !important;
+  background:#fff;
+}
+.home-material-visual-label{display:none !important}
+@media(max-width:560px){
+  .home-material-visual{min-height:172px}
+  .home-material-visual > img{height:172px;min-height:172px;padding:6px}
+}
