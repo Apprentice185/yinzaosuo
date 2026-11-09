@@ -3,19 +3,34 @@ const siteProductData = storedProductData
   ? { ...printData, ...storedProductData, products: storedProductData.products || printData.products }
   : printData;
 const legacyProducts = siteProductData.products || [];
-const catalogueProducts = (window.PRODUCTS_DATA?.[localStorage.getItem('site_lang') || 'en']?.categories || [])
-  .flatMap(category => category.items.map(item => ({
+const activeLanguage = localStorage.getItem('site_lang') || 'en';
+const catalogueProducts = [
+  ...(window.PRODUCTS_DATA?.[activeLanguage]?.categories || []).flatMap(category => category.items.map(item => ({
     ...item,
     category: category.title,
     intro: item.desc,
     options: Array.isArray(item.options) ? item.options : []
-  })));
+  }))),
+  ...(window.CMS_CONTENT?.products || [])
+    .filter(item => !(window.PRODUCTS_DATA?.[activeLanguage]?.categories || []).some(category => category.items.some(existing => existing.id === item.id)))
+    .map(item => ({
+      id: item.id,
+      name: item[activeLanguage === 'en' ? 'title_en' : 'title'] || item.title,
+      desc: item[activeLanguage === 'en' ? 'desc_en' : 'desc'] || item.desc,
+      intro: item[activeLanguage === 'en' ? 'desc_en' : 'desc'] || item.desc,
+      image: item.image,
+      category: item[activeLanguage === 'en' ? 'category_title_en' : 'category_title'] || 'Photo & Wide-Format Print Media',
+      options: [],
+      seoTitle: item[activeLanguage === 'en' ? 'seo_title_en' : 'seo_title_zh'] || '',
+      seoDescription: item[activeLanguage === 'en' ? 'seo_description_en' : 'seo_description_zh'] || ''
+    }))
+];
 const managedCatalogue = window.CMS_CONTENT?.catalogue || [];
 const productData = {
   ...siteProductData,
-  products: [...catalogueProducts.map(item => { const managed = managedCatalogue.find(entry => entry.id === item.id); const lang = localStorage.getItem('site_lang') || 'en'; return managed ? { ...item, name: managed[lang === 'en' ? 'name_en' : 'name_zh'] || item.name, image: managed.image || item.image, desc: managed[lang === 'en' ? 'desc_en' : 'desc_zh'] || item.desc, detail: managed[lang === 'en' ? 'detail_en' : 'detail_zh'] || item.detail } : item; }), ...legacyProducts.filter(item => !catalogueProducts.some(current => current.id === item.id))]
+  products: [...catalogueProducts.map(item => { const managed = managedCatalogue.find(entry => entry.id === item.id); const lang = localStorage.getItem('site_lang') || 'en'; return managed ? { ...item, name: managed[lang === 'en' ? 'name_en' : 'name_zh'] || item.name, image: managed.image || item.image, desc: managed[lang === 'en' ? 'desc_en' : 'desc_zh'] || item.desc, detail: managed[lang === 'en' ? 'detail_en' : 'detail_zh'] || item.detail, seoTitle: managed[lang === 'en' ? 'seo_title_en' : 'seo_title_zh'] || item.seoTitle, seoDescription: managed[lang === 'en' ? 'seo_description_en' : 'seo_description_zh'] || item.seoDescription } : item; }), ...legacyProducts.filter(item => !catalogueProducts.some(current => current.id === item.id))]
 };
-const productId = new URLSearchParams(location.search).get('id');
+const productId = new URLSearchParams(location.search).get('id') || document.querySelector('.product-detail-page')?.dataset.productId;
 let product = productData.products.find(item => item.id === productId) || null;
 const language = () => localStorage.getItem('site_lang') || 'en';
 const productText = field => field === 'name' ? product.name : field === 'intro' ? (product.desc || '') : window.contentText('products', product.id, field, product[field] || product.desc || '');
@@ -67,7 +82,7 @@ function optionValue(value) {
 }
 
 function referencePrice() {
-  return window.t('price_quote_only');
+  return /^USD\s/i.test(product.price || '') ? product.price : window.t('price_quote_only');
 }
 function renderProductDetails() {
   if (!product) {
@@ -79,24 +94,38 @@ function renderProductDetails() {
   const localizedCategory = (window.PRODUCTS_DATA?.[language()]?.categories || [])
     .find(category => category.items.some(item => item.id === productId));
   const localizedItem = localizedCategory?.items.find(item => item.id === productId);
-  if (localizedItem) { const managed = managedCatalogue.find(entry => entry.id === productId); const lang = language(); product = { ...localizedItem, name: managed?.[lang === 'en' ? 'name_en' : 'name_zh'] || localizedItem.name, image: managed?.image || localizedItem.image, desc: managed?.[lang === 'en' ? 'desc_en' : 'desc_zh'] || localizedItem.desc, detail: managed?.[lang === 'en' ? 'detail_en' : 'detail_zh'] || localizedItem.detail, category: localizedCategory.title, intro: localizedItem.desc, options: localizedItem.options || [] }; }
+  if (localizedItem) { const managed = managedCatalogue.find(entry => entry.id === productId); const cmsProduct = (window.CMS_CONTENT?.products || []).find(entry => entry.id === productId); const lang = language(); product = { ...product, ...localizedItem, name: managed?.[lang === 'en' ? 'name_en' : 'name_zh'] || localizedItem.name, image: managed?.image || localizedItem.image, desc: managed?.[lang === 'en' ? 'desc_en' : 'desc_zh'] || localizedItem.desc, detail: managed?.[lang === 'en' ? 'detail_en' : 'detail_zh'] || localizedItem.detail, seoTitle: managed?.[lang === 'en' ? 'seo_title_en' : 'seo_title_zh'] || cmsProduct?.[lang === 'en' ? 'seo_title_en' : 'seo_title_zh'] || product.seoTitle, seoDescription: managed?.[lang === 'en' ? 'seo_description_en' : 'seo_description_zh'] || cmsProduct?.[lang === 'en' ? 'seo_description_en' : 'seo_description_zh'] || product.seoDescription, price: cmsProduct?.price || product.price, category: localizedCategory.title, intro: localizedItem.desc, options: localizedItem.options || [] }; }
   const currentValues = [...document.querySelectorAll('#detailOptions select')].map(select => select.selectedIndex);
-  const title = `${productText('name')} | YINZAOSUO`;
+  const title = `${product.seoTitle || productText('name')} | YINZAOSUO`;
   const description = language() === 'en'
-    ? productText('intro')
+    ? product.seoDescription || productText('intro')
     : product.seoDescription || product.intro || product.desc || product.name;
   document.title = language() === 'en' ? title : product.seoTitle || `${product.name}｜印造所`;
   document.querySelector('meta[name="description"]').content = description;
   document.querySelector('meta[property="og:title"]').content = document.title;
   document.querySelector('meta[property="og:description"]').content = description;
 
-  const url = new URL(`product.html?id=${encodeURIComponent(product.id)}`, 'https://yinzaosuo.com/');
+  const url = new URL(`/products/${String(product.id).toLowerCase()}/`, 'https://yinzaosuo.com/');
   document.querySelector('link[rel="canonical"]').href = url.href;
   document.querySelector('meta[property="og:url"]').content = url.href;
+  const alternates = [
+    ['en', url.href],
+    ['zh-CN', `https://yinzaosuo.com/zh/products/${String(product.id).toLowerCase()}/`],
+    ['x-default', url.href]
+  ];
+  for (const [locale, href] of alternates) {
+    let link = document.querySelector(`link[rel="alternate"][hreflang="${locale}"]`);
+    if (!link) { link = document.createElement('link'); link.rel = 'alternate'; link.hreflang = locale; document.head.append(link); }
+    link.href = href;
+  }
   document.querySelector('#productCategory').textContent = `${productText('category')} · ${product.id}`;
   document.querySelector('#productName').textContent = productText('name');
   document.querySelector('#productIntro').textContent = productText('intro') || product.desc;
   document.querySelector('#productPrice').textContent = referencePrice();
+  const structuredData = { '@context': 'https://schema.org', '@type': 'Product', name: productText('name'), description, brand: { '@type': 'Brand', name: 'YINZAOSUO' }, image: product.image || product.thumb || undefined };
+  let schema = document.querySelector('#productStructuredData');
+  if (!schema) { schema = document.createElement('script'); schema.id = 'productStructuredData'; schema.type = 'application/ld+json'; document.head.append(schema); }
+  schema.textContent = JSON.stringify(structuredData);
 
   const imageContainer = document.querySelector('#productImage');
   imageContainer.replaceChildren();

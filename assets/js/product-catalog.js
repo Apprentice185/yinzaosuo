@@ -1,5 +1,25 @@
 (function () {
-  const catalog = window.PRODUCTS_DATA || window.CMS_CONTENT?.catalog;
+  const managedCatalog = window.CMS_CONTENT?.catalog;
+  const staticCatalog = window.PRODUCTS_DATA;
+  const catalog = managedCatalog && staticCatalog
+    ? {
+        zh: { categories: [...managedCatalog.zh.categories.map(category => ({ ...category, items: [...category.items] }))] },
+        en: { categories: [...managedCatalog.en.categories.map(category => ({ ...category, items: [...category.items] }))] }
+      }
+    : managedCatalog || staticCatalog;
+  if (catalog && managedCatalog && staticCatalog) {
+    for (const lang of ['zh', 'en']) {
+      const knownIds = new Set(catalog[lang].categories.flatMap(category => category.items.map(item => item.id)));
+      for (const category of staticCatalog[lang]?.categories || []) {
+        const remaining = category.items.filter(item => !knownIds.has(item.id));
+        if (!remaining.length) continue;
+        const existing = catalog[lang].categories.find(item => item.id === category.id);
+        if (existing) existing.items.push(...remaining);
+        else catalog[lang].categories.push({ ...category, items: remaining });
+        remaining.forEach(item => knownIds.add(item.id));
+      }
+    }
+  }
   const managedCatalogue = Array.isArray(window.CMS_CONTENT?.catalogue) ? window.CMS_CONTENT.catalogue : [];
   const tabList = document.querySelector('#productCategoryTabs');
   const productGrid = document.querySelector('#productGrid');
@@ -64,7 +84,7 @@
     }
     const card = document.createElement('a');
     card.className = 'archive-card';
-    card.href = `product.html?id=${encodeURIComponent(item.id)}`;
+    card.href = `products/${String(item.id).toLowerCase()}/`;
     card.dataset.productId = item.id;
     const visual = document.createElement('div');
     visual.className = 'archive-visual';

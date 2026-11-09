@@ -5,6 +5,7 @@ const test = require('node:test');
 const { articleSlug, parseFrontmatter, renderStaticArticle, renderStaticText, slugify } = require('./generate-content');
 
 const articleTemplate = fs.readFileSync(path.join(__dirname, '..', 'article.html'), 'utf8');
+const productTemplate = fs.readFileSync(path.join(__dirname, '..', 'product.html'), 'utf8');
 
 test('article slugs prefer an explicit path and fall back to the English title', () => {
   assert.equal(slugify('  Paper & Print: A Guide  '), 'paper-print-a-guide');
@@ -50,4 +51,45 @@ test('static article output includes unique SEO metadata and safe structured dat
   assert.match(html, /hreflang="zh-CN"/);
   assert.doesNotMatch(html, /<script>window\.pwned=1<\/script>/);
   assert.doesNotMatch(html, /article\.html\?type=/);
+});
+
+
+test('static product output includes SEO metadata, canonical URL and readable product details', () => {
+  const { renderStaticProduct } = require('./generate-content');
+  const html = renderStaticProduct({
+    id: 'YS-GLOSS-PHOTO-PAPER',
+    title: '光面写真相纸',
+    title_en: 'Gloss Photo Paper',
+    desc: '光面写真相纸规格。',
+    desc_en: 'Gloss photo paper for posters.',
+    price: 'USD 18.60/m²',
+    publish_to: 'both'
+  }, {
+    id: 'YS-GLOSS-PHOTO-PAPER',
+    name_zh: '光面写真相纸',
+    name_en: 'Gloss Photo Paper',
+    seo_title_en: 'Gloss Photo Paper Wholesale',
+    seo_description_en: '1520 mm wide, 200 gsm, 50 m rolls.',
+    desc_en: 'Gloss photo paper for posters and displays.',
+    image: '/pic/gloss-photo-paper.jpg',
+    publish_to: 'both',
+    detail_en: {
+      lead: 'For posters and retail displays.',
+      highlights: ['1520 mm width', '200 gsm', '50 m per roll'],
+      applications: ['Posters'],
+      finishing: ['Gloss or matte lamination'],
+      delivery: ['Rigid paper tube roll packing'],
+      artwork: 'Supply print-ready files.',
+      brief: 'Share dimensions and quantity.',
+      caveat: 'Confirm freight by destination.'
+    }
+  }, productTemplate);
+
+  assert.ok(html.includes('<title>Gloss Photo Paper Wholesale | YINZAOSUO</title>'));
+  assert.ok(html.includes('<meta name="description" content="1520 mm wide, 200 gsm, 50 m rolls.">'));
+  assert.ok(html.includes('<link rel="canonical" href="https://yinzaosuo.com/products/ys-gloss-photo-paper/">'));
+  assert.ok(html.includes('<h1 id="productName">Gloss Photo Paper</h1>'));
+  assert.ok(html.includes('1520 mm width'));
+  assert.ok(html.includes('id="productStructuredData"'));
+  assert.ok(html.includes('hreflang="zh-CN"'));
 });

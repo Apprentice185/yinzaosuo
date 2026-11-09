@@ -12,6 +12,13 @@ const outputFile = path.join(root, 'assets', 'js', 'content-index.js');
 const siteUrl = 'https://yinzaosuo.com';
 
 const categoryDefaults = {
+  wideformat: {
+    num: '01',
+    zh: '写真与大幅面印刷材料',
+    en: 'Photo & Wide-Format Print Media',
+    desc: '面向印刷贸易商、广告制作商与标识供应商的写真相纸、合成纸、背胶及PVC喷绘材料。',
+    desc_en: 'Photo papers, PP synthetic paper, self-adhesive vinyl and PVC print media for trade printers and sign makers.'
+  },
   commercial: {
     num: '01',
     zh: '商务印制类',
@@ -32,7 +39,7 @@ const categoryDefaults = {
     en: 'Exhibition',
     desc: '面向活动、零售与空间展示的广告物料和制作服务',
     desc_en: 'Display graphics and production for events, retail, and branded spaces.'
-  }
+  },
 };
 
 function filesIn(folder, extension) {
@@ -231,7 +238,7 @@ function renderStaticArticle(item, collection, template) {
     html = html.replace('</head>', `<link rel="alternate" hreflang="en" href="${englishUrl}"><link rel="alternate" hreflang="zh-CN" href="${chineseUrl}"><link rel="alternate" hreflang="x-default" href="${englishUrl}"></head>`);
   }
   if (imageUrl) html = html.replace('</head>', `<meta property="og:image" content="${escapeHtml(imageUrl)}"></head>`);
-  html = html.replace('</head>', `<script type="application/ld+json">${jsonLd}</script></head>`);
+  html = html.replace('</head>', `<script id="productStructuredData" type="application/ld+json">${jsonLd}</script></head>`);
   html = html.replace(
     '<main id="articlePage">',
     `<main id="articlePage" data-article-type="${escapeHtml(collection === 'knowledge' ? 'knowledge' : collection === 'news' ? 'articles' : 'solutions')}" data-article-id="${escapeHtml(item.id)}">`
@@ -573,7 +580,7 @@ function buildSitemap(data) {
       queue.push(relativeTarget);
     }
   }
-  for (const product of data.products) routes.add(`/product.html?id=${encodeURIComponent(product.id)}`);
+  for (const product of [...data.products, ...data.catalogue]) routes.add(`/products/${slugify(product.id)}/`);
   for (const item of [...data.knowledge, ...data.news, ...data.solutions]) routes.add(item.route);
   const metadata = {
     '/': { changefreq: 'weekly', priority: '1.0' },
@@ -589,6 +596,112 @@ function buildSitemap(data) {
     return `  <url><loc>${escapeHtml(`${siteUrl}${publicRoute}`)}</loc>${tags}</url>`;
   });
   fs.writeFileSync(path.join(root, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>\n`);
+}
+
+
+function renderStaticProduct(product, catalogueItem, template) {
+  const isEnglish = !isChineseBuild;
+  const id = String(product.id || catalogueItem.id);
+  const slug = slugify(id);
+  const name = isEnglish
+    ? catalogueItem.name_en || product.title_en || product.title || catalogueItem.name_zh
+    : catalogueItem.name_zh || product.title || product.title_en || catalogueItem.name_en;
+  const description = isEnglish
+    ? catalogueItem.seo_description_en || product.seo_description_en || catalogueItem.desc_en || product.desc_en || name
+    : catalogueItem.seo_description_zh || product.seo_description_zh || catalogueItem.desc_zh || product.desc || name;
+  const seoTitle = isEnglish
+    ? catalogueItem.seo_title_en || product.seo_title_en || name
+    : catalogueItem.seo_title_zh || product.seo_title_zh || name;
+  const intro = isEnglish
+    ? catalogueItem.desc_en || product.desc_en || product.intro_en || description
+    : catalogueItem.desc_zh || product.desc || product.intro || description;
+  const detail = isEnglish ? catalogueItem.detail_en : catalogueItem.detail_zh;
+  const image = safeMediaUrl(catalogueItem.image || product.image);
+  const imageUrl = image ? new URL(image, `${siteUrl}/`).href : '';
+  const canonicalUrl = `${siteUrl}${sitePrefix}/products/${slug}/`;
+  const category = isEnglish
+    ? product.category_legacy_en || product.category_legacy || (product.category === 'wideformat' ? 'Photo & Wide-Format Print Media' : product.category) || 'Print Media'
+    : product.category_legacy || (product.category === 'wideformat' ? '写真与大幅面印刷材料' : product.category) || '印刷材料';
+  const price = product.price && (!isEnglish || /^USD\s/i.test(product.price)) ? product.price : '';
+  const jsonLd = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name,
+    description,
+    url: canonicalUrl,
+    image: imageUrl || undefined,
+    brand: { '@type': 'Brand', name: 'YINZAOSUO' }
+  }).replace(/</g, '\\u003c');
+  const baseUrl = `${siteUrl}${sitePrefix || ''}/`;
+  let html = /<base\b/i.test(template)
+    ? template
+    : template.replace('<head>', `<head><base href="${escapeHtml(baseUrl)}">`);
+  html = html.replace(/<title[^>]*>[\s\S]*?<\/title>/i, `<title>${escapeHtml(seoTitle)} | ${isEnglish ? 'YINZAOSUO' : '印造所'}</title>`);
+  html = html.replace(/<meta name="description" content="[^"]*"[^>]*>/i, `<meta name="description" content="${escapeHtml(description)}">`);
+  html = html.replace(/<meta property="og:title" content="[^"]*"[^>]*>/i, `<meta property="og:title" content="${escapeHtml(seoTitle)}">`);
+  html = html.replace(/<meta property="og:description" content="[^"]*"[^>]*>/i, `<meta property="og:description" content="${escapeHtml(description)}">`);
+  html = html.replace(/<meta property="og:url" content="[^"]*"[^>]*>/i, `<meta property="og:url" content="${escapeHtml(canonicalUrl)}">`);
+  html = html.replace(/<link rel="canonical" href="[^"]*"[^>]*>/i, `<link rel="canonical" href="${escapeHtml(canonicalUrl)}">`);
+  if (product.publish_to === 'both' || catalogueItem.publish_to === 'both') {
+    const englishUrl = `${siteUrl}/products/${slug}/`;
+    const chineseUrl = `${siteUrl}/zh/products/${slug}/`;
+    html = html.replace('</head>', `<link rel="alternate" hreflang="en" href="${englishUrl}"><link rel="alternate" hreflang="zh-CN" href="${chineseUrl}"><link rel="alternate" hreflang="x-default" href="${englishUrl}"></head>`);
+  }
+  html = html.replace('</head>', `<script id="productStructuredData" type="application/ld+json">${jsonLd}</script></head>`);
+  html = html.replace('<section class="product-detail-page">', `<section class="product-detail-page" data-product-id="${escapeHtml(id)}">`);
+  html = html.replace(/<p class="eyebrow" id="productCategory">[\s\S]*?<\/p>/, `<p class="eyebrow" id="productCategory">${escapeHtml(category)}</p>`);
+  html = html.replace(/<h1 id="productName">[\s\S]*?<\/h1>/, `<h1 id="productName">${escapeHtml(name)}</h1>`);
+  html = html.replace(/<p class="product-detail-intro" id="productIntro">[\s\S]*?<\/p>/, `<p class="product-detail-intro" id="productIntro">${escapeHtml(intro)}</p>`);
+  html = html.replace(/<strong class="product-detail-price" id="productPrice">[\s\S]*?<\/strong>/, `<strong class="product-detail-price" id="productPrice">${escapeHtml(price || (isEnglish ? 'Request a quote' : '欢迎询价'))}</strong>`);
+  html = html.replace(/<div class="product-detail-image" id="productImage"><\/div>/, `<div class="product-detail-image" id="productImage">${imageUrl ? `<img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(name)}" decoding="async">` : ''}</div>`);
+  if (detail) {
+    html = html.replace(/<section class="product-information" id="productInformation"[^>]*>/, '<section class="product-information" id="productInformation">');
+    html = html.replace(/<h2 id="productInfoTitle">[\s\S]*?<\/h2>/, `<h2 id="productInfoTitle">${escapeHtml(isEnglish ? 'Product specifications & ordering' : '产品详情与采购信息')}</h2>`);
+    html = html.replace(/<p id="productInfoLead"><\/p>/, `<p id="productInfoLead">${escapeHtml(detail.lead || '')}</p>`);
+    const lists = [
+      ['productHighlights', detail.highlights],
+      ['productApplications', detail.applications],
+      ['productFinishing', detail.finishing],
+      ['productDelivery', detail.delivery]
+    ];
+    for (const [idName, values] of lists) {
+      const listHtml = (values || []).map(value => `<li>${escapeHtml(value)}</li>`).join('');
+      html = html.replace(new RegExp(`(<ul id="${idName}">)[\\s\\S]*?(<\\/ul>)`), `$1${listHtml}$2`);
+    }
+    html = html.replace(/<p id="productArtwork"><\/p>/, `<p id="productArtwork">${escapeHtml(detail.artwork || '')}</p>`);
+    html = html.replace(/<p id="productBrief"><\/p>/, `<p id="productBrief">${escapeHtml(detail.brief || '')}</p>`);
+    html = html.replace(/<p class="product-information-caveat" id="productCaveat"><\/p>/, `<p class="product-information-caveat" id="productCaveat">${escapeHtml(detail.caveat || '')}</p>`);
+  } else {
+    html = html.replace(/<section class="product-information" id="productInformation"[^>]*>/, '<section class="product-information" id="productInformation" hidden>');
+  }
+  return html;
+}
+
+function writeProductPages(data) {
+  const templatePath = path.join(root, isChineseBuild ? 'product.html' : 'product.html');
+  const template = fs.readFileSync(templatePath, 'utf8');
+  const products = new Map();
+  for (const item of data.products) products.set(String(item.id), item);
+  for (const item of data.catalogue) {
+    const id = String(item.id);
+    const existing = products.get(id) || {
+      id,
+      title: item.name_zh || '',
+      title_en: item.name_en || '',
+      desc: item.desc_zh || '',
+      desc_en: item.desc_en || '',
+      image: item.image || '',
+      publish_to: item.publish_to || 'both'
+    };
+    products.set(id, existing);
+  }
+  for (const [id, product] of products) {
+    const catalogueItem = data.catalogue.find(item => String(item.id) === id) || {};
+    const slug = slugify(id);
+    const output = path.join(root, 'products', slug, 'index.html');
+    fs.mkdirSync(path.dirname(output), { recursive: true });
+    fs.writeFileSync(output, renderStaticProduct(product, catalogueItem, template), 'utf8');
+  }
 }
 
 function main() {
@@ -628,7 +741,7 @@ function main() {
     }
   };
   const catalogue = filesIn('catalogue', '.json').map(file => normalizePublication(JSON.parse(fs.readFileSync(file, 'utf8')))).filter(item => item && item.id).filter(isPublishedForCurrentSite);
-  const requiredCatalogueIds = ['YS-PVC-BANNER', 'YS-PVC-MESH', 'YS-SYNTHETIC-PAPER', 'YS-ADHESIVE-VINYL', 'YS-ROLL-UP', 'YS-X-BANNER', 'YS-DOOR-STAND'];
+  const requiredCatalogueIds = ['YS-GLOSS-PHOTO-PAPER', 'YS-SATIN-PHOTO-PAPER', 'YS-SYNTHETIC-PAPER', 'YS-ADHESIVE-VINYL', 'YS-OUTDOOR-PVC-RIGID-FILM', 'YS-PVC-BANNER', 'YS-PVC-MESH', 'YS-ROLL-UP', 'YS-X-BANNER', 'YS-DOOR-STAND'];
   const catalogueById = new Map(catalogue.map(item => [String(item.id), item]));
   const missingCatalogueIds = requiredCatalogueIds.filter(id => !catalogueById.has(id));
   if (missingCatalogueIds.length) throw new Error(`Missing core catalogue records: ${missingCatalogueIds.join(', ')}`);
@@ -666,6 +779,7 @@ function main() {
     templates,
     translations: buildTranslations(products, knowledge, news, templates, solutions)
   };
+  writeProductPages(data);
   writeArticlePages([
     { collection: 'knowledge', items: knowledge },
     { collection: 'news', items: news },
@@ -678,4 +792,4 @@ function main() {
 
 if (require.main === module) main();
 
-module.exports = { articleSlug, main, parseFrontmatter, renderStaticArticle, renderStaticText, slugify };
+module.exports = { articleSlug, main, parseFrontmatter, renderStaticArticle, renderStaticProduct, renderStaticText, slugify };
