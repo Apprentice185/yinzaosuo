@@ -32,6 +32,13 @@ const categoryDefaults = {
     en: 'Exhibition',
     desc: '面向活动、零售与空间展示的广告物料和制作服务',
     desc_en: 'Display graphics and production for events, retail, and branded spaces.'
+  },
+  wideformat: {
+    num: '01',
+    zh: '写真与大幅面印刷材料',
+    en: 'Photo & Wide-Format Print Media',
+    desc: '面向印刷贸易商、广告制作商与标识供应商的写真相纸、合成纸、背胶及PVC喷绘材料。',
+    desc_en: 'Photo papers, PP synthetic paper, self-adhesive vinyl and PVC print media for trade printers and sign makers.'
   }
 };
 
