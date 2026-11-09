@@ -21,7 +21,7 @@ const productData = {
   ...siteProductData,
   products: [...managedProducts, ...(siteProductData.products || []).filter(item => !managedProducts.some(managed => managed.id === item.id))]
 };
-const productId = new URLSearchParams(location.search).get('id');
+const productId = new URLSearchParams(location.search).get('id') || document.querySelector('.product-detail-page')?.dataset.productId;
 const product = productData.products.find(item => item.id === productId) || productData.products[0];
 const language = () => localStorage.getItem('site_lang') || 'zh';
 const productText = field => window.contentText('products', product.id, field, product[field] || product.desc || '');
@@ -64,13 +64,13 @@ function renderProductDetails() {
   document.querySelector('meta[property="og:title"]').content = document.title;
   document.querySelector('meta[property="og:description"]').content = description;
 
-  const url = new URL(`/zh/product.html?id=${encodeURIComponent(product.id)}`, 'https://yinzaosuo.com/');
+  const url = new URL(`/zh/products/${String(product.id).toLowerCase()}/`, 'https://yinzaosuo.com/');
   document.querySelector('link[rel="canonical"]').href = url.href;
   document.querySelector('meta[property="og:url"]').content = url.href;
   const alternates = [
-    ['en', `https://yinzaosuo.com/product.html?id=${encodeURIComponent(product.id)}`],
+    ['en', `https://yinzaosuo.com/products/${String(product.id).toLowerCase()}/`],
     ['zh-CN', url.href],
-    ['x-default', `https://yinzaosuo.com/product.html?id=${encodeURIComponent(product.id)}`]
+    ['x-default', `https://yinzaosuo.com/products/${String(product.id).toLowerCase()}/`]
   ];
   for (const [locale, href] of alternates) {
     let link = document.querySelector(`link[rel="alternate"][hreflang="${locale}"]`);
