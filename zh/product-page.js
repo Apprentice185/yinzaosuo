@@ -63,9 +63,19 @@ function renderProductDetails() {
   document.querySelector('meta[property="og:title"]').content = document.title;
   document.querySelector('meta[property="og:description"]').content = description;
 
-  const url = new URL(`product.html?id=${encodeURIComponent(product.id)}`, 'https://yinzaosuo.com/');
+  const url = new URL(`/zh/product.html?id=${encodeURIComponent(product.id)}`, 'https://yinzaosuo.com/');
   document.querySelector('link[rel="canonical"]').href = url.href;
   document.querySelector('meta[property="og:url"]').content = url.href;
+  const alternates = [
+    ['en', `https://yinzaosuo.com/product.html?id=${encodeURIComponent(product.id)}`],
+    ['zh-CN', url.href],
+    ['x-default', `https://yinzaosuo.com/product.html?id=${encodeURIComponent(product.id)}`]
+  ];
+  for (const [locale, href] of alternates) {
+    let link = document.querySelector(`link[rel="alternate"][hreflang="${locale}"]`);
+    if (!link) { link = document.createElement('link'); link.rel = 'alternate'; link.hreflang = locale; document.head.append(link); }
+    link.href = href;
+  }
   document.querySelector('#productCategory').textContent = `${productText('category')} · ${product.id}`;
   document.querySelector('#productName').textContent = productText('name');
   document.querySelector('#productIntro').textContent = productText('intro') || product.desc;
