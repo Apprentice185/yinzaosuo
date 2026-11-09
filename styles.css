@@ -31,7 +31,7 @@
 
 
 /* Supplied YINZAOSUO photography */
-.hero-production-visual{background-image:url("pic/brand-visual-board.jpg");background-position:center;background-size:cover;position:relative;overflow:hidden;}
+.hero-production-visual{background-image:url("pic/brand-visual-board.webp");background-position:center;background-size:cover;position:relative;overflow:hidden;}
 .hero-production-visual::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,20,38,.08),transparent 55%);pointer-events:none;}
 .hero-production-visual .visual-topline,.hero-production-visual .visual-banner,.hero-production-visual .visual-spec{display:none!important;}
 .editorial-image.trade-editorial-visual{overflow:hidden;background:#eef1f4;}

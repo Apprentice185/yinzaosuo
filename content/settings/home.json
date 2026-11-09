@@ -5,7 +5,7 @@
       "image": "/pic/display-stands.jpg"
     },
     {
-      "image": "/pic/banner.png"
+      "image": "/pic/banner.webp"
     },
     {
       "image": "pic/pvc-mesh-banner.jpg"
@@ -68,7 +68,7 @@
     "faq"
   ],
   "eyebrow_en": "YOUR GLOBAL PRINT PRODUCTION PARTNER",
-  "hero_image": "assets/images/products/banner.jpg",
+  "hero_image": "assets/images/products/banner.webp",
   "hero_image_alt": "全新机器+原厂油墨",
   "hero_image_alt_en": "Brand new machine + original ink"
 }

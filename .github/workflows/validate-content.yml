@@ -60,7 +60,7 @@ jobs:
           test -f zh/sitemap.xml
           grep -q 'https://yinzaosuo.com/zh/' zh/sitemap.xml
           grep -q '"image":"assets/images/products/pa001.jpg"' zh/assets/js/content-index.js
-          grep -q '"hero_image":"assets/images/products/banner.jpg"' zh/assets/js/content-index.js
+          grep -q '"hero_image":"assets/images/products/banner.webp"' zh/assets/js/content-index.js
           test ! -d zh/content
           test ! -d zh/admin
           test -f admin/index.html

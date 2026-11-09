@@ -1,14 +1,19 @@
 <!DOCTYPE html>
 <html lang="zh-CN"><head>
   <base href="/zh/">
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-6N6B729C2Y"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'G-6N6B729C2Y');
+  window.addEventListener('load', function () {
+    window.setTimeout(function () {
+      var script = document.createElement('script');
+      script.src = 'https://www.googletagmanager.com/gtag/js?id=G-6N6B729C2Y';
+      script.async = true;
+      document.head.appendChild(script);
+    }, 0);
+  }, { once: true });
 </script><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="阅读印造所品牌案例、材料上新与印刷行业观察，了解品牌物料与印刷制作的灵感和实践。" data-i18n-content="meta_journal_description"><meta property="og:type" content="website"><meta property="og:title" content="品牌资讯｜印造所" data-i18n-content="meta_journal_title"><meta property="og:description" content="品牌案例、材料上新与印刷行业观察。" data-i18n-content="meta_journal_description"><meta property="og:url" content="https://yinzaosuo.com/zh/journal.html"><link rel="canonical" href="https://yinzaosuo.com/zh/journal.html"><title data-i18n="meta_journal_title">品牌资讯｜印造所</title><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="assets/css/site-locale.css"><link rel="stylesheet" href="pages.css">  <link rel="stylesheet" href="assets/css/site-footer.css">
   <link rel="stylesheet" href="assets/css/industrial-placeholders.css">
 </head>

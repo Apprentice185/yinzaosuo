@@ -12,7 +12,7 @@ media_folder: "pic"
 public_folder: "/pic"
 site_url: "https://yinzaosuo.com"
 display_url: "https://yinzaosuo.com"
-logo_url: "https://yinzaosuo.com/pic/brand-visual-board.jpg"
+logo_url: "https://yinzaosuo.com/pic/brand-visual-board.webp"
 
 collections:
   - name: "products"

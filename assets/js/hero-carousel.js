@@ -57,6 +57,8 @@
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const show = n => {
     index = (n + slides.length) % slides.length;
+    const activeImage = slides[index].querySelector('img');
+    if (activeImage) activeImage.loading = 'eager';
     slides.forEach((slide, i) => slide.classList.toggle('is-active', i === index));
     dots.forEach((dot, i) => {
       dot.classList.toggle('is-active', i === index);
