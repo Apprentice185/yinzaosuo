@@ -36,6 +36,10 @@ collections:
       - { label: "国内站产品图片（可选）", name: "image_zh", widget: "image", required: false }
       - { label: "产品介绍（中文）", name: "desc", widget: "text" }
       - { label: "英文译文：内容介绍", name: "desc_en", widget: "text", required: false }
+      - { label: "SEO 标题（中文）", name: "seo_title_zh", widget: "string", required: false }
+      - { label: "SEO 标题（英文）", name: "seo_title_en", widget: "string", required: false }
+      - { label: "SEO 描述（中文）", name: "seo_description_zh", widget: "text", required: false }
+      - { label: "SEO 描述（英文）", name: "seo_description_en", widget: "text", required: false }
       - { label: "材质标签（中文）", name: "materials", widget: "list", required: false }
       - { label: "英文译文：材质标签", name: "materials_en", widget: "list", required: false }
       - { label: "加工工艺标签（中文）", name: "crafts", widget: "list", required: false }
