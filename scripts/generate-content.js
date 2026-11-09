@@ -93,7 +93,10 @@ function parseFrontmatter(source) {
     const [, name, raw = ''] = field;
     if (/^[|>][+-]?$/.test(raw)) {
       const block = [];
-      while (index + 1 < lines.length && /^\s+/.test(lines[index + 1])) block.push(lines[++index].replace(/^\s{2}/, ''));
+      while (index + 1 < lines.length && (/^\s+/.test(lines[index + 1]) || !lines[index + 1].trim())) {
+        const line = lines[++index];
+        block.push(line.trim() ? line.replace(/^\s{2}/, '') : '');
+      }
       fields[name] = block.join(raw.startsWith('>') ? ' ' : '\n');
     } else if (raw.trim()) {
       fields[name] = parseYamlValue(raw);
@@ -675,4 +678,4 @@ function main() {
 
 if (require.main === module) main();
 
-module.exports = { articleSlug, main, renderStaticArticle, renderStaticText, slugify };
+module.exports = { articleSlug, main, parseFrontmatter, renderStaticArticle, renderStaticText, slugify };

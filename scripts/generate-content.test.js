@@ -2,7 +2,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const test = require('node:test');
-const { articleSlug, renderStaticArticle, renderStaticText, slugify } = require('./generate-content');
+const { articleSlug, parseFrontmatter, renderStaticArticle, renderStaticText, slugify } = require('./generate-content');
 
 const articleTemplate = fs.readFileSync(path.join(__dirname, '..', 'article.html'), 'utf8');
 
@@ -15,6 +15,12 @@ test('article slugs prefer an explicit path and fall back to the English title',
 test('static text rendering removes markup and escapes article text', () => {
   const html = renderStaticText('<h2>Safe &amp; useful</h2><p>First line</p><script>window.pwned=1</script><img src=x onerror=alert(1)>');
   assert.equal(html, '<p>Safe &amp; useful</p><p>First line</p>');
+});
+
+test('frontmatter block scalars preserve blank lines between paragraphs', () => {
+  const parsed = parseFrontmatter('---\ntitle: "Example"\nbody_en: |\n  First paragraph\n\n  Second paragraph\n---\nChinese body');
+  assert.equal(parsed.fields.body_en, 'First paragraph\n\nSecond paragraph');
+  assert.equal(parsed.body, 'Chinese body');
 });
 
 test('static article output includes unique SEO metadata and safe structured data', () => {
