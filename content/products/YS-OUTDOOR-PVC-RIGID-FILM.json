@@ -1,0 +1,40 @@
+{
+  "id": "YS-OUTDOOR-PVC-RIGID-FILM",
+  "publish_to": "international",
+  "hidden": false,
+  "title": "户外PVC硬质喷绘膜",
+  "title_en": "Outdoor PVC Rigid Printing Film",
+  "category": "wideformat",
+  "image": "",
+  "desc": "PVC基材，防水哑面涂层，卷宽1270mm、240gsm、每卷50米，适用于户外喷绘展示。",
+  "desc_en": "Outdoor PVC printing film with a waterproof matte coating, supplied in 1270 mm width, 240 gsm and 50 m rolls.",
+  "materials": [
+    "240gsm",
+    "1270mm",
+    "50米/卷"
+  ],
+  "materials_en": [
+    "240gsm",
+    "1270mm",
+    "50 m per roll"
+  ],
+  "crafts": [
+    "喷绘印刷",
+    "裁切",
+    "可选冷裱膜（亮膜/哑膜）",
+    "硬质纸筒卷装"
+  ],
+  "crafts_en": [
+    "Large-format printing",
+    "Trimming",
+    "Optional gloss or matte cold lamination",
+    "Roll packing with rigid paper tube"
+  ],
+  "sort_order": 5,
+  "show_in_archive": true,
+  "category_title": "写真与大幅面印刷材料",
+  "category_title_en": "Photo & Wide-Format Print Media",
+  "category_desc": "写真相纸、PP合成纸、背胶及PVC喷绘材料，面向印刷贸易与广告制作采购。",
+  "category_desc_en": "Photo papers, PP synthetic paper, self-adhesive vinyl and PVC print media for trade printers and sign makers.",
+  "category_num": "01"
+}
