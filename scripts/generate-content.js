@@ -620,8 +620,8 @@ function renderStaticProduct(product, catalogueItem, template) {
   const imageUrl = image ? new URL(image, `${siteUrl}/`).href : '';
   const canonicalUrl = `${siteUrl}${sitePrefix}/products/${slug}/`;
   const category = isEnglish
-    ? product.category_legacy_en || product.category_legacy || product.category || 'Print Media'
-    : product.category_legacy || product.category || '印刷材料';
+    ? product.category_legacy_en || product.category_legacy || (product.category === 'wideformat' ? 'Photo & Wide-Format Print Media' : product.category) || 'Print Media'
+    : product.category_legacy || (product.category === 'wideformat' ? '写真与大幅面印刷材料' : product.category) || '印刷材料';
   const price = product.price && (!isEnglish || /^USD\s/i.test(product.price)) ? product.price : '';
   const jsonLd = JSON.stringify({
     '@context': 'https://schema.org',
@@ -647,7 +647,7 @@ function renderStaticProduct(product, catalogueItem, template) {
     const chineseUrl = `${siteUrl}/zh/products/${slug}/`;
     html = html.replace('</head>', `<link rel="alternate" hreflang="en" href="${englishUrl}"><link rel="alternate" hreflang="zh-CN" href="${chineseUrl}"><link rel="alternate" hreflang="x-default" href="${englishUrl}"></head>`);
   }
-  html = html.replace('</head>', `<script type="application/ld+json">${jsonLd}</script></head>`);
+  html = html.replace('</head>', `<script id="productStructuredData" type="application/ld+json">${jsonLd}</script></head>`);
   html = html.replace('<section class="product-detail-page">', `<section class="product-detail-page" data-product-id="${escapeHtml(id)}">`);
   html = html.replace(/<p class="eyebrow" id="productCategory">[\s\S]*?<\/p>/, `<p class="eyebrow" id="productCategory">${escapeHtml(category)}</p>`);
   html = html.replace(/<h1 id="productName">[\s\S]*?<\/h1>/, `<h1 id="productName">${escapeHtml(name)}</h1>`);
