@@ -74,12 +74,9 @@ test("collects existing English values when overwrite is requested", () => {
   assert.deepEqual(tasks.map(item => item.targetPath), [["title_en"], ["materials_en"]]);
 });
 
-test("translates all entry fields with one Turnstile token and one batch request", async () => {
+test("translates all entry fields without a key or verification challenge", async () => {
   const patches = [];
-  let turnstileRenders = 0;
-  let turnstileExecutions = 0;
   let requests = 0;
-  let turnstileOptions;
   const context = {
     window: {
       CMS: {
@@ -98,18 +95,6 @@ test("translates all entry fields with one Turnstile token and one batch request
           }
         }
       },
-      turnstile: {
-        render: (_container, options) => {
-          turnstileRenders += 1;
-          turnstileOptions = options;
-          return "widget";
-        },
-        execute: () => {
-          turnstileExecutions += 1;
-          turnstileOptions.callback("verified-token");
-        },
-        reset() {}
-      },
       setTimeout,
       clearTimeout
     },
@@ -118,17 +103,30 @@ test("translates all entry fields with one Turnstile token and one batch request
       body: { appendChild() {} },
       getElementById() { return null; },
       createElement() {
-        return { style: {}, setAttribute() {} };
+        return {
+          style: {},
+          setAttribute() {},
+          set innerHTML(value) { this.value = value; }
+        };
       }
     },
-    console, Set, Array, Object, Promise,
-    fetch: async (_url, options) => {
+    console, Set, Array, Object, Promise, TextEncoder, URL,
+    fetch: async url => {
       requests += 1;
-      assert.equal(options.headers["X-Turnstile-Token"], "verified-token");
-      assert.deepEqual(JSON.parse(options.body).texts, ["产品标题", "特种纸", "烫金"]);
+      assert.equal(new URL(url).searchParams.get("langpair"), "zh-CN|en");
+      assert.ok(new URL(url).searchParams.get("q"));
       return {
         ok: true,
-        json: async () => ({ translatedTexts: ["Product title", "Special paper", "Foil stamping"] })
+        json: async () => ({
+          responseStatus: 200,
+          responseData: {
+            translatedText: {
+              "产品标题": "Product title",
+              "特种纸": "Special paper",
+              "烫金": "Foil stamping"
+            }[new URL(url).searchParams.get("q")]
+          }
+        })
       };
     }
   };
@@ -136,11 +134,35 @@ test("translates all entry fields with one Turnstile token and one batch request
 
   await context.window.YinzaosuoTranslation.translateCurrentEntry();
 
-  assert.equal(turnstileRenders, 1);
-  assert.equal(turnstileExecutions, 1);
-  assert.equal(requests, 1);
+  assert.equal(requests, 3);
   assert.deepEqual(JSON.parse(JSON.stringify(patches)), [
     { path: "title_en", value: "Product title" },
     { path: "materials_en", value: ["Special paper", "Foil stamping"] }
   ]);
+});
+
+test("splits long text into MyMemory's request size limit", async () => {
+  const requests = [];
+  const context = {
+    window: {},
+    document: {
+      createElement() {
+        return { set innerHTML(value) { this.value = value; } };
+      }
+    },
+    console, Set, Array, Object, Promise, TextEncoder, URL,
+    fetch: async url => {
+      const text = new URL(url).searchParams.get("q");
+      requests.push(text);
+      assert.ok(new TextEncoder().encode(text).length <= 450);
+      return { ok: true, json: async () => ({ responseStatus: 200, responseData: { translatedText: text } }) };
+    }
+  };
+  vm.runInNewContext(fs.readFileSync("admin/translation.js", "utf8"), context);
+
+  const source = "特种纸张与高端印刷工艺。".repeat(80);
+  const translated = await context.window.YinzaosuoTranslation.translateText(source);
+
+  assert.ok(requests.length > 1);
+  assert.ok(translated.length > 0);
 });
