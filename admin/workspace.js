@@ -99,6 +99,10 @@
     }
   }
 
+  function scheduleSaveStateSync() {
+    window.setTimeout(syncSaveState, 0);
+  }
+
   async function translate() {
     var api = window.YinzaosuoTranslation;
     var button = actionBar && actionBar.querySelector("[data-action=translate]");
@@ -338,6 +342,8 @@
   if (root) {
     var observer = new MutationObserver(mount);
     observer.observe(root, { childList: true, subtree: true });
+    root.addEventListener("input", scheduleSaveStateSync, true);
+    root.addEventListener("change", scheduleSaveStateSync, true);
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", mount, { once: true });
   else mount();
