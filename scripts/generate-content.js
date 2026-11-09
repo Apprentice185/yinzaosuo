@@ -792,4 +792,4 @@ function main() {
 
 if (require.main === module) main();
 
-module.exports = { articleSlug, main, parseFrontmatter, renderStaticArticle, renderStaticText, slugify };
+module.exports = { articleSlug, main, parseFrontmatter, renderStaticArticle, renderStaticProduct, renderStaticText, slugify };
