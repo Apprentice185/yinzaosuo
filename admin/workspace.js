@@ -25,9 +25,7 @@
   }
 
   function findNativeSave() {
-    var toolbar = root.querySelector(".nc-entryEditor-toolbar");
-    if (!toolbar) return null;
-    var nodes = toolbar.querySelectorAll("button,[role='button']");
+    var nodes = root.querySelectorAll("button,[role='button']");
     for (var i = 0; i < nodes.length; i++) {
       if ((!actionBar || !actionBar.contains(nodes[i])) && /^(保存|Save|Save changes|保存更改)$/i.test(text(nodes[i]))) {
         return nodes[i];
@@ -36,11 +34,36 @@
     return null;
   }
 
-  function hideNativeEditorActions() {
-    var toolbar = root.querySelector(".nc-entryEditor-toolbar");
+  function commonAncestor(first, second) {
+    if (!first || !second) return null;
+    var ancestors = [];
+    for (var node = first; node; node = node.parentElement) ancestors.push(node);
+    for (var other = second; other; other = other.parentElement) {
+      if (ancestors.indexOf(other) !== -1) return other;
+    }
+    return null;
+  }
+
+  function findEditorToolbar() {
+    var status = findStatus();
+    var remove = findButton(/^(删除内容|Delete|Delete entry)$/i);
+    var toolbar = commonAncestor(status, remove);
+    if (toolbar && toolbar !== root) return toolbar;
+
+    var anchor = status || findNativeSave() || remove;
+    for (var node = anchor && anchor.parentElement; node && node !== root; node = node.parentElement) {
+      var rect = node.getBoundingClientRect();
+      if (rect.top <= 100 && rect.height > 0 && rect.height <= 100 && rect.width >= Math.min(480, window.innerWidth * 0.5)) {
+        return node;
+      }
+    }
+    return null;
+  }
+
+  function hideNativeEditorActions(toolbar) {
     if (!toolbar) return;
-    var labels = /^(发布|Publish|发布更改|Publish changes|删除内容|Delete|Delete entry)[\s▼▾⌄]*$/i;
-    var buttons = toolbar.querySelectorAll("button,[role='button']");
+    var labels = /^(已发布|未发布|Published|Unpublished|草稿|Draft|发布|Publish|发布更改|Publish changes|删除内容|Delete|Delete entry|查看发布|View published)[\s▼▾⌄↗]*$/i;
+    var buttons = toolbar.querySelectorAll("button,[role='button'],a");
     for (var i = 0; i < buttons.length; i++) {
       if (labels.test(text(buttons[i]))) {
         buttons[i].classList.add("yinzaosuo-native-action-hidden");
@@ -252,10 +275,11 @@
   }
 
   function mountEditorActions() {
-    hideNativeEditorActions();
-    var saveButton = findNativeSave();
-    var toolbar = root.querySelector(".nc-entryEditor-toolbar");
+    if (!/\/collections\/[^/]+\/entries\//.test(window.location.hash)) return;
+    var toolbar = findEditorToolbar();
     if (!toolbar) return;
+    hideNativeEditorActions(toolbar);
+    var saveButton = findNativeSave();
     if (actionBar && actionBar.isConnected && nativeSaveButton === saveButton) {
       syncSaveState();
       return;

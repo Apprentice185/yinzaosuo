@@ -35,6 +35,9 @@
 
 #nc-root .yinzaosuo-editor-actions {
   margin-left: 0;
+  flex: 0 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
 #nc-root .yinzaosuo-entry-actions {
