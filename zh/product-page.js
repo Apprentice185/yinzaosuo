@@ -17,9 +17,25 @@ const managedProducts = (window.CMS_CONTENT?.products || []).map(item => {
     seoDescription: item.seo_description_zh || detail?.seo_description_zh || ''
   };
 });
+const legacyCatalogueProducts = (window.PRODUCTS_DATA?.zh?.categories || []).flatMap(category => category.items.map(item => {
+  const detail = managedCatalogue.find(entry => entry.id === item.id);
+  return {
+    ...item,
+    category: category.title,
+    intro: item.desc,
+    options: Array.isArray(item.options) ? item.options : [],
+    detail: detail?.detail_zh || item.detail,
+    seoTitle: detail?.seo_title_zh || item.seoTitle || '',
+    seoDescription: detail?.seo_description_zh || item.seoDescription || ''
+  };
+}));
 const productData = {
   ...siteProductData,
-  products: [...managedProducts, ...(siteProductData.products || []).filter(item => !managedProducts.some(managed => managed.id === item.id))]
+  products: [
+    ...managedProducts,
+    ...legacyCatalogueProducts.filter(item => !managedProducts.some(managed => managed.id === item.id)),
+    ...(siteProductData.products || []).filter(item => !managedProducts.some(managed => managed.id === item.id) && !legacyCatalogueProducts.some(legacy => legacy.id === item.id))
+  ]
 };
 const productId = new URLSearchParams(location.search).get('id') || document.querySelector('.product-detail-page')?.dataset.productId;
 const product = productData.products.find(item => item.id === productId) || productData.products[0];
