@@ -47,6 +47,7 @@ function optionValue(value) {
 
 function referencePrice() {
   if (!product.price) return window.t('price_reference');
+  if (/^USD\\s/i.test(product.price)) return `${product.price}｜${window.t('price_reference')}`;
   if (language() !== 'en') return `${product.price}｜${window.t('price_reference')}`;
   const amount = product.price.replace(/^¥\s*/, '').replace(/\s*起$/, '');
   return `${window.t('template_price_from')} ¥${amount} · ${window.t('price_reference')}`;
