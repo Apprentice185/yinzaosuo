@@ -1,0 +1,40 @@
+{
+  "id": "YS-GLOSS-PHOTO-PAPER",
+  "publish_to": "international",
+  "hidden": false,
+  "title": "光面写真相纸",
+  "title_en": "Gloss Photo Paper",
+  "category": "wideformat",
+  "image": "",
+  "desc": "用于海报、广告画面及零售展示的光面写真相纸，整卷50米，适合大幅面喷绘项目。",
+  "desc_en": "Gloss photo paper for posters, advertising graphics and retail displays. Supplied in 50 m rolls for large-format print projects.",
+  "materials": [
+    "200gsm",
+    "1520mm",
+    "50米/卷"
+  ],
+  "materials_en": [
+    "200gsm",
+    "1520mm",
+    "50 m per roll"
+  ],
+  "crafts": [
+    "喷绘印刷",
+    "裁切",
+    "可选冷裱膜（亮膜/哑膜）",
+    "硬质纸筒卷装"
+  ],
+  "crafts_en": [
+    "Large-format printing",
+    "Trimming",
+    "Optional gloss or matte cold lamination",
+    "Roll packing with rigid paper tube"
+  ],
+  "sort_order": 1,
+  "show_in_archive": true,
+  "category_title": "写真与大幅面印刷材料",
+  "category_title_en": "Photo & Wide-Format Print Media",
+  "category_desc": "写真相纸、PP合成纸、背胶及PVC喷绘材料，面向印刷贸易与广告制作采购。",
+  "category_desc_en": "Photo papers, PP synthetic paper, self-adhesive vinyl and PVC print media for trade printers and sign makers.",
+  "category_num": "01"
+}
