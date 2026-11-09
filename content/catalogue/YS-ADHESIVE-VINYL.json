@@ -17,6 +17,7 @@
     "highlights": [
       "卷宽1520mm",
       "材料规格：120gsm或140gsm底纸",
+      "120gsm或140gsm底纸均可选择白胶或黑胶",
       "每卷长度50米",
       "参考价格：120gsm底纸 USD 13.60/m²；140gsm底纸 USD 14.60/m²",
       "默认使用爱普生兼容替代墨水；可选爱普生原装墨水，价格增加USD 5/m²",
@@ -31,7 +32,8 @@
       "大幅面喷绘印刷",
       "按项目尺寸裁切",
       "默认100gsm PVC冷裱膜（黄底离型纸），可选亮膜或哑膜",
-      "默认卷装并使用硬质纸筒包装"
+      "默认卷装并使用硬质纸筒包装",
+      "覆膜材料本身具有高透明、低气味、耐水、耐腐蚀、耐磨、耐刮擦及抗UV等特性；这些描述针对覆膜材料，不代表成品具有未经测试的户外使用寿命。"
     ],
     "delivery": [
       "标准包装：卷装，内置硬质纸筒",
@@ -41,13 +43,14 @@
     ],
     "artwork": "请提供印刷文件、成品尺寸、数量、卷装或裁切要求及目的地。生产前可核对文件尺寸和出血设置。",
     "brief": "请提供材料类型、宽度、数量或面积、是否覆膜、油墨选择、包装要求及收货国家/地区。",
-    "caveat": "最低起订条件为100平方米，或订单货值超过USD 2,000（满足其中一项即可）。价格为参考单价，运费、税费及最终交付时间需按目的地和运输方案确认。"
+    "caveat": "最低起订条件为100平方米，或订单货值超过USD 2,000（满足其中一项即可）。价格为参考单价，运费、税费及最终交付时间需按目的地和运输方案确认。 120gsm和140gsm指底纸克重，不是PVC面膜厚度；面膜厚度及胶水具体性能以工厂最终确认为准。"
   },
   "detail_en": {
     "lead": "Self-adhesive vinyl for signage, promotional graphics and displays. Confirmed options include a 120 gsm or 140 gsm release liner and white or black adhesive.",
     "highlights": [
       "Roll width: 1520mm",
       "Media specification: 120gsm或140gsm底纸",
+      "White or black adhesive is available with either liner weight",
       "Roll length: 50 m",
       "Reference price: 120gsm底纸 USD 13.60/m²；140gsm底纸 USD 14.60/m²",
       "Epson-compatible replacement ink is standard; original Epson ink is available at an additional USD 5/m²",
@@ -62,7 +65,8 @@
       "Large-format inkjet printing",
       "Custom trimming to project dimensions",
       "Standard 100 gsm PVC cold lamination with yellow release liner; gloss or matte finish",
-      "Standard roll packing with a rigid paper tube inside"
+      "Standard roll packing with a rigid paper tube inside",
+      "The lamination film itself is described as highly transparent, low-odour, water-resistant, corrosion-resistant, abrasion-resistant, scratch-resistant and UV-resistant. These properties describe the film, not an untested outdoor service life for the finished print."
     ],
     "delivery": [
       "Standard roll packing with a rigid paper tube inside",
@@ -72,6 +76,6 @@
     ],
     "artwork": "Please provide print-ready artwork, finished dimensions, quantity, roll or cut-sheet requirements and destination. File dimensions and bleed can be checked before production.",
     "brief": "Please specify the media type, width, quantity or area, lamination, ink option, packing requirements and destination country or region.",
-    "caveat": "MOQ is 100 m², or an order goods value above USD 2,000; either condition is sufficient. Prices are reference rates. Freight, duties and final delivery dates must be confirmed for the destination and shipping arrangement."
+    "caveat": "MOQ is 100 m², or an order goods value above USD 2,000; either condition is sufficient. Prices are reference rates. Freight, duties and final delivery dates must be confirmed for the destination and shipping arrangement. The 120 gsm and 140 gsm figures refer to release-liner weight, not PVC face-film thickness. Face-film thickness and specific adhesive performance must be confirmed with the factory."
   }
 }
