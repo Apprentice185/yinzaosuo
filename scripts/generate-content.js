@@ -633,10 +633,10 @@ function renderStaticProduct(product, catalogueItem, template) {
     brand: { '@type': 'Brand', name: 'YINZAOSUO' }
   }).replace(/</g, '\\u003c');
   const baseUrl = `${siteUrl}${sitePrefix || ''}/`;
-  let html = /<base\\b/i.test(template)
+  let html = /<base\b/i.test(template)
     ? template
     : template.replace('<head>', `<head><base href="${escapeHtml(baseUrl)}">`);
-  html = html.replace(/<title[^>]*>[\\s\\S]*?<\\/title>/i, `<title>${escapeHtml(seoTitle)} | ${isEnglish ? 'YINZAOSUO' : '印造所'}</title>`);
+  html = html.replace(/<title[^>]*>[\s\S]*?<\/title>/i, `<title>${escapeHtml(seoTitle)} | ${isEnglish ? 'YINZAOSUO' : '印造所'}</title>`);
   html = html.replace(/<meta name="description" content="[^"]*"[^>]*>/i, `<meta name="description" content="${escapeHtml(description)}">`);
   html = html.replace(/<meta property="og:title" content="[^"]*"[^>]*>/i, `<meta property="og:title" content="${escapeHtml(seoTitle)}">`);
   html = html.replace(/<meta property="og:description" content="[^"]*"[^>]*>/i, `<meta property="og:description" content="${escapeHtml(description)}">`);
@@ -649,15 +649,15 @@ function renderStaticProduct(product, catalogueItem, template) {
   }
   html = html.replace('</head>', `<script type="application/ld+json">${jsonLd}</script></head>`);
   html = html.replace('<section class="product-detail-page">', `<section class="product-detail-page" data-product-id="${escapeHtml(id)}">`);
-  html = html.replace(/<p class="eyebrow" id="productCategory">[\\s\\S]*?<\\/p>/, `<p class="eyebrow" id="productCategory">${escapeHtml(category)}</p>`);
-  html = html.replace(/<h1 id="productName">[\\s\\S]*?<\\/h1>/, `<h1 id="productName">${escapeHtml(name)}</h1>`);
-  html = html.replace(/<p class="product-detail-intro" id="productIntro">[\\s\\S]*?<\\/p>/, `<p class="product-detail-intro" id="productIntro">${escapeHtml(intro)}</p>`);
-  html = html.replace(/<strong class="product-detail-price" id="productPrice">[\\s\\S]*?<\\/strong>/, `<strong class="product-detail-price" id="productPrice">${escapeHtml(price || (isEnglish ? 'Request a quote' : '欢迎询价'))}</strong>`);
-  html = html.replace(/<div class="product-detail-image" id="productImage"><\\/div>/, `<div class="product-detail-image" id="productImage">${imageUrl ? `<img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(name)}" decoding="async">` : ''}</div>`);
+  html = html.replace(/<p class="eyebrow" id="productCategory">[\s\S]*?<\/p>/, `<p class="eyebrow" id="productCategory">${escapeHtml(category)}</p>`);
+  html = html.replace(/<h1 id="productName">[\s\S]*?<\/h1>/, `<h1 id="productName">${escapeHtml(name)}</h1>`);
+  html = html.replace(/<p class="product-detail-intro" id="productIntro">[\s\S]*?<\/p>/, `<p class="product-detail-intro" id="productIntro">${escapeHtml(intro)}</p>`);
+  html = html.replace(/<strong class="product-detail-price" id="productPrice">[\s\S]*?<\/strong>/, `<strong class="product-detail-price" id="productPrice">${escapeHtml(price || (isEnglish ? 'Request a quote' : '欢迎询价'))}</strong>`);
+  html = html.replace(/<div class="product-detail-image" id="productImage"><\/div>/, `<div class="product-detail-image" id="productImage">${imageUrl ? `<img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(name)}" decoding="async">` : ''}</div>`);
   if (detail) {
     html = html.replace(/<section class="product-information" id="productInformation"[^>]*>/, '<section class="product-information" id="productInformation">');
-    html = html.replace(/<h2 id="productInfoTitle">[\\s\\S]*?<\\/h2>/, `<h2 id="productInfoTitle">${escapeHtml(isEnglish ? 'Product specifications & ordering' : '产品详情与采购信息')}</h2>`);
-    html = html.replace(/<p id="productInfoLead"><\\/p>/, `<p id="productInfoLead">${escapeHtml(detail.lead || '')}</p>`);
+    html = html.replace(/<h2 id="productInfoTitle">[\s\S]*?<\/h2>/, `<h2 id="productInfoTitle">${escapeHtml(isEnglish ? 'Product specifications & ordering' : '产品详情与采购信息')}</h2>`);
+    html = html.replace(/<p id="productInfoLead"><\/p>/, `<p id="productInfoLead">${escapeHtml(detail.lead || '')}</p>`);
     const lists = [
       ['productHighlights', detail.highlights],
       ['productApplications', detail.applications],
@@ -668,9 +668,9 @@ function renderStaticProduct(product, catalogueItem, template) {
       const listHtml = (values || []).map(value => `<li>${escapeHtml(value)}</li>`).join('');
       html = html.replace(new RegExp(`(<ul id="${idName}">)[\\s\\S]*?(<\\/ul>)`), `$1${listHtml}$2`);
     }
-    html = html.replace(/<p id="productArtwork"><\\/p>/, `<p id="productArtwork">${escapeHtml(detail.artwork || '')}</p>`);
-    html = html.replace(/<p id="productBrief"><\\/p>/, `<p id="productBrief">${escapeHtml(detail.brief || '')}</p>`);
-    html = html.replace(/<p class="product-information-caveat" id="productCaveat"><\\/p>/, `<p class="product-information-caveat" id="productCaveat">${escapeHtml(detail.caveat || '')}</p>`);
+    html = html.replace(/<p id="productArtwork"><\/p>/, `<p id="productArtwork">${escapeHtml(detail.artwork || '')}</p>`);
+    html = html.replace(/<p id="productBrief"><\/p>/, `<p id="productBrief">${escapeHtml(detail.brief || '')}</p>`);
+    html = html.replace(/<p class="product-information-caveat" id="productCaveat"><\/p>/, `<p class="product-information-caveat" id="productCaveat">${escapeHtml(detail.caveat || '')}</p>`);
   } else {
     html = html.replace(/<section class="product-information" id="productInformation"[^>]*>/, '<section class="product-information" id="productInformation" hidden>');
   }
