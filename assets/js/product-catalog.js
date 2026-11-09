@@ -84,7 +84,7 @@
     }
     const card = document.createElement('a');
     card.className = 'archive-card';
-    card.href = `product.html?id=${encodeURIComponent(item.id)}`;
+    card.href = `products/${String(item.id).toLowerCase()}/`;
     card.dataset.productId = item.id;
     const visual = document.createElement('div');
     visual.className = 'archive-visual';
