@@ -31,7 +31,7 @@ collections:
       - { label: "隐藏内容", name: "hidden", widget: "boolean", default: false }
       - { label: "产品中文名称", name: "title", widget: "string" }
       - { label: "英文译文：标题 / 名称", name: "title_en", widget: "string", required: false }
-      - { label: "所属首页产品分类", name: "category", widget: "select", options: [{ label: "定制印刷成品", value: "commercial" }, { label: "包装定制类", value: "packaging" }, { label: "广告加工与展示", value: "exhibition" }] }
+      - { label: "所属首页产品分类", name: "category", widget: "select", options: [{ label: "定制印刷成品", value: "commercial" }, { label: "包装定制类", value: "packaging" }, { label: "广告加工与展示", value: "exhibition" }, { label: "写真与大幅面印刷材料", value: "wideformat" }] }
       - { label: "国际站产品图片", name: "image", widget: "image" }
       - { label: "国内站产品图片（可选）", name: "image_zh", widget: "image", required: false }
       - { label: "产品介绍（中文）", name: "desc", widget: "text" }
@@ -49,7 +49,7 @@ collections:
       - { label: "分类序号", name: "category_num", widget: "string", required: false }
 
   - name: "catalogue"
-    label: "核心产品详情（7类）"
+    label: "产品详情与 SEO"
     folder: "content/catalogue"
     summary: "{{name_zh}} · {{status}} · {{sort_order}}"
     sortable_fields:
@@ -70,6 +70,10 @@ collections:
       - { label: "产品主图", name: "image", widget: "image" }
       - { label: "产品简介（中文）", name: "desc_zh", widget: "text" }
       - { label: "英文译文：内容介绍", name: "desc_en", widget: "text", required: false }
+      - { label: "SEO 标题（中文）", name: "seo_title_zh", widget: "string", required: false }
+      - { label: "SEO 标题（英文）", name: "seo_title_en", widget: "string", required: false }
+      - { label: "SEO 描述（中文）", name: "seo_description_zh", widget: "text", required: false }
+      - { label: "SEO 描述（英文）", name: "seo_description_en", widget: "text", required: false }
       - label: "产品详情（中文）"
         name: "detail_zh"
         widget: "object"
