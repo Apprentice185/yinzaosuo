@@ -108,6 +108,16 @@ function renderProductDetails() {
   const url = new URL(`product.html?id=${encodeURIComponent(product.id)}`, 'https://yinzaosuo.com/');
   document.querySelector('link[rel="canonical"]').href = url.href;
   document.querySelector('meta[property="og:url"]').content = url.href;
+  const alternates = [
+    ['en', url.href],
+    ['zh-CN', `https://yinzaosuo.com/zh/product.html?id=${encodeURIComponent(product.id)}`],
+    ['x-default', url.href]
+  ];
+  for (const [locale, href] of alternates) {
+    let link = document.querySelector(`link[rel="alternate"][hreflang="${locale}"]`);
+    if (!link) { link = document.createElement('link'); link.rel = 'alternate'; link.hreflang = locale; document.head.append(link); }
+    link.href = href;
+  }
   document.querySelector('#productCategory').textContent = `${productText('category')} · ${product.id}`;
   document.querySelector('#productName').textContent = productText('name');
   document.querySelector('#productIntro').textContent = productText('intro') || product.desc;
