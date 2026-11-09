@@ -3,13 +3,13 @@
   "name_zh": "户外PVC喷绘膜",
   "name_en": "Outdoor PVC Printing Film",
   "image": "",
-  "desc_zh": "户外PVC喷绘膜，1270mm卷宽，240gsm，每卷50米。USD 25.90/m²。",
-  "desc_en": "Outdoor PVC Printing Film, 1270mm roll width, 240gsm, supplied in 50 m rolls. USD 25.90/m².",
+  "desc_zh": "PVC基材，防水哑面涂层，卷宽1270mm、240gsm、每卷50米，适用于户外喷绘展示。",
+  "desc_en": "Outdoor PVC printing film with a waterproof matte coating, supplied in 1270 mm width, 240 gsm and 50 m rolls.",
   "sort_order": 5,
   "publish_to": "both",
   "hidden": false,
-  "seo_title_zh": "户外PVC喷绘膜批发｜规格、价格与定制印刷｜YINZAOSUO",
-  "seo_title_en": "Outdoor PVC Printing Film Wholesale | Specs, Pricing & Custom Printing | YINZAOSUO",
+  "seo_title_zh": "户外PVC喷绘膜批发｜防水哑面PVC卷材｜YINZAOSUO",
+  "seo_title_en": "Outdoor PVC Printing Film Wholesale | YINZAOSUO",
   "seo_description_zh": "户外PVC喷绘膜，1270mm卷宽，每卷50米，USD 25.90/m²。支持亮膜/哑膜覆膜及批量采购，欢迎询价。",
   "seo_description_en": "Outdoor PVC Printing Film in 1270mm rolls, 50 m per roll. USD 25.90/m². Gloss or matte lamination and trade quantities available. Enquire now.",
   "detail_zh": {
@@ -20,7 +20,9 @@
       "每卷长度50米",
       "参考价格：USD 25.90/m²",
       "默认使用爱普生兼容替代墨水；可选爱普生原装墨水，价格增加USD 5/m²",
-      "默认覆100gsm PVC冷裱膜，黄底离型纸；可选亮膜或哑膜"
+      "默认覆100gsm PVC冷裱膜，黄底离型纸；可选亮膜或哑膜",
+      "PVC基材及防水哑面涂层",
+      "已确认具备防水、抗氧化特性"
     ],
     "applications": [
       "户外广告画面",
@@ -31,7 +33,8 @@
       "大幅面喷绘印刷",
       "按项目尺寸裁切",
       "默认100gsm PVC冷裱膜（黄底离型纸），可选亮膜或哑膜",
-      "默认卷装并使用硬质纸筒包装"
+      "默认卷装并使用硬质纸筒包装",
+      "覆膜材料本身具有高透明、低气味、耐水、耐腐蚀、耐磨、耐刮擦及抗UV等特性；这些描述针对覆膜材料，不代表成品具有未经测试的户外使用寿命。"
     ],
     "delivery": [
       "标准包装：卷装，内置硬质纸筒",
@@ -51,7 +54,9 @@
       "Roll length: 50 m",
       "Reference price: USD 25.90/m²",
       "Epson-compatible replacement ink is standard; original Epson ink is available at an additional USD 5/m²",
-      "Standard cold lamination uses 100 gsm PVC film with a yellow release liner; gloss or matte finish available"
+      "Standard cold lamination uses 100 gsm PVC film with a yellow release liner; gloss or matte finish available",
+      "PVC substrate with a waterproof matte coating",
+      "Confirmed waterproof and oxidation-resistant characteristics"
     ],
     "applications": [
       "Outdoor advertising graphics",
@@ -62,7 +67,8 @@
       "Large-format inkjet printing",
       "Custom trimming to project dimensions",
       "Standard 100 gsm PVC cold lamination with yellow release liner; gloss or matte finish",
-      "Standard roll packing with a rigid paper tube inside"
+      "Standard roll packing with a rigid paper tube inside",
+      "The lamination film itself is described as highly transparent, low-odour, water-resistant, corrosion-resistant, abrasion-resistant, scratch-resistant and UV-resistant. These properties describe the film, not an untested outdoor service life for the finished print."
     ],
     "delivery": [
       "Standard roll packing with a rigid paper tube inside",
