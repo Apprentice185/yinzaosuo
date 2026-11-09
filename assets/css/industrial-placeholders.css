@@ -215,3 +215,33 @@
 .home-article-cover.is-placeholder::before {
   border-color: #cbd2d8;
 }
+
+
+/* Never draw wireframes or geometric artwork over product photographs. */
+.archive-visual-placeholder::before,
+.archive-visual-placeholder::after,
+.archive-visual-placeholder .archive-placeholder-frame,
+.archive-visual-placeholder .archive-placeholder-label:not(.archive-placeholder-pending),
+.archive-visual-placeholder .archive-placeholder-dimensions,
+.template-thumb.image-placeholder .placeholder-frame,
+.detail-gallery .image-placeholder .placeholder-frame,
+.product-detail-image.is-placeholder::before,
+.long-card-visual.is-placeholder::before,
+.long-card-visual.is-placeholder::after,
+.scene-visual.is-placeholder::before,
+.scene-visual.is-placeholder::after{
+  display:none !important;
+  content:none !important;
+  border:0 !important;
+  box-shadow:none !important;
+  background-image:none !important;
+}
+.archive-visual-placeholder,
+.archive-visual-placeholder .archive-image-placeholder,
+.template-thumb.image-placeholder,
+.detail-gallery .image-placeholder,
+.product-detail-image.is-placeholder,
+.long-card-visual.is-placeholder,
+.scene-visual.is-placeholder{
+  background:#fff !important;
+}

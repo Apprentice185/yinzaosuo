@@ -105,33 +105,61 @@ function renderProductDetails() {
 
   const imageContainer = document.querySelector('#productImage');
   imageContainer.replaceChildren();
-  const imageSource = product.image || product.thumb;
-  imageContainer.classList.remove('is-placeholder');
-  if (imageSource) {
-    try {
-      const imageUrl = new URL(imageSource, `${window.location.origin}/`);
-      if (!['http:', 'https:'].includes(imageUrl.protocol)) throw new Error('Unsupported image URL protocol');
-      const image = document.createElement('img');
-      image.src = imageUrl.href;
-      image.alt = productText('name');
-      image.decoding = 'async';
-      imageContainer.append(image);
-    } catch (error) {
-      console.error(`Invalid image URL for product ${product.id}:`, error);
-    }
-  }
-  if (!imageContainer.childElementCount) {
-    imageContainer.classList.add('is-placeholder');
-    const label = document.createElement('span');
-    label.className = 'placeholder-label';
-    label.textContent = `${window.t('image_pending')} · ${productText('name')}`;
-    const spec = document.createElement('small');
-    spec.className = 'placeholder-spec';
-    spec.textContent = 'PROTOTYPE / SPEC PENDING';
-    const dimensions = document.createElement('small');
-    dimensions.className = 'placeholder-dimensions';
-    dimensions.textContent = '— × — mm';
-    imageContainer.append(label, spec, dimensions);
+  const imageSource = String(product.image || product.thumb || '').trim().replace(/^\/?new\//, '/');
+  imageContainer.classList.remove('is-placeholder', 'image-unavailable');
+  const productImageFallbacks = {
+  "YS-GLOSS-PHOTO-PAPER": [
+    "https://www.webstaurantstore.com/images/products/large/538644/1968681.jpg"
+  ],
+  "YS-SATIN-PHOTO-PAPER": [
+    "https://imagingspectrum.com/cdn/shop/files/prem-luster-roll.jpg?v=1711122770",
+    "https://de2wfhoo6xqi5.cloudfront.net/orig/78e/4e2/472ab5862f2be87fa84e8ecdd404aac325.jpg"
+  ],
+  "YS-SYNTHETIC-PAPER": [
+    "https://image.made-in-china.com/2f0j00JKabkAOciuqm/Eco-Solvent-PP-Synthetic-Paper-Double-Sides-Matte-240g-for-Printing.jpg"
+  ],
+  "YS-ADHESIVE-VINYL": [
+    "https://image.made-in-china.com/2f0j00BsPGvtQdhDqV/White-Eco-Solvent-Large-Format-Vinyl-Media-Printing-PVC-Roll-Self-Adhesive-Vinyl.webp",
+    "https://image.made-in-china.com/202f0j00UyhlJVrnMikj/Glossy-Matt-White-Eco-Solvent-Printing-PVC-Roll-Printable-Adhesive-Car-Wrap-Vinyl.webp"
+  ],
+  "YS-OUTDOOR-PVC-RIGID-FILM": [
+    "https://avanceytec.com.mx/_next/image?q=75&url=https%3A%2F%2Fnew.avanceytec.com.mx%2Fimg%2Fp%2F2%2F3%2F7%2F5%2F1%2F23751.jpg&w=2048",
+    "https://image.made-in-china.com/2f0j00KlqRZfahbzbA/510GSM-PVC-Flex-Backlit-Banner-Marketing-Solvent-Printed-Banners-Rollos-for-Printing-Machine.jpg"
+  ]
+}
+  const imageCandidates = [imageSource, ...(productImageFallbacks[product.id] || [])]
+    .filter((value, index, all) => value && all.indexOf(value) === index);
+  if (imageCandidates.length) {
+    const image = document.createElement('img');
+    image.alt = productText('name');
+    image.decoding = 'async';
+    image.loading = 'eager';
+    let imageIndex = 0;
+    image.addEventListener('error', () => {
+      imageIndex += 1;
+      if (imageIndex < imageCandidates.length) {
+        image.src = imageCandidates[imageIndex];
+        return;
+      }
+      image.remove();
+      imageContainer.classList.add('image-unavailable');
+      const message = document.createElement('p');
+      message.className = 'product-image-error';
+      message.textContent = language() === 'en'
+        ? 'Product photo is temporarily unavailable. Please contact us for a material reference.'
+        : '产品图片暂时无法加载，请联系我们获取材料图片。';
+      imageContainer.append(message);
+    });
+    image.src = imageCandidates[0];
+    imageContainer.append(image);
+  } else {
+    imageContainer.classList.add('image-unavailable');
+    const message = document.createElement('p');
+    message.className = 'product-image-error';
+    message.textContent = language() === 'en'
+      ? 'Product photo is being prepared. Please contact us for a material reference.'
+      : '产品图片正在整理中，请联系我们获取材料图片。';
+    imageContainer.append(message);
   }
 
   const options = product.options || [];
