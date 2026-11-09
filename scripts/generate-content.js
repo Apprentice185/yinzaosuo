@@ -741,7 +741,7 @@ function main() {
     }
   };
   const catalogue = filesIn('catalogue', '.json').map(file => normalizePublication(JSON.parse(fs.readFileSync(file, 'utf8')))).filter(item => item && item.id).filter(isPublishedForCurrentSite);
-  const requiredCatalogueIds = ['YS-PVC-BANNER', 'YS-PVC-MESH', 'YS-SYNTHETIC-PAPER', 'YS-ADHESIVE-VINYL', 'YS-ROLL-UP', 'YS-X-BANNER', 'YS-DOOR-STAND'];
+  const requiredCatalogueIds = ['YS-GLOSS-PHOTO-PAPER', 'YS-SATIN-PHOTO-PAPER', 'YS-SYNTHETIC-PAPER', 'YS-ADHESIVE-VINYL', 'YS-OUTDOOR-PVC-RIGID-FILM', 'YS-PVC-BANNER', 'YS-PVC-MESH', 'YS-ROLL-UP', 'YS-X-BANNER', 'YS-DOOR-STAND'];
   const catalogueById = new Map(catalogue.map(item => [String(item.id), item]));
   const missingCatalogueIds = requiredCatalogueIds.filter(id => !catalogueById.has(id));
   if (missingCatalogueIds.length) throw new Error(`Missing core catalogue records: ${missingCatalogueIds.join(', ')}`);
