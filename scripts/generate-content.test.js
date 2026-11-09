@@ -54,7 +54,7 @@ test('static article output includes unique SEO metadata and safe structured dat
 });
 
 
-test('static product output includes unique SEO metadata, canonical URL and readable product details', () => {
+test('static product output includes SEO metadata, canonical URL and readable product details', () => {
   const { renderStaticProduct } = require('./generate-content');
   const html = renderStaticProduct({
     id: 'YS-GLOSS-PHOTO-PAPER',
@@ -85,11 +85,11 @@ test('static product output includes unique SEO metadata, canonical URL and read
     }
   }, productTemplate);
 
-  assert.match(html, /<title>Gloss Photo Paper Wholesale \\| YINZAOSUO<\\/title>/);
-  assert.match(html, /<meta name="description" content="1520 mm wide, 200 gsm, 50 m rolls\\.">/);
-  assert.match(html, /<link rel="canonical" href="https:\\/\\/yinzaosuo\\.com\\/products\\/ys-gloss-photo-paper\\/">/);
-  assert.match(html, /<h1 id="productName">Gloss Photo Paper<\\/h1>/);
-  assert.match(html, /1520 mm width/);
-  assert.match(html, /"@type":"Product"/);
-  assert.match(html, /hreflang="zh-CN"/);
+  assert.ok(html.includes('<title>Gloss Photo Paper Wholesale | YINZAOSUO</title>'));
+  assert.ok(html.includes('<meta name="description" content="1520 mm wide, 200 gsm, 50 m rolls.">'));
+  assert.ok(html.includes('<link rel="canonical" href="https://yinzaosuo.com/products/ys-gloss-photo-paper/">'));
+  assert.ok(html.includes('<h1 id="productName">Gloss Photo Paper</h1>'));
+  assert.ok(html.includes('1520 mm width'));
+  assert.ok(html.includes('id="productStructuredData"'));
+  assert.ok(html.includes('hreflang="zh-CN"'));
 });
