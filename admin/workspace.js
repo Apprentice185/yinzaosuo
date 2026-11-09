@@ -25,14 +25,37 @@
   }
 
   function findNativeSave() {
-    return findButton(/^(保存|Save)$/);
+    var toolbar = root.querySelector(".nc-entryEditor-toolbar");
+    if (!toolbar) return null;
+    var nodes = toolbar.querySelectorAll("button,[role='button']");
+    for (var i = 0; i < nodes.length; i++) {
+      if ((!actionBar || !actionBar.contains(nodes[i])) && /^(保存|Save|Save changes|保存更改)$/i.test(text(nodes[i]))) {
+        return nodes[i];
+      }
+    }
+    return null;
+  }
+
+  function hideNativeEditorActions() {
+    var toolbar = root.querySelector(".nc-entryEditor-toolbar");
+    if (!toolbar) return;
+    var labels = /^(发布|Publish|发布更改|Publish changes|删除内容|Delete|Delete entry)[\s▼▾⌄]*$/i;
+    var buttons = toolbar.querySelectorAll("button,[role='button']");
+    for (var i = 0; i < buttons.length; i++) {
+      if (labels.test(text(buttons[i]))) {
+        buttons[i].classList.add("yinzaosuo-native-action-hidden");
+        buttons[i].setAttribute("aria-hidden", "true");
+        buttons[i].setAttribute("tabindex", "-1");
+      }
+    }
   }
 
   function syncSaveState() {
-    if (!actionBar || !nativeSaveButton) return;
+    if (!actionBar) return;
     var button = actionBar.querySelector("[data-action=save]");
-    button.disabled = nativeSaveButton.disabled;
-    button.setAttribute("aria-disabled", String(nativeSaveButton.disabled));
+    var disabled = !nativeSaveButton || nativeSaveButton.disabled;
+    button.disabled = disabled;
+    button.setAttribute("aria-disabled", String(disabled));
   }
 
   function save() {
@@ -229,8 +252,10 @@
   }
 
   function mountEditorActions() {
+    hideNativeEditorActions();
     var saveButton = findNativeSave();
-    if (!saveButton || !saveButton.parentElement) return;
+    var toolbar = root.querySelector(".nc-entryEditor-toolbar");
+    if (!toolbar) return;
     if (actionBar && actionBar.isConnected && nativeSaveButton === saveButton) {
       syncSaveState();
       return;
@@ -238,17 +263,14 @@
     if (actionBar) actionBar.remove();
     nativeSaveButton = saveButton;
     if (saveObserver) saveObserver.disconnect();
-    saveObserver = new MutationObserver(syncSaveState);
-    saveObserver.observe(saveButton, { attributes: true, attributeFilter: ["disabled"] });
-    saveButton.classList.add("yinzaosuo-native-save-hidden");
+    saveObserver = null;
+    if (saveButton) {
+      saveObserver = new MutationObserver(syncSaveState);
+      saveObserver.observe(saveButton, { attributes: true, attributeFilter: ["disabled"] });
+      saveButton.classList.add("yinzaosuo-native-save-hidden");
+    }
     actionBar = document.createElement("div");
     actionBar.className = "yinzaosuo-editor-actions";
-
-    var saveAction = document.createElement("button");
-    saveAction.type = "button";
-    saveAction.dataset.action = "save";
-    saveAction.textContent = "保存";
-    saveAction.addEventListener("click", save);
 
     var translateAction = document.createElement("button");
     translateAction.type = "button";
@@ -256,8 +278,14 @@
     translateAction.textContent = "填入翻译内容";
     translateAction.addEventListener("click", translate);
 
-    actionBar.append(saveAction, translateAction);
-    saveButton.insertAdjacentElement("afterend", actionBar);
+    var saveAction = document.createElement("button");
+    saveAction.type = "button";
+    saveAction.dataset.action = "save";
+    saveAction.textContent = "保存";
+    saveAction.addEventListener("click", save);
+
+    actionBar.append(translateAction, saveAction);
+    toolbar.appendChild(actionBar);
     syncSaveState();
   }
 
