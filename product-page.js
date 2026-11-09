@@ -112,6 +112,10 @@ function renderProductDetails() {
   document.querySelector('#productName').textContent = productText('name');
   document.querySelector('#productIntro').textContent = productText('intro') || product.desc;
   document.querySelector('#productPrice').textContent = referencePrice();
+  const structuredData = { '@context': 'https://schema.org', '@type': 'Product', name: productText('name'), description, brand: { '@type': 'Brand', name: 'YINZAOSUO' }, image: product.image || product.thumb || undefined };
+  let schema = document.querySelector('#productStructuredData');
+  if (!schema) { schema = document.createElement('script'); schema.id = 'productStructuredData'; schema.type = 'application/ld+json'; document.head.append(schema); }
+  schema.textContent = JSON.stringify(structuredData);
 
   const imageContainer = document.querySelector('#productImage');
   imageContainer.replaceChildren();
