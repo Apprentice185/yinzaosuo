@@ -622,7 +622,7 @@ function renderStaticProduct(product, catalogueItem, template) {
   const category = isEnglish
     ? product.category_legacy_en || product.category_legacy || product.category || 'Print Media'
     : product.category_legacy || product.category || '印刷材料';
-  const price = product.price && (!isEnglish || /^USD\\s/i.test(product.price)) ? product.price : '';
+  const price = product.price && (!isEnglish || /^USD\s/i.test(product.price)) ? product.price : '';
   const jsonLd = JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'Product',
