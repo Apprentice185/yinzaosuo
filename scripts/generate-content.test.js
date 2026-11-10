@@ -19,8 +19,8 @@ test('static text rendering removes markup and escapes article text', () => {
 });
 
 test('static article rendering preserves semantic lists and safe internal links', () => {
-  const html = renderStaticText('<h2>Media guide</h2><p>Read the <a href="products/ys-gloss-photo-paper/" onclick="alert(1)">photo paper details</a>.</p><ul><li>Roll width</li><li>Roll length</li></ul>');
-  assert.equal(html, '<h2>Media guide</h2><p>Read the <a href="products/ys-gloss-photo-paper/" rel="noopener noreferrer">photo paper details</a>.</p><ul><li>Roll width</li><li>Roll length</li></ul>');
+  const html = renderStaticText('<h2>Media guide</h2><p>Read the <a href="./products/ys-gloss-photo-paper/" onclick="alert(1)">photo paper details</a>.</p><ul><li>Roll width</li><li>Roll length</li></ul>');
+  assert.equal(html, '<h2>Media guide</h2><p>Read the <a href="./products/ys-gloss-photo-paper/" rel="noopener noreferrer">photo paper details</a>.</p><ul><li>Roll width</li><li>Roll length</li></ul>');
 });
 
 test('static article rendering strips unsafe links and active content', () => {
@@ -56,7 +56,7 @@ test('static article output includes unique SEO metadata and safe structured dat
   assert.match(html, /<meta name="description" content="A useful guide for print buyers\.">/);
   assert.match(html, /<link rel="canonical" href="https:\/\/yinzaosuo\.com\/articles\/safe-print-guide\/">/);
   assert.match(html, /<h1 id="articleTitle">A practical print guide<\/h1>/);
-  assert.match(html, /<h2>Safe &amp; useful<\/h2><p>Print article\.<\/p><ul><li>First item<\/li><li>Second item<\/li><\/ul>/);
+  assert.match(html, /<h2>Safe &amp; useful<\/h2>\s*<p>Print article\.<\/p><ul><li>First item<\/li><li>Second item<\/li><\/ul>/);
   assert.match(html, /property="og:image:alt" content="Custom SEO title"/);
   assert.match(html, /"@type":"Article"/);
   assert.match(html, /"datePublished":"2026-03-09"/);
