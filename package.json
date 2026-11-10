@@ -4,7 +4,7 @@
   "scripts": {
     "cms": "npx decap-server",
     "content:build": "node scripts/generate-content.js",
-    "test": "node --test admin/translation.test.js scripts/generate-content.test.js",
+    "test": "node --test admin/translation.test.js scripts/generate-content.test.js scripts/seo-metadata.test.js",
     "test:admin-translation": "node --test admin/translation.test.js"
   }
 }
