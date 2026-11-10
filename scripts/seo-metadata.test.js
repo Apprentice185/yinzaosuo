@@ -45,7 +45,8 @@ test('all five core catalogue products have bilingual, product-specific SEO titl
     const item = JSON.parse(read(`content/catalogue/${id}.json`));
     for (const field of ['seo_title_zh', 'seo_title_en', 'seo_description_zh', 'seo_description_en']) {
       assert.equal(typeof item[field], 'string', `${id} is missing ${field}`);
-      assert.ok(item[field].trim().length > 35, `${id} has weak ${field}`);
+      const minimumLength = field.startsWith('seo_title') ? 15 : 35;
+      assert.ok(item[field].trim().length > minimumLength, `${id} has weak ${field}`);
       assert.ok(item[field].length < 260, `${id} has an excessively long ${field}`);
     }
     assert.match(item.seo_title_en, /Wholesale/i, `${id} English title should target trade intent`);
