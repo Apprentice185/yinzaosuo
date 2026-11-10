@@ -47,15 +47,17 @@ test('static article output includes unique SEO metadata and safe structured dat
     category: '工艺解析',
     category_en: 'Print knowledge',
     date: '2026-03-09',
+    cover: '/assets/images/content/guide-cover.jpg',
     content: '<p>中文正文</p>',
-    content_en: '<h2>Safe &amp; useful</h2><script>window.pwned=1</script><p>Print article.</p>'
+    content_en: '<h2>Safe &amp; useful</h2><script>window.pwned=1</script><p>Print article.</p><ul><li>First item</li><li>Second item</li></ul>'
   }, 'knowledge', articleTemplate);
 
   assert.match(html, /<title>Custom SEO title \| YINZAOSUO<\/title>/);
   assert.match(html, /<meta name="description" content="A useful guide for print buyers\.">/);
   assert.match(html, /<link rel="canonical" href="https:\/\/yinzaosuo\.com\/articles\/safe-print-guide\/">/);
   assert.match(html, /<h1 id="articleTitle">A practical print guide<\/h1>/);
-  assert.match(html, /<p>Safe &amp; useful<\/p><p>Print article\.<\/p>/);
+  assert.match(html, /<h2>Safe &amp; useful<\/h2><p>Print article\.<\/p><ul><li>First item<\/li><li>Second item<\/li><\/ul>/);
+  assert.match(html, /property="og:image:alt" content="Custom SEO title"/);
   assert.match(html, /"@type":"Article"/);
   assert.match(html, /"datePublished":"2026-03-09"/);
   assert.match(html, /hreflang="zh-CN"/);
