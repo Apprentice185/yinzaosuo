@@ -133,22 +133,19 @@ function renderProductDetails() {
   imageContainer.classList.remove('is-placeholder', 'image-unavailable');
   const productImageFallbacks = {
   "YS-GLOSS-PHOTO-PAPER": [
-    "https://www.webstaurantstore.com/images/products/large/538644/1968681.jpg"
+    "assets/images/products/ys-gloss-photo-paper.jpg"
   ],
   "YS-SATIN-PHOTO-PAPER": [
-    "https://imagingspectrum.com/cdn/shop/files/prem-luster-roll.jpg?v=1711122770",
-    "https://de2wfhoo6xqi5.cloudfront.net/orig/78e/4e2/472ab5862f2be87fa84e8ecdd404aac325.jpg"
+    "assets/images/products/ys-satin-photo-paper.jpg"
   ],
   "YS-SYNTHETIC-PAPER": [
-    "https://image.made-in-china.com/2f0j00JKabkAOciuqm/Eco-Solvent-PP-Synthetic-Paper-Double-Sides-Matte-240g-for-Printing.jpg"
+    "assets/images/products/ys-synthetic-paper.jpg"
   ],
   "YS-ADHESIVE-VINYL": [
-    "https://image.made-in-china.com/2f0j00BsPGvtQdhDqV/White-Eco-Solvent-Large-Format-Vinyl-Media-Printing-PVC-Roll-Self-Adhesive-Vinyl.webp",
-    "https://image.made-in-china.com/202f0j00UyhlJVrnMikj/Glossy-Matt-White-Eco-Solvent-Printing-PVC-Roll-Printable-Adhesive-Car-Wrap-Vinyl.webp"
+    "assets/images/products/ys-adhesive-vinyl.jpg"
   ],
   "YS-OUTDOOR-PVC-RIGID-FILM": [
-    "https://avanceytec.com.mx/_next/image?q=75&url=https%3A%2F%2Fnew.avanceytec.com.mx%2Fimg%2Fp%2F2%2F3%2F7%2F5%2F1%2F23751.jpg&w=2048",
-    "https://image.made-in-china.com/2f0j00KlqRZfahbzbA/510GSM-PVC-Flex-Backlit-Banner-Marketing-Solvent-Printed-Banners-Rollos-for-Printing-Machine.jpg"
+    "assets/images/products/ys-outdoor-pvc-rigid-film.jpg"
   ]
 }
   const imageCandidates = [imageSource, ...(productImageFallbacks[product.id] || [])]

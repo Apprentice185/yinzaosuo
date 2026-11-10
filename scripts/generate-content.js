@@ -822,7 +822,26 @@ function writeProductPages(data) {
   }
 }
 
+// Product images are stored in the repository as base64 text files
+// (<name>.jpg.b64) because the push channel only accepts UTF-8 text.
+// Decode them into real .jpg files in the build workspace so the
+// deployed site serves normal images at the usual paths. No-op when
+// the directory or files are absent (e.g. the Chinese build root).
+function decodeBase64Images() {
+  const directory = path.join(root, 'assets', 'images', 'products');
+  if (!fs.existsSync(directory)) return;
+  const encodedFiles = fs.readdirSync(directory)
+    .filter(file => file.toLowerCase().endsWith('.jpg.b64'))
+    .sort((a, b) => a.localeCompare(b));
+  for (const file of encodedFiles) {
+    const encoded = fs.readFileSync(path.join(directory, file), 'utf8');
+    const output = path.join(directory, file.slice(0, -'.b64'.length));
+    fs.writeFileSync(output, Buffer.from(encoded, 'base64'));
+  }
+}
+
 function main() {
+  decodeBase64Images();
   const products = deduplicateProducts(filesIn('products', '.json')
     .map(file => ({
       file,
@@ -911,4 +930,4 @@ function main() {
 
 if (require.main === module) main();
 
-module.exports = { articleSlug, injectStaticList, main, parseFrontmatter, renderStaticArticle, renderStaticProduct, renderStaticProductList, renderStaticText, slugify };
+module.exports = { articleSlug, decodeBase64Images, injectStaticList, main, parseFrontmatter, renderStaticArticle, renderStaticProduct, renderStaticProductList, renderStaticText, slugify };
