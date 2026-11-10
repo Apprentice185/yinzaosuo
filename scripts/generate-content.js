@@ -215,6 +215,101 @@ function renderStaticText(html) {
     .trim();
 }
 
+function renderStaticArticle(item, collection, template) {
+  const isEnglish = !isChineseBuild;
+  const title = isEnglish
+    ? item.seo_title_en || item.title_en || item.title
+    : item.seo_title || item.title;
+  const heading = isEnglish ? item.title_en || item.title : item.title;
+  const description = isEnglish
+    ? item.seo_description_en || item.summary_en || item.description_en || item.title_en || item.title
+    : item.seo_description || item.excerpt || item.title;
+  const canonicalUrl = `${siteUrl}${item.url}`;
+  const image = safeMediaUrl(item.cover);
+  const imageUrl = image ? new URL(image, `${siteUrl}/`).href : '';
+  const body = isEnglish ? item.content_en : item.content;
+  const articleType = collection === 'news' ? 'NewsArticle' : 'Article';
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': articleType,
+    headline: heading,
+    description,
+    datePublished: item.date || undefined,
+    mainEntityOfPage: canonicalUrl,
+    url: canonicalUrl,
+    author: { '@type': 'Organization', name: 'YINZAOSUO', url: siteUrl },
+    publisher: { '@type': 'Organization', name: 'YINZAOSUO', url: siteUrl },
+    image: imageUrl || undefined
+  };
+  const jsonLd = JSON.stringify(structuredData)
+    .replace(/</g, '\\u003c')
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029');
+  const baseUrl = `${siteUrl}${sitePrefix || ''}/`;
+  let html = /<base\b/i.test(template)
+    ? template
+    : template.replace('<head>', `<head><base href="${escapeHtml(baseUrl)}">`);
+  html = html.replace(/<meta name="robots" content="noindex,follow">/i, '');
+  html = html.replace(/<title[^>]*>[\s\S]*?<\/title>/i, `<title>${escapeHtml(title)} | ${isEnglish ? 'YINZAOSUO' : '印造所'}</title>`);
+  html = html.replace(/<meta name="description" content="[^"]*"[^>]*>/i, `<meta name="description" content="${escapeHtml(description)}">`);
+  html = html.replace(/<meta property="og:title" content="[^"]*"[^>]*>/i, `<meta property="og:title" content="${escapeHtml(title)}">`);
+  html = html.replace(/<meta property="og:description" content="[^"]*"[^>]*>/i, `<meta property="og:description" content="${escapeHtml(description)}">`);
+  html = html.replace(/<meta property="og:url" content="[^"]*"[^>]*>/i, `<meta property="og:url" content="${escapeHtml(canonicalUrl)}">`);
+  html = html.replace(/<link rel="canonical" href="[^"]*"[^>]*>/i, `<link rel="canonical" href="${escapeHtml(canonicalUrl)}">`);
+  if (item.publish_to === 'both') {
+    const englishUrl = `${siteUrl}/articles/${encodeURIComponent(item.slug)}/`;
+    const chineseUrl = `${siteUrl}/zh/articles/${encodeURIComponent(item.slug)}/`;
+    html = html.replace('</head>', `<link rel="alternate" hreflang="en" href="${englishUrl}"><link rel="alternate" hreflang="zh-CN" href="${chineseUrl}"><link rel="alternate" hreflang="x-default" href="${englishUrl}"></head>`);
+  }
+  if (imageUrl) html = html.replace('</head>', `<meta property="og:image" content="${escapeHtml(imageUrl)}"><meta property="og:image:alt" content="${escapeHtml(title)}"></head>`);
+  html = html.replace('</head>', `<script id="productStructuredData" type="application/ld+json">${jsonLd}</script></head>`);
+  html = html.replace(
+    '<main id="articlePage">',
+    `<main id="articlePage" data-article-type="${escapeHtml(collection === 'knowledge' ? 'knowledge' : collection === 'news' ? 'articles' : 'solutions')}" data-article-id="${escapeHtml(item.id)}">`
+  );
+  html = html.replace(/<p class="eyebrow" id="articleCategory">[\s\S]*?<\/p>/, `<p class="eyebrow" id="articleCategory">${escapeHtml(isEnglish ? item.category_en || item.category : item.category)}</p>`);
+  html = html.replace(/<h1 id="articleTitle">[\s\S]*?<\/h1>/, `<h1 id="articleTitle">${escapeHtml(heading)}</h1>`);
+  html = html.replace(
+    /<p class="article-date" id="articleDate">[\s\S]*?<\/p>/,
+    `<p class="article-date" id="articleDate">${escapeHtml([isEnglish ? item.category_en || item.category : item.category, item.date].filter(Boolean).join(' · '))}</p>`
+  );
+  html = html.replace(
+    /<img id="articleCover"[^>]*>/,
+    `<img id="articleCover" class="article-cover" alt="${escapeHtml(title)}"${imageUrl ? ` src="${escapeHtml(imageUrl)}"` : ' hidden'}>`
+  );
+  html = html.replace(
+    /<div class="article-detail-body" id="articleBody"><\/div>/,
+    `<div class="article-detail-body" id="articleBody">${renderStaticText(body)}</div>`
+  );
+  return html;
+}
+
+function writeArticlePages(collections) {
+  const template = fs.readFileSync(path.join(root, 'article.html'), 'utf8');
+  const routes = new Set();
+  for (const { collection, items } of collections) {
+    for (const item of items) {
+      const route = `/articles/${encodeURIComponent(item.slug)}/`;
+      if (routes.has(route)) throw new Error(`Duplicate article URL: ${route}`);
+      routes.add(route);
+      const output = path.join(root, 'articles', item.slug, 'index.html');
+      fs.mkdirSync(path.dirname(output), { recursive: true });
+      fs.writeFileSync(output, renderStaticArticle(item, collection, template), 'utf8');
+    }
+  }
+}
+
+function safeUrl(url) {
+  const value = url.trim();
+  return /^(https?:|\/|\.\/|\.\.\/|#)/i.test(value) ? value : '';
+}
+
+function safeMediaUrl(url) {
+  const value = String(url || '').trim();
+  if (!value || /^[a-z][a-z\d+.-]*:/i.test(value) && !/^https?:\/\//i.test(value)) return '';
+  return value;
+}
+
 function renderMarkdown(markdown) {
   const body = String(markdown || '').trim();
   if (!body) return '';
