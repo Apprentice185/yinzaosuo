@@ -70,6 +70,20 @@ test('adhesive vinyl claims stay within confirmed product specifications', () =>
   assert.ok(product.materials_en.every(value => !/[\u3400-\u9fff]/.test(value)));
 });
 
+test('bilingual knowledge guides do not publish unconfirmed adhesive-colour options', () => {
+  const guide = read('content/knowledge/k2026111001.md');
+  const linerGuide = read('content/knowledge/k2026111003.md');
+
+  for (const content of [guide, linerGuide]) {
+    assert.doesNotMatch(content, /white[- ]glue|black[- ]glue|white adhesive|black adhesive|白胶|黑胶/i);
+  }
+
+  assert.match(guide, /have not been confirmed/i);
+  assert.match(guide, /尚未确认/);
+  assert.match(linerGuide, /have not yet been confirmed/i);
+  assert.match(linerGuide, /目前尚未确认/);
+});
+
 test('new bilingual knowledge guides target real print-media buying questions', () => {
   const ids = [
     'k2026111001.md',
