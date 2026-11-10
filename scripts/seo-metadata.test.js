@@ -70,7 +70,7 @@ test('new bilingual knowledge guides target real print-media buying questions', 
     assert.match(source, /seo_description: ".+"/);
     assert.match(source, /seo_description_en: ".+"/);
     assert.match(source, /body_en: \|/);
-    assert.match(source, /\[查看|\[View/);
+    assert.match(source, /\]\(\.\/products\//);
   }
 });
 
