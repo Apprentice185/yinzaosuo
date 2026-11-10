@@ -67,7 +67,7 @@ test('adhesive vinyl claims stay within confirmed product specifications', () =>
   assert.match(catalogue.desc_en, /120 gsm or 140 gsm release liner/i);
   assert.match(catalogue.seo_description_en, /120 gsm or 140 gsm release liner/i);
   assert.match(product.desc_en, /120 gsm or 140 gsm release liner/i);
-  assert.ok(product.materials_en.every(value => !/[\\u3400-\\u9fff]/.test(value)));
+  assert.ok(product.materials_en.every(value => !/[\u3400-\u9fff]/.test(value)));
 });
 
 test('new bilingual knowledge guides target real print-media buying questions', () => {
