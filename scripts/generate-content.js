@@ -629,6 +629,8 @@ function renderStaticProduct(product, catalogueItem, template) {
     name,
     description,
     url: canonicalUrl,
+    sku: id,
+    category,
     image: imageUrl || undefined,
     brand: { '@type': 'Brand', name: 'YINZAOSUO' }
   }).replace(/</g, '\\u003c');
@@ -642,6 +644,9 @@ function renderStaticProduct(product, catalogueItem, template) {
   html = html.replace(/<meta property="og:description" content="[^"]*"[^>]*>/i, `<meta property="og:description" content="${escapeHtml(description)}">`);
   html = html.replace(/<meta property="og:url" content="[^"]*"[^>]*>/i, `<meta property="og:url" content="${escapeHtml(canonicalUrl)}">`);
   html = html.replace(/<link rel="canonical" href="[^"]*"[^>]*>/i, `<link rel="canonical" href="${escapeHtml(canonicalUrl)}">`);
+  if (imageUrl) {
+    html = html.replace('</head>', `<meta property="og:image" content="${escapeHtml(imageUrl)}"><meta property="og:image:alt" content="${escapeHtml(name)}"></head>`);
+  }
   if (product.publish_to === 'both' || catalogueItem.publish_to === 'both') {
     const englishUrl = `${siteUrl}/products/${slug}/`;
     const chineseUrl = `${siteUrl}/zh/products/${slug}/`;
