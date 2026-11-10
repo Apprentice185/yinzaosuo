@@ -302,6 +302,90 @@ function writeArticlePages(collections) {
   }
 }
 
+function renderStaticArticleCard(item, index) {
+  const isEnglish = !isChineseBuild;
+  const category = isEnglish ? item.category_en || item.category : item.category;
+  const title = isEnglish ? item.title_en || item.title : item.title;
+  const excerpt = isEnglish ? item.excerpt_en || item.excerpt : item.excerpt;
+  const cover = safeMediaUrl(item.cover);
+  const visual = cover
+    ? `<div class="long-card-visual visual-${index % 4} has-image" style="background-image:url('${escapeHtml(cover)}')"></div>`
+    : `<div class="long-card-visual visual-${index % 4} is-placeholder"><span>${escapeHtml(category)}</span></div>`;
+  const meta = [category, item.date].filter(Boolean).join(' · ');
+  const readMore = isEnglish ? 'Read article' : '阅读全文';
+  return `<article class="long-card">${visual}<div class="article-meta">${escapeHtml(meta)}</div><h2>${escapeHtml(title)}</h2><p>${escapeHtml(excerpt)}</p><a class="text-link" href="${escapeHtml(item.url)}">${readMore} <span>↗</span></a></article>`;
+}
+
+function renderStaticProductCard(item) {
+  const name = item.name || '';
+  const image = safeMediaUrl(item.image);
+  const visual = image
+    ? `<img src="${escapeHtml(image)}" alt="${escapeHtml(name)}" loading="lazy" decoding="async">`
+    : '';
+  return `<a class="archive-card" href="products/${slugify(item.id)}/" data-product-id="${escapeHtml(String(item.id))}"><div class="archive-visual">${visual}</div><div class="archive-card-content"><h3>${escapeHtml(name)}</h3><p class="archive-card-summary">${escapeHtml(item.desc || '')}</p></div></a>`;
+}
+
+function renderStaticProductList(data) {
+  const lang = isChineseBuild ? 'zh' : 'en';
+  const covered = new Set();
+  const sections = [];
+  for (const category of data.catalog[lang].categories) {
+    if (!category.items.length) continue;
+    category.items.forEach(item => covered.add(String(item.id)));
+    sections.push({ title: category.title, desc: category.desc, items: category.items });
+  }
+  const coreOrder = ['YS-GLOSS-PHOTO-PAPER', 'YS-SATIN-PHOTO-PAPER', 'YS-SYNTHETIC-PAPER', 'YS-ADHESIVE-VINYL', 'YS-OUTDOOR-PVC-RIGID-FILM', 'YS-PVC-BANNER', 'YS-PVC-MESH', 'YS-ROLL-UP', 'YS-X-BANNER', 'YS-DOOR-STAND'];
+  const extras = data.catalogue
+    .filter(item => !covered.has(String(item.id)))
+    .sort((a, b) => coreOrder.indexOf(String(a.id)) - coreOrder.indexOf(String(b.id)))
+    .map(item => ({
+      id: String(item.id),
+      name: isChineseBuild ? item.name_zh || item.name_en : item.name_en || item.name_zh,
+      desc: isChineseBuild ? item.desc_zh || item.desc_en : item.desc_en || item.desc_zh,
+      image: item.image
+    }));
+  if (extras.length) {
+    const defaults = categoryDefaults.exhibition;
+    sections.push({
+      title: isChineseBuild ? defaults.zh : defaults.en,
+      desc: isChineseBuild ? defaults.desc : defaults.desc_en,
+      items: extras
+    });
+  }
+  return sections.map(section => `<section class="all-products-category"><div class="all-products-category-heading"><h2>${escapeHtml(section.title)}</h2><p>${escapeHtml(section.desc)}</p></div><div class="product-archive-grid">${section.items.map(renderStaticProductCard).join('')}</div></section>`).join('');
+}
+
+function injectStaticList(html, containerId, pageKey, innerHtml) {
+  const openPattern = new RegExp(`(<[^>]*\\bid="${containerId}"[^>]*>)`);
+  if (!openPattern.test(html)) return null;
+  const stripped = html.replace(/<!--static-list:[\w.-]+-->[\s\S]*?<!--\/static-list-->/g, '');
+  if (!innerHtml) return stripped;
+  return stripped.replace(openPattern, `$1<!--static-list:${pageKey}-->${innerHtml}<!--/static-list-->`);
+}
+
+function writeListPages(data) {
+  const pages = [
+    { file: 'products.html', container: 'allProductCategories', render: () => renderStaticProductList(data) },
+    { file: 'solutions.html', container: 'solutionsGrid', render: () => data.solutions.map(renderStaticArticleCard).join('') },
+    { file: 'knowledge.html', container: 'knowledgeGrid', render: () => data.knowledge.map(renderStaticArticleCard).join('') },
+    { file: 'journal.html', container: 'articleGrid', render: () => data.news.map(renderStaticArticleCard).join('') }
+  ];
+  for (const page of pages) {
+    const filePath = path.join(root, page.file);
+    if (!fs.existsSync(filePath)) {
+      console.warn(`Skipping static list pre-render: ${page.file} not found`);
+      continue;
+    }
+    const source = fs.readFileSync(filePath, 'utf8');
+    const output = injectStaticList(source, page.container, page.file, page.render());
+    if (output === null) {
+      console.warn(`Skipping static list pre-render: no #${page.container} container in ${page.file}`);
+      continue;
+    }
+    if (output !== source) fs.writeFileSync(filePath, output, 'utf8');
+  }
+}
+
 function safeUrl(url) {
   const value = url.trim();
   return /^(https?:|\/|\.\/|\.\.\/|#)/i.test(value) ? value : '';
@@ -819,6 +903,7 @@ function main() {
     { collection: 'news', items: news },
     { collection: 'solutions', items: solutions }
   ]);
+  writeListPages(data);
   fs.writeFileSync(outputFile, `window.CMS_CONTENT = ${JSON.stringify(data)};\n`, 'utf8');
   buildSitemap(data);
   console.log(`Generated ${path.relative(root, outputFile)} and sitemap.xml (${products.length} products, ${knowledge.length} knowledge articles, ${news.length} news, ${templates.length} templates, ${solutions.length} solutions).`);
@@ -826,4 +911,4 @@ function main() {
 
 if (require.main === module) main();
 
-module.exports = { articleSlug, main, parseFrontmatter, renderStaticArticle, renderStaticProduct, renderStaticText, slugify };
+module.exports = { articleSlug, injectStaticList, main, parseFrontmatter, renderStaticArticle, renderStaticProduct, renderStaticProductList, renderStaticText, slugify };
