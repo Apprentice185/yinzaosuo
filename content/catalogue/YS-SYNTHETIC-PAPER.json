@@ -42,7 +42,7 @@
     ],
     "artwork": "请提供印刷文件、成品尺寸、数量、卷装或裁切要求及目的地。生产前可核对文件尺寸和出血设置。",
     "brief": "请提供材料类型、宽度、数量或面积、是否覆膜、油墨选择、包装要求及收货国家/地区。",
-    "caveat": "最低起订条件为100平方米，或订单货值超过USD 2,000（满足其中一项即可）。价格为参考单价，运费、税费及最终交付时间需按目的地和运输方案确认。"
+    "caveat": "最低起订条件为100平方米，或订单货值超过USD 2,000（满足其中一项即可）。价格为参考单价，运费、税费及最终交付时间需按目的地和运输方案确认。 户外使用适用性及耐候等级尚未取得工厂测试资料，具体使用条件需结合油墨、覆膜方式和实际环境确认。"
   },
   "detail_en": {
     "lead": "Outdoor PP synthetic paper for posters, promotional graphics and display projects. Confirmed specification: 1520 mm roll width, 180 gsm and 50 m per roll.",
@@ -74,6 +74,6 @@
     ],
     "artwork": "Please provide print-ready artwork, finished dimensions, quantity, roll or cut-sheet requirements and destination. File dimensions and bleed can be checked before production.",
     "brief": "Please specify the media type, width, quantity or area, lamination, ink option, packing requirements and destination country or region.",
-    "caveat": "MOQ is 100 m², or an order goods value above USD 2,000; either condition is sufficient. Prices are reference rates. Freight, duties and final delivery dates must be confirmed for the destination and shipping arrangement."
+    "caveat": "MOQ is 100 m², or an order goods value above USD 2,000; either condition is sufficient. Prices are reference rates. Freight, duties and final delivery dates must be confirmed for the destination and shipping arrangement. Outdoor suitability and weather-resistance ratings have not yet been supported by factory test documentation. Confirm the intended exposure, ink system and finishing with the factory before specifying this media for long-term outdoor use."
   }
 }
