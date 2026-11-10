@@ -183,6 +183,7 @@ function renderStaticText(html) {
   const tagPattern = /<\/?([a-z][a-z0-9:-]*)\b([^>]*)>/gi;
   let output = '';
   let cursor = 0;
+  let anchorOpen = false;
 
   for (const match of source.matchAll(tagPattern)) {
     output += escapeHtml(decodeHtmlEntities(source.slice(cursor, match.index)));
@@ -193,11 +194,13 @@ function renderStaticText(html) {
     if (allowedTags.has(tag)) {
       if (tag === 'a') {
         if (closing) {
-          output += '</a>';
+          if (anchorOpen) output += '</a>';
+          anchorOpen = false;
         } else {
           const hrefMatch = match[2].match(/\bhref\s*=\s*(["'])(.*?)\1/i);
           const href = hrefMatch ? safeUrl(decodeHtmlEntities(hrefMatch[2])) : '';
-          output += href ? '<a href="' + escapeHtml(href) + '" rel="noopener noreferrer">' : '';
+          anchorOpen = Boolean(href);
+          if (anchorOpen) output += '<a href="' + escapeHtml(href) + '" rel="noopener noreferrer">';
         }
       } else if (tag === 'br') {
         if (!closing) output += '<br>';
