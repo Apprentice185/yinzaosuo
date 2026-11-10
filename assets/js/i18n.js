@@ -206,7 +206,7 @@ window.I18N = {
     template_copy_done: 'Template details copied', article_announcement: '<span>YINZAOSUO Editorial</span> · Thoughtful writing and thoughtful print',
     article_back: '← Back to content', article_cover_alt: 'Article cover', article_aside_title: 'YINZAOSUO Editorial',
     article_aside_intro: 'We regularly publish guidance on paper, print finishes, branded materials, and real-world projects.',
-    article_aside_templates: 'Explore the template library <span>↗</span>', article_quote_title: 'Need print produced?',
+    article_aside_templates: 'Explore the print knowledge library <span>↗</span>', article_quote_title: 'Need print produced?',
     article_quote_intro: 'Share the article title or template details with us to make your enquiry easier.',
     article_quote_link: 'Get a quote <span>↗</span>', product_announcement: '<span>Custom print production</span> · Tell us about your project requirements',
     product_quote: 'Ask about this configuration <span>↗</span>',
