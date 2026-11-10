@@ -175,20 +175,47 @@ function decodeHtmlEntities(value) {
 }
 
 function renderStaticText(html) {
-  const text = decodeHtmlEntities(String(html || '')
+  const source = String(html || '')
     .replace(/<!--[\s\S]*?-->/g, ' ')
     .replace(/<(script|style|iframe|object|svg|math)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, ' ')
-    .replace(/<br\b[^>]*\/?>/gi, '\n')
-    .replace(/<\/(?:p|div|h[1-6]|li|blockquote|pre|section|tr)\s*>/gi, '\n')
-    .replace(/<[^>]*>/g, ' '))
+    .replace(/<(?:img|input|button|form|iframe|video|audio)\b[^>]*>/gi, ' ');
+  const allowedTags = new Set(['h2', 'h3', 'h4', 'h5', 'h6', 'p', 'ul', 'ol', 'li', 'blockquote', 'strong', 'b', 'em', 'i', 'code', 'pre', 'a', 'br']);
+  const tagPattern = /<\/?([a-z][a-z0-9:-]*)\b([^>]*)>/gi;
+  let output = '';
+  let cursor = 0;
+  let anchorOpen = false;
+
+  for (const match of source.matchAll(tagPattern)) {
+    output += escapeHtml(decodeHtmlEntities(source.slice(cursor, match.index)));
+    const rawTag = match[0];
+    const closing = /^<\//.test(rawTag);
+    const tag = match[1].toLowerCase();
+
+    if (allowedTags.has(tag)) {
+      if (tag === 'a') {
+        if (closing) {
+          if (anchorOpen) output += '</a>';
+          anchorOpen = false;
+        } else {
+          const hrefMatch = match[2].match(/\bhref\s*=\s*(["'])(.*?)\1/i);
+          const href = hrefMatch ? safeUrl(decodeHtmlEntities(hrefMatch[2])) : '';
+          anchorOpen = Boolean(href);
+          if (anchorOpen) output += '<a href="' + escapeHtml(href) + '" rel="noopener noreferrer">';
+        }
+      } else if (tag === 'br') {
+        if (!closing) output += '<br>';
+      } else {
+        output += closing ? '</' + tag + '>' : '<' + tag + '>';
+      }
+    }
+    cursor = match.index + rawTag.length;
+  }
+
+  output += escapeHtml(decodeHtmlEntities(source.slice(cursor)));
+  return output
     .replace(/\u00a0/g, ' ')
     .replace(/[ \t\f\v]+/g, ' ')
-    .replace(/ *\n */g, '\n')
-    .replace(/\n{2,}/g, '\n')
     .trim();
-  return text
-    ? text.split('\n').map(line => `<p>${escapeHtml(line)}</p>`).join('')
-    : '';
 }
 
 function renderStaticArticle(item, collection, template) {
@@ -237,7 +264,7 @@ function renderStaticArticle(item, collection, template) {
     const chineseUrl = `${siteUrl}/zh/articles/${encodeURIComponent(item.slug)}/`;
     html = html.replace('</head>', `<link rel="alternate" hreflang="en" href="${englishUrl}"><link rel="alternate" hreflang="zh-CN" href="${chineseUrl}"><link rel="alternate" hreflang="x-default" href="${englishUrl}"></head>`);
   }
-  if (imageUrl) html = html.replace('</head>', `<meta property="og:image" content="${escapeHtml(imageUrl)}"></head>`);
+  if (imageUrl) html = html.replace('</head>', `<meta property="og:image" content="${escapeHtml(imageUrl)}"><meta property="og:image:alt" content="${escapeHtml(title)}"></head>`);
   html = html.replace('</head>', `<script id="productStructuredData" type="application/ld+json">${jsonLd}</script></head>`);
   html = html.replace(
     '<main id="articlePage">',
