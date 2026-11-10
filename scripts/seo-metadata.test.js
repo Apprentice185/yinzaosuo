@@ -54,6 +54,26 @@ test('all five core catalogue products have bilingual, product-specific SEO titl
   }
 });
 
+test('new bilingual knowledge guides target real print-media buying questions', () => {
+  const ids = [
+    'k2026111001.md',
+    'k2026111002.md',
+    'k2026111003.md'
+  ];
+
+  for (const file of ids) {
+    const source = read(`content/knowledge/${file}`);
+    assert.match(source, /publish_to: "both"/);
+    assert.match(source, /title_en: ".+"/);
+    assert.match(source, /seo_title: ".+"/);
+    assert.match(source, /seo_title_en: ".+"/);
+    assert.match(source, /seo_description: ".+"/);
+    assert.match(source, /seo_description_en: ".+"/);
+    assert.match(source, /body_en: \|/);
+    assert.match(source, /\[查看|\[View/);
+  }
+});
+
 test('robots.txt advertises both language-specific sitemaps', () => {
   const robots = read('robots.txt');
   assert.match(robots, /Sitemap: https:\/\/yinzaosuo\.com\/sitemap\.xml/);
