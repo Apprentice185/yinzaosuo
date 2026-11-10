@@ -609,6 +609,7 @@ function buildSitemap(data) {
   }
   for (const product of [...data.products, ...data.catalogue]) routes.add(`/products/${slugify(product.id)}/`);
   for (const item of [...data.knowledge, ...data.news, ...data.solutions]) routes.add(item.route);
+  if (!isChineseBuild) routes.delete('/templates.html');
   const metadata = {
     '/': { changefreq: 'weekly', priority: '1.0' },
     '/templates.html': { changefreq: 'weekly', priority: '0.8' },
@@ -639,6 +640,7 @@ function renderStaticProduct(product, catalogueItem, template) {
   const seoTitle = isEnglish
     ? catalogueItem.seo_title_en || product.seo_title_en || name
     : catalogueItem.seo_title_zh || product.seo_title_zh || name;
+  const seoTitleBase = String(seoTitle).replace(/\s*(?:\||｜)\s*(?:YINZAOSUO|印造所)\s*$/i, '');
   const intro = isEnglish
     ? catalogueItem.desc_en || product.desc_en || product.intro_en || description
     : catalogueItem.desc_zh || product.desc || product.intro || description;
@@ -665,7 +667,7 @@ function renderStaticProduct(product, catalogueItem, template) {
   let html = /<base\b/i.test(template)
     ? template
     : template.replace('<head>', `<head><base href="${escapeHtml(baseUrl)}">`);
-  html = html.replace(/<title[^>]*>[\s\S]*?<\/title>/i, `<title>${escapeHtml(seoTitle)} | ${isEnglish ? 'YINZAOSUO' : '印造所'}</title>`);
+  html = html.replace(/<title[^>]*>[\s\S]*?<\/title>/i, `<title>${escapeHtml(seoTitleBase)} | ${isEnglish ? 'YINZAOSUO' : '印造所'}</title>`);
   html = html.replace(/<meta name="description" content="[^"]*"[^>]*>/i, `<meta name="description" content="${escapeHtml(description)}">`);
   html = html.replace(/<meta property="og:title" content="[^"]*"[^>]*>/i, `<meta property="og:title" content="${escapeHtml(seoTitle)}">`);
   html = html.replace(/<meta property="og:description" content="[^"]*"[^>]*>/i, `<meta property="og:description" content="${escapeHtml(description)}">`);

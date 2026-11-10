@@ -140,7 +140,7 @@ window.I18N = {
     archive_materials: 'Materials', archive_crafts: 'Crafts', archive_specs: 'Specifications', archive_close: 'Close specs', archive_count_suffix: 'products', archive_image_pending: 'Product photo coming soon',
     archive_placeholder_prototype: 'PROTOTYPE', archive_placeholder_pending: 'SPEC PENDING',
     archive_view_all: 'Browse the full material range <span aria-hidden="true">↗</span>',
-    products_page_eyebrow: 'YINZAOSUO · WIDE-FORMAT MEDIA', products_page_title: 'Wholesale Large Format Print Media', products_page_intro: 'Compare gloss and satin photo paper, PP synthetic paper, self-adhesive vinyl and outdoor PVC printing film by roll width, media weight, roll length and trade pricing.', products_page_home: 'Back to home',
+    products_page_eyebrow: 'YINZAOSUO · WIDE-FORMAT MEDIA', products_page_title: 'Large Format Print Media & Printed Graphics – Trade Range | YINZAOSUO', products_page_intro: 'Compare gloss and satin photo paper, PP synthetic paper, self-adhesive vinyl and outdoor PVC printing film by roll width, media weight, roll length and trade pricing.', products_page_home: 'Back to home',
     archive_tabs_label: 'Product categories', read_article: 'Read article', search_noted: 'Search noted:',
     image_pending: 'Image coming soon', image_detail_pending: 'Image {n} coming soon',
     translation_pending_title: 'English title coming soon', translation_pending_category: 'Other',
