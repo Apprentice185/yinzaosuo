@@ -24,11 +24,11 @@ test('English and Chinese product-directory metadata describes the core media pr
   const chinese = read('zh/products.html');
   const i18n = read('assets/js/i18n.js');
 
-  assert.match(english, /<title[^>]*>Wholesale Large Format Print Media \| YINZAOSUO<\/title>/);
+  assert.match(english, /<title[^>]*>Large Format Print Media & Printed Graphics – Trade Range \| YINZAOSUO<\/title>/);
   assert.match(english, /meta name="description" content="[^"]*wholesale[^"]*photo paper[^"]*PP synthetic paper[^"]*self-adhesive vinyl[^"]*outdoor PVC printing film/i);
   assert.match(chinese, /<title[^>]*>大幅面喷绘材料批发目录｜印造所<\/title>/);
   assert.match(chinese, /meta name="description" content="[^"]*光面与绸面写真相纸[^"]*PP合成纸[^"]*自粘背胶[^"]*户外PVC喷绘膜/);
-  assert.match(i18n, /products_page_title: 'Wholesale Large Format Print Media'/);
+  assert.match(i18n, /products_page_title: 'Large Format Print Media & Printed Graphics – Trade Range \| YINZAOSUO'/);
   assert.match(i18n, /products_page_title: '大幅面喷绘材料批发目录'/);
 });
 
