@@ -711,7 +711,59 @@ function buildSitemap(data) {
 }
 
 
-function renderStaticProduct(product, catalogueItem, template) {
+// Core trade media that cross-link to each other at the bottom of their
+// generated product pages. Display-stand hardware (roll-up, X-banner,
+// door stand) is deliberately excluded: it is not print media.
+const RELATED_MEDIA_IDS = [
+  'YS-GLOSS-PHOTO-PAPER',
+  'YS-SATIN-PHOTO-PAPER',
+  'YS-SYNTHETIC-PAPER',
+  'YS-ADHESIVE-VINYL',
+  'YS-OUTDOOR-PVC-RIGID-FILM',
+  'YS-PVC-BANNER',
+  'YS-PVC-MESH'
+];
+
+// Name fallback used only when the caller does not pass the catalogue
+// (writeProductPages always passes it, so production pages use the
+// catalogue records themselves).
+const RELATED_MEDIA_FALLBACK = {
+  'YS-GLOSS-PHOTO-PAPER': { name_en: 'Gloss Photo Paper', name_zh: '光面写真相纸' },
+  'YS-SATIN-PHOTO-PAPER': { name_en: 'Satin Photo Paper', name_zh: '绸面写真相纸' },
+  'YS-SYNTHETIC-PAPER': { name_en: 'Outdoor PP Synthetic Paper', name_zh: '户外PP合成纸' },
+  'YS-ADHESIVE-VINYL': { name_en: 'Self-Adhesive Vinyl', name_zh: '自粘背胶' },
+  'YS-OUTDOOR-PVC-RIGID-FILM': { name_en: 'Outdoor PVC Printing Film', name_zh: '户外PVC喷绘膜' },
+  'YS-PVC-BANNER': { name_en: 'Printed PVC Banners', name_zh: 'PVC 横幅喷绘' },
+  'YS-PVC-MESH': { name_en: 'Printed PVC Mesh Banners', name_zh: 'PVC 网格布喷绘' }
+};
+
+function renderRelatedMedia(product, catalogueItem, catalogue) {
+  const currentId = String(product.id || catalogueItem.id);
+  if (!RELATED_MEDIA_IDS.includes(currentId)) return '';
+  const isEnglish = !isChineseBuild;
+  const byId = new Map((Array.isArray(catalogue) ? catalogue : []).map(item => [String(item.id), item]));
+  const cards = RELATED_MEDIA_IDS
+    .filter(otherId => otherId !== currentId)
+    .map(otherId => {
+      const item = byId.get(otherId) || RELATED_MEDIA_FALLBACK[otherId] || {};
+      const name = isEnglish ? item.name_en || item.name_zh : item.name_zh || item.name_en;
+      if (!name) return '';
+      const desc = isEnglish ? item.desc_en || '' : item.desc_zh || '';
+      const image = safeMediaUrl(item.image);
+      const visual = image
+        ? `<img src="${escapeHtml(image)}" alt="${escapeHtml(name)}" loading="lazy" decoding="async">`
+        : '';
+      return `<a class="archive-card" href="products/${slugify(otherId)}/" data-product-id="${escapeHtml(otherId)}"><div class="archive-visual">${visual}</div><div class="archive-card-content"><h3>${escapeHtml(name)}</h3><p class="archive-card-summary">${escapeHtml(desc)}</p></div></a>`;
+    })
+    .filter(Boolean)
+    .join('');
+  if (!cards) return '';
+  const eyebrow = isEnglish ? 'RELATED MEDIA' : '相关材料';
+  const heading = isEnglish ? 'Related media' : '相关产品材料';
+  return `<section class="section product-related-media"><div class="container"><p class="eyebrow">${eyebrow}</p><h2>${heading}</h2><div class="product-archive-grid">${cards}</div></div></section>`;
+}
+
+function renderStaticProduct(product, catalogueItem, template, catalogue) {
   const isEnglish = !isChineseBuild;
   const id = String(product.id || catalogueItem.id);
   const slug = slugify(id);
@@ -792,6 +844,8 @@ function renderStaticProduct(product, catalogueItem, template) {
   } else {
     html = html.replace(/<section class="product-information" id="productInformation"[^>]*>/, '<section class="product-information" id="productInformation" hidden>');
   }
+  const relatedMedia = renderRelatedMedia(product, catalogueItem, catalogue);
+  if (relatedMedia) html = html.replace('</main>', `${relatedMedia}</main>`);
   return html;
 }
 
@@ -818,7 +872,7 @@ function writeProductPages(data) {
     const slug = slugify(id);
     const output = path.join(root, 'products', slug, 'index.html');
     fs.mkdirSync(path.dirname(output), { recursive: true });
-    fs.writeFileSync(output, renderStaticProduct(product, catalogueItem, template), 'utf8');
+    fs.writeFileSync(output, renderStaticProduct(product, catalogueItem, template, data.catalogue), 'utf8');
   }
 }
 
@@ -930,4 +984,4 @@ function main() {
 
 if (require.main === module) main();
 
-module.exports = { articleSlug, decodeBase64Images, injectStaticList, main, parseFrontmatter, renderStaticArticle, renderStaticProduct, renderStaticProductList, renderStaticText, slugify };
+module.exports = { articleSlug, decodeBase64Images, injectStaticList, main, parseFrontmatter, renderRelatedMedia, renderStaticArticle, renderStaticProduct, renderStaticProductList, renderStaticText, slugify };
