@@ -54,6 +54,22 @@ test('all five core catalogue products have bilingual, product-specific SEO titl
   }
 });
 
+test('adhesive vinyl claims stay within confirmed product specifications', () => {
+  const catalogue = JSON.parse(read('content/catalogue/YS-ADHESIVE-VINYL.json'));
+  const product = JSON.parse(read('content/products/YS-ADHESIVE-VINYL.json'));
+
+  for (const item of [catalogue, product]) {
+    const text = JSON.stringify(item);
+    assert.doesNotMatch(text, /white or black adhesive|白胶或黑胶|白胶|黑胶/i);
+  }
+
+  assert.match(catalogue.desc_zh, /120gsm或140gsm底纸/);
+  assert.match(catalogue.desc_en, /120 gsm or 140 gsm release liner/i);
+  assert.match(catalogue.seo_description_en, /120 gsm or 140 gsm release liner/i);
+  assert.match(product.desc_en, /120 gsm or 140 gsm release liner/i);
+  assert.ok(product.materials_en.every(value => !/[\\u3400-\\u9fff]/.test(value)));
+});
+
 test('new bilingual knowledge guides target real print-media buying questions', () => {
   const ids = [
     'k2026111001.md',
