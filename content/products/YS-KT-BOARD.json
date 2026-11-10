@@ -1,1 +1,44 @@
-{"category":"wideformat","category_desc":"写真相纸、PP合成纸、背胶及PVC喷绘材料，面向印刷贸易与广告制作采购。","category_desc_en":"Photo papers, PP synthetic paper, self-adhesive vinyl and PVC print media for trade printers and sign makers.","category_num":"01","category_title":"写真与大幅面印刷材料","category_title_en":"Photo & Wide-Format Print Media","crafts":["喷绘印刷","裱贴覆膜","裁切","平张包装"],"crafts_en":["Large-format printing","Mounting and lamination","Trimming","Flat sheet packing"],"desc":"KT板（PVC发泡板）室内展示板材，表面平整、重量轻，适用于印刷画面裱贴、展览展示板及室内标识。厚度、尺寸与价格按询价确认。","desc_en":"KT board (PVC foam board) sheets for indoor display: a flat, lightweight rigid board for mounting printed graphics, exhibition boards and indoor signage. Thickness, sheet size and pricing are confirmed per quotation.","hidden":false,"id":"YS-KT-BOARD","image":"assets/images/products/ys-kt-board.jpg","materials":["PVC发泡板","轻质硬质板材","可按要求裁切"],"materials_en":["PVC foam board","Lightweight rigid sheet","Cut to size on request"],"publish_to":"both","seo_description_en":"KT board (PVC foam board) sheets for mounting printed graphics, exhibition display boards and indoor signage. For trade printers and sign makers; thickness, sheet size and pricing confirmed per quotation. Enquire about bulk orders and international shipping.","seo_description_zh":"KT板（PVC发泡板）室内展示板材，适用于印刷画面裱贴、展览展示板与室内标识。面向印刷贸易商与广告制作商，厚度、尺寸与价格按询价确认，支持批量采购及国际运输询价。","seo_title_en":"KT Board (PVC Foam Board) Wholesale | Wide-Format Print Media | YINZAOSUO","seo_title_zh":"KT板（PVC发泡板）批发｜写真与大幅面印刷材料｜YINZAOSUO","show_in_archive":true,"sort_order":6,"title":"KT板（PVC发泡板）","title_en":"KT Board (PVC Foam Board)"}
+{
+  "category": "wideformat",
+  "category_desc": "写真相纸、PP合成纸、背胶及PVC喷绘材料，面向印刷贸易与广告制作采购。",
+  "category_desc_en": "Photo papers, PP synthetic paper, self-adhesive vinyl and PVC print media for trade printers and sign makers.",
+  "category_num": "01",
+  "category_title": "写真与大幅面印刷材料",
+  "category_title_en": "Photo & Wide-Format Print Media",
+  "crafts": [
+    "喷绘印刷",
+    "裱贴覆膜",
+    "裁切",
+    "平张包装"
+  ],
+  "crafts_en": [
+    "Large-format printing",
+    "Mounting and lamination",
+    "Trimming",
+    "Flat sheet packing"
+  ],
+  "desc": "KT板（PVC发泡板）室内展示板材，表面平整、重量轻，适用于印刷画面裱贴、展览展示板及室内标识。厚度、尺寸与价格按询价确认。",
+  "desc_en": "KT board (PVC foam board) sheets for indoor display: a flat, lightweight rigid board for mounting printed graphics, exhibition boards and indoor signage. Thickness, sheet size and pricing are confirmed per quotation.",
+  "hidden": false,
+  "id": "YS-KT-BOARD",
+  "image": "assets/images/products/ys-kt-board.jpg",
+  "materials": [
+    "PVC发泡板",
+    "轻质硬质板材",
+    "可按要求裁切"
+  ],
+  "materials_en": [
+    "PVC foam board",
+    "Lightweight rigid sheet",
+    "Cut to size on request"
+  ],
+  "publish_to": "both",
+  "seo_description_en": "KT board (PVC foam board) sheets for mounting printed graphics, exhibition display boards and indoor signage. For trade printers and sign makers; thickness, sheet size and pricing confirmed per quotation. Enquire about bulk orders and international shipping.",
+  "seo_description_zh": "KT板（PVC发泡板）室内展示板材，适用于印刷画面裱贴、展览展示板与室内标识。面向印刷贸易商与广告制作商，厚度、尺寸与价格按询价确认，支持批量采购及国际运输询价。",
+  "seo_title_en": "KT Board (PVC Foam Board) Wholesale | Wide-Format Print Media | YINZAOSUO",
+  "seo_title_zh": "KT板（PVC发泡板）批发｜写真与大幅面印刷材料｜YINZAOSUO",
+  "show_in_archive": true,
+  "sort_order": 5,
+  "title": "KT板（PVC发泡板）",
+  "title_en": "KT Board (PVC Foam Board)"
+}

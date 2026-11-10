@@ -36,7 +36,7 @@
       "question_zh": "可以先确认材料和生产规格吗？",
       "answer_zh": "可以。请在询价时说明用途和关注的材料规格，我们会根据可供产品确认具体参数及样品安排。",
       "question_en": "Can I confirm materials and specifications before ordering?",
-      "answer_en": "Yes. Share your application and material requirements, and we will confirm available specifications and sample options."
+      "answer_en": "Tell us the application and the specifications you need to confirm, and we will confirm the available options before you commit. Material samples or a printed proof can be arranged for most media — ask when you request your quotation."
     },
     {
       "question_zh": "没有设计稿，也能制作吗？",
@@ -47,14 +47,14 @@
     {
       "question_zh": "如何安排国际运输？",
       "answer_zh": "我们会根据订单尺寸、重量、包装和目的地协调运输方案，具体费用与交期以项目确认结果为准。",
-      "question_en": "How is international shipping arranged?",
-      "answer_en": "We coordinate shipping based on order dimensions, weight, packing and destination. Costs and timing are confirmed per project."
+      "question_en": "What payment and delivery methods are available?",
+      "answer_en": "Payment is by bank transfer (T/T) against a proforma invoice, so the specification, quantity and total are agreed in writing before you pay. Production time is confirmed in your quotation; sea freight to main Australian ports typically takes around 40 days in transit. Delivery terms and any import charges for your destination are stated in the quotation before you confirm."
     },
     {
       "question_zh": "如何处理印刷质量问题？",
       "answer_zh": "生产前会确认文件和规格。如出现影响使用的生产质量问题，请提供照片和订单信息，我们会核实并协商处理方案。",
       "question_en": "What if there is a print quality issue?",
-      "answer_en": "Please share photos and order details. We will review the issue against the approved specifications and discuss an appropriate resolution."
+      "answer_en": "Files and specifications are confirmed before production, and photos of the finished goods and their export packing are shared with you before dispatch. If a production quality issue still affects use, tell us with photos and order details — we will prioritize reprinting or agree on another appropriate solution."
     }
   ],
   "hero_title_zh": "全球定制印刷与展示供应，为贸易伙伴而协作。",
