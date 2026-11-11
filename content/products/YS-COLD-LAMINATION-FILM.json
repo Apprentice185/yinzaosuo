@@ -17,24 +17,24 @@
     "Cut to size",
     "Roll slitting"
   ],
-  "desc": "冷裱膜为压敏覆膜材料，无需加热即可贴合保护印刷画面，防止刮擦、受潮与褪色，延长画面使用寿命。提供光面与哑面效果，幅宽与价格按询价确认。",
-  "desc_en": "Pressure-sensitive cold lamination film that protects printed graphics without heat — guarding photos, posters and prints against scratches, moisture and fading. Gloss and matte finishes; roll width and pricing are confirmed per quotation.",
+  "desc": "冷裱膜为压敏覆膜材料，无需加热即可贴合保护印刷画面，防止刮擦、受潮与褪色，延长画面使用寿命。常规提供光面与哑面效果，缎面等其他表面可按需求安排，幅宽与价格按询价确认。",
+  "desc_en": "Pressure-sensitive cold lamination film that protects printed graphics without heat — guarding photos, posters and prints against scratches, moisture and fading. Gloss and matte finishes as standard, with satin and other finishes available on request; roll width and pricing are confirmed per quotation.",
   "hidden": false,
   "id": "YS-COLD-LAMINATION-FILM",
   "image": "assets/images/products/ys-cold-lamination-film.jpg",
   "materials": [
     "PVC冷裱膜",
-    "光面与哑面两种表面",
+    "光面与哑面两种表面（缎面可按需）",
     "压敏胶层"
   ],
   "materials_en": [
     "PVC cold lamination film",
-    "Gloss and matte finishes",
+    "Gloss and matte finishes (satin on request)",
     "Pressure-sensitive adhesive"
   ],
   "publish_to": "both",
-  "seo_description_en": "Wholesale cold lamination film (gloss and matte) for protecting photos, posters and printed graphics from scratches, moisture and fading. Roll width, finish and pricing confirmed per quotation.",
-  "seo_description_zh": "冷裱膜（光面/哑面）用于保护相片、海报与印刷画面，防刮擦、防潮、防褪色。面向印刷贸易商与广告制作商，幅宽、表面效果与价格按询价确认。",
+  "seo_description_en": "Wholesale cold lamination film (gloss and matte; satin on request) for protecting photos, posters and printed graphics from scratches, moisture and fading. Roll width, finish and pricing confirmed per quotation.",
+  "seo_description_zh": "冷裱膜（光面/哑面，缎面可按需）用于保护相片、海报与印刷画面，防刮擦、防潮、防褪色。面向印刷贸易商与广告制作商，幅宽、表面效果与价格按询价确认。",
   "seo_title_en": "Cold Lamination Film Wholesale | Wide-Format Print Media | YINZAOSUO",
   "seo_title_zh": "冷裱膜批发｜写真与大幅面印刷材料｜YINZAOSUO",
   "show_in_archive": true,

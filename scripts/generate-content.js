@@ -784,6 +784,9 @@ function renderStaticProduct(product, catalogueItem, template, catalogue) {
     : catalogueItem.desc_zh || product.desc || product.intro || description;
   const detail = isEnglish ? catalogueItem.detail_en : catalogueItem.detail_zh;
   const image = safeMediaUrl(catalogueItem.image || product.image);
+  const imageCredit = isEnglish
+    ? catalogueItem.image_credit_en || product.image_credit_en || ''
+    : catalogueItem.image_credit_zh || product.image_credit_zh || '';
   const imageUrl = image ? new URL(image, `${siteUrl}/`).href : '';
   const canonicalUrl = `${siteUrl}${sitePrefix}/products/${slug}/`;
   const category = isEnglish
@@ -807,7 +810,7 @@ function renderStaticProduct(product, catalogueItem, template, catalogue) {
     : template.replace('<head>', `<head><base href="${escapeHtml(baseUrl)}">`);
   html = html.replace(/<title[^>]*>[\s\S]*?<\/title>/i, `<title>${escapeHtml(seoTitleBase)} | ${isEnglish ? 'YINZAOSUO' : '印造所'}</title>`);
   html = html.replace(/<meta name="description" content="[^"]*"[^>]*>/i, `<meta name="description" content="${escapeHtml(description)}">`);
-  html = html.replace(/<meta property="og:title" content="[^"]*"[^>]*>/i, `<meta property="og:title" content="${escapeHtml(seoTitle)}">`);
+  html = html.replace(/<meta property="og:title" content="[^"]*"[^>]*>/i, `<meta property="og:title" content="${escapeHtml(seoTitleBase)} | ${isEnglish ? 'YINZAOSUO' : '印造所'}">`);
   html = html.replace(/<meta property="og:description" content="[^"]*"[^>]*>/i, `<meta property="og:description" content="${escapeHtml(description)}">`);
   html = html.replace(/<meta property="og:url" content="[^"]*"[^>]*>/i, `<meta property="og:url" content="${escapeHtml(canonicalUrl)}">`);
   html = html.replace(/<link rel="canonical" href="[^"]*"[^>]*>/i, `<link rel="canonical" href="${escapeHtml(canonicalUrl)}">`);
@@ -826,6 +829,10 @@ function renderStaticProduct(product, catalogueItem, template, catalogue) {
   html = html.replace(/<p class="product-detail-intro" id="productIntro">[\s\S]*?<\/p>/, `<p class="product-detail-intro" id="productIntro">${escapeHtml(intro)}</p>`);
   html = html.replace(/<strong class="product-detail-price" id="productPrice">[\s\S]*?<\/strong>/, `<strong class="product-detail-price" id="productPrice">${escapeHtml(price || (isEnglish ? 'Request a quote' : '欢迎询价'))}</strong>`);
   html = html.replace(/<div class="product-detail-image" id="productImage"><\/div>/, `<div class="product-detail-image" id="productImage">${imageUrl ? `<img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(name)}" decoding="async">` : ''}</div>`);
+  if (imageCredit) {
+    html = html.replace(/(<div class="product-detail-image" id="productImage">[\s\S]*?<\/div>)/, `$1<p class="product-image-credit">${escapeHtml(imageCredit)}</p>`);
+    html = html.replace('</head>', '<style>.product-image-credit{margin:8px 2px 0;font-size:12px;line-height:1.5;color:#777}</style></head>');
+  }
   if (detail) {
     html = html.replace(/<section class="product-information" id="productInformation"[^>]*>/, '<section class="product-information" id="productInformation">');
     html = html.replace(/<h2 id="productInfoTitle">[\s\S]*?<\/h2>/, `<h2 id="productInfoTitle">${escapeHtml(isEnglish ? 'Product specifications & ordering' : '产品详情与采购信息')}</h2>`);
