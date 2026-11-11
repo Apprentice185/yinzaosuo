@@ -19,9 +19,9 @@
 .archive-visual-placeholder:before{background-image:linear-gradient(135deg,#eee,#d8d8d8)}
 .archive-image-placeholder{position:absolute;inset:0;display:grid;place-items:center;color:#666;font-size:11px;letter-spacing:.04em}
 .archive-visual img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.92) contrast(1.02);transition:transform .65s cubic-bezier(.2,.7,.2,1)}
-.archive-visual-placeholder{display:grid;place-items:center;background:linear-gradient(135deg,#ebe8e1,#d9d4ca)}
+.archive-visual-placeholder{display:grid;place-items:center;background:linear-gradient(135deg,#eaeaea,#d8d8d8)}
 .archive-visual-placeholder:before{display:none}
-.archive-visual-placeholder span{position:relative;z-index:1;max-width:80%;color:#625e56;font-family:Georgia,serif;font-size:clamp(20px,3vw,34px);line-height:1.2;text-align:center}
+.archive-visual-placeholder span{position:relative;z-index:1;max-width:80%;color:#5c5c5c;font-family:Georgia,serif;font-size:clamp(20px,3vw,34px);line-height:1.2;text-align:center}
 .archive-card:hover .archive-visual img,.archive-card:focus-visible .archive-visual img{transform:scale(1.035)}
 .archive-index{position:absolute;z-index:1;top:15px;left:16px;color:#fff;font-size:10px;letter-spacing:.08em;text-shadow:0 1px 5px #0008;font-variant-numeric:tabular-nums}
 .archive-tag-group{min-width:0}
