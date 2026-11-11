@@ -2,7 +2,7 @@
   "id": "YS-PVC-MESH",
   "name_zh": "PVC 网格布喷绘",
   "name_en": "Printed PVC Mesh Banners",
-  "image": "pic/pvc-mesh-banner.jpg",
+  "image": "/pic/pvc-mesh-banner.jpg",
   "desc_zh": "适用于户外围挡、建筑及大型展示场景的定制网格布印刷成品。",
   "desc_en": "Custom-printed mesh banners for outdoor fencing, building wraps and large-format display applications.",
   "detail_zh": {

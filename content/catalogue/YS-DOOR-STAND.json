@@ -2,7 +2,7 @@
   "id": "YS-DOOR-STAND",
   "name_zh": "门型展示架",
   "name_en": "Door-Type Display Stands",
-  "image": "pic/display-stands.jpg",
+  "image": "/pic/display-stands.jpg",
   "desc_zh": "门型结构展示架，可提供硬件、印刷画面或完整组合方案。",
   "desc_en": "Door-style display frames supplied as hardware, printed graphics, or a complete display set.",
   "detail_zh": {
