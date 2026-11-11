@@ -665,8 +665,8 @@ function buildTranslations(products, knowledge, news, templates, solutions) {
 
 function buildSitemap(data) {
   const routes = new Set(['/']);
-  const nonIndexablePages = new Set(['admin.html', 'index.html', 'article.html', 'product.html']);
-  const excludedPages = new Set(['admin.html']);
+  const nonIndexablePages = new Set(['admin.html', 'index.html', 'article.html', 'product.html', 'bj.html', 'ys.html']);
+  const excludedPages = new Set(['admin.html', 'bj.html', 'ys.html']);
   for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
     if (!entry.isFile() || !/\.html?$/i.test(entry.name) || excludedPages.has(entry.name)) continue;
     if (!nonIndexablePages.has(entry.name)) routes.add(`/${entry.name}`);
