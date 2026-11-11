@@ -23,18 +23,6 @@
       "label_en": "Knowledge",
       "url": "knowledge.html",
       "enabled": true
-    },
-    {
-      "label_zh": "品牌资讯",
-      "label_en": "Journal",
-      "url": "journal.html",
-      "enabled": true
-    },
-    {
-      "label_zh": "模板素材",
-      "label_en": "Templates",
-      "url": "templates.html",
-      "enabled": true
     }
   ],
   "seo_home_title_en": "Wholesale Photo Paper & Wide-Format Print Media | YINZAOSUO",
