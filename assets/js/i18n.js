@@ -22,7 +22,7 @@ window.I18N = {
     trust_factory_title: '合作生产伙伴', trust_factory_text: '协调中国生产资源',
     trust_custom_title: '按需加工', trust_custom_text: '根据尺寸与项目要求定制',
     trust_service_title: '订单协调', trust_service_text: '规格确认 · 生产跟进',
-    trust_delivery_title: '国际物流协调', trust_delivery_text: '按订单确认包装与运输方案',
+    trust_delivery_title: '贸易物流保障', trust_delivery_text: '海运到澳大利亚主要港口约 40 天 · 发货前发成品与出口包装照片确认',
 
     home_materials_eyebrow: '核心材料系列', home_materials_title: '五大核心大幅面打印材料', home_materials_intro: '面向印刷贸易商、广告制作商与展示供应商的卷材产品，规格清晰，支持批量询价。',
     home_gloss_title: '光面写真相纸', home_gloss_desc: '表面光泽明亮，适用于海报、促销画面与室内展示。', home_gloss_specs: '1520mm · 200gsm · 50米/卷 · USD 18.60/m²',
@@ -127,7 +127,7 @@ window.I18N = {
     trust_factory_title: 'Production partners', trust_factory_text: 'Coordinated manufacturing in China',
     trust_custom_title: 'Custom specifications', trust_custom_text: 'Materials, sizes, and finishing options',
     trust_service_title: 'Order coordination', trust_service_text: 'Specification review · production follow-up',
-    trust_delivery_title: 'Shipping coordination', trust_delivery_text: 'Packing and freight options discussed per order',
+    trust_delivery_title: 'Delivery assurance', trust_delivery_text: 'Sea freight to main Australian ports in around 40 days · Export packing photographed for your confirmation before dispatch',
 
     home_materials_eyebrow: 'CORE MATERIAL RANGE', home_materials_title: 'Five Core Wide-Format Media', home_materials_intro: 'Roll media for trade printers, sign makers and display suppliers, with clear specifications for trade enquiries.',
     home_gloss_title: 'Gloss Photo Paper', home_gloss_desc: 'A bright, glossy surface for posters, promotions and indoor displays.', home_gloss_specs: '1520mm · 200gsm · 50m/roll · USD 18.60/m²',

@@ -22,7 +22,7 @@ window.I18N = {
     trust_factory_title: '生产协同', trust_factory_text: '中国合作工厂协同生产',
     trust_custom_title: '灵活定制', trust_custom_text: '尺寸、材质、工艺自由组合',
     trust_service_title: '专人服务', trust_service_text: '文件检查 · 打样 · 售后',
-    trust_delivery_title: '全国配送', trust_delivery_text: '高效打包 · 稳定送达',
+    trust_delivery_title: '物流配送保障', trust_delivery_text: '同城次日达 · 送货上门',
 
     home_materials_eyebrow: '核心材料系列', home_materials_title: '五大核心大幅面打印材料', home_materials_intro: '面向印刷贸易商、广告制作商与展示供应商的卷材产品，规格清晰，支持批量询价。',
     home_gloss_title: '光面写真相纸', home_gloss_desc: '表面光泽明亮，适用于海报、促销画面与室内展示。', home_gloss_specs: '1520mm · 200gsm · 50米/卷 · USD 18.60/m²',
@@ -133,7 +133,7 @@ window.I18N = {
     trust_factory_title: 'Production partners', trust_factory_text: 'Coordinated manufacturing in China',
     trust_custom_title: 'Flexible customization', trust_custom_text: 'Combine sizes, stocks, and finishes',
     trust_service_title: 'Personal service', trust_service_text: 'File checks · proofs · after-sales support',
-    trust_delivery_title: 'Nationwide delivery', trust_delivery_text: 'Careful packing · reliable arrival',
+    trust_delivery_title: 'Delivery assurance', trust_delivery_text: 'Same-city next-day delivery · to your door',
     archive_title: 'Material & Craft Archive', archive_description: 'Explore print stocks, packaging structures, and display capabilities.',
     archive_materials: 'Materials', archive_crafts: 'Crafts', archive_specs: 'Specifications', archive_close: 'Close specs', archive_count_suffix: 'products', archive_image_pending: 'Product photo coming soon',
     archive_placeholder_prototype: 'PROTOTYPE', archive_placeholder_pending: 'SPEC PENDING',
