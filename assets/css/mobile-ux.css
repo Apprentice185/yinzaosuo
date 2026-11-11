@@ -41,10 +41,30 @@
   .step h3 { font-size: 15px; }
   .step p { font-size: 12px; }
   .all-products-category-heading { grid-template-columns: minmax(0, 1fr); }
-  .site-footer .footer-links { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+  .site-footer .footer-links { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
   .site-footer .footer-contact-content { grid-template-columns: minmax(0, 1fr) 96px; }
   .site-footer .footer-wechat .qr-code { width: 96px; height: 96px; }
 }
 @media (prefers-reduced-motion: reduce) {
   * { scroll-behavior: auto !important; }
+}
+
+/* Right-side mobile menu panel + in-panel language switch (2026-11-12) */
+@media (max-width: 800px) {
+  .main-nav.mobile-open { left: auto; right: 10px; top: calc(100% + 10px); width: min(250px, 70vw); padding: 6px 22px 16px; border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 24px 48px rgba(0,0,0,.22); align-items: stretch; }
+  .main-nav.mobile-open a { text-align: right; font-size: 16px; font-weight: 600; padding: 15px 0; letter-spacing: .01em; }
+  .main-nav .language-switch { margin-top: 16px; display: flex; align-items: stretch; gap: 0; padding: 0; border: 1px solid #131313; border-radius: 999px; overflow: hidden; min-height: 40px; width: 100%; }
+  .main-nav .language-switch i { display: none; }
+  .main-nav .language-switch span { flex: 1; display: grid; place-items: center; padding: 9px 0; font-size: 11px; color: #131313; background: #fff; }
+  .main-nav .language-switch span.active { background: #131313; color: #fff; }
+  /* Mobile content folding: full text stays in the DOM, capped only on small screens */
+  .mfold-on { position: relative; }
+  .mfold-on:not(.is-open) { max-height: 5.6em; overflow: hidden; }
+  .mfold-on:not(.is-open)::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 2.4em; background: linear-gradient(rgba(255,255,255,0), #fff); pointer-events: none; }
+  .process .mfold-on:not(.is-open)::after { background: linear-gradient(rgba(240,240,240,0), #f0f0f0); }
+  .mfold-toggle { display: inline-block; margin-top: 10px; font-size: 12px; font-weight: 700; color: var(--ink); border-bottom: 1px solid var(--ink); padding-bottom: 2px; min-height: 0; }
+}
+@media (min-width: 801px) { .mfold-toggle { display: none !important; } }
+@media (max-width: 560px) {
+  .steps .step p { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 }

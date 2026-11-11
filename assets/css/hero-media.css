@@ -1,36 +1,36 @@
 /* Full-width 1920 x 600-style editorial banner carousel */
-.hero.hero-fullbleed{height:clamp(500px,31.25vw,680px);min-height:500px;max-height:680px;padding:0;position:relative;isolation:isolate;overflow:hidden;background:#101d2b;color:#fff}
+.hero.hero-fullbleed{height:clamp(500px,31.25vw,680px);min-height:500px;max-height:680px;padding:0;position:relative;isolation:isolate;overflow:hidden;background:#111111;color:#fff}
 .hero-fullbleed .hero-slides,.hero-fullbleed .hero-shade{position:absolute;inset:0}
 .hero-fullbleed .hero-slides{z-index:-2}
 .hero-fullbleed .hero-slide{position:absolute;inset:0;opacity:0;transition:opacity 1.15s ease;will-change:opacity}
 .hero-fullbleed .hero-slide.is-active{opacity:1}
 .hero-fullbleed .hero-slide img{width:100%;height:100%;display:block;object-fit:cover;object-position:center}
-.hero-fullbleed .hero-shade{z-index:-1;background:linear-gradient(90deg,rgba(8,20,33,.82) 0%,rgba(8,20,33,.63) 36%,rgba(8,20,33,.2) 72%,rgba(8,20,33,.08) 100%),linear-gradient(0deg,rgba(8,20,33,.24),transparent 48%)}
+.hero-fullbleed .hero-shade{z-index:-1;background:linear-gradient(90deg,rgba(0,0,0,.82) 0%,rgba(0,0,0,.63) 36%,rgba(0,0,0,.2) 72%,rgba(0,0,0,.08) 100%),linear-gradient(0deg,rgba(0,0,0,.24),transparent 48%)}
 .hero-fullbleed .hero-content{height:100%;display:flex;align-items:center;position:relative}
 .hero-fullbleed .hero-copy{max-width:700px;padding:50px 0 74px;color:#fff}
-.hero-fullbleed .eyebrow{color:#f1a184}
+.hero-fullbleed .eyebrow{color:#ffffff}
 .hero-fullbleed h1{font-size:clamp(42px,5.3vw,76px);line-height:1.08;max-width:760px;color:#fff}
-.hero-fullbleed h1 em{color:#ffb18e}
+.hero-fullbleed h1 em{color:#ffffff}
 .hero-fullbleed .hero-text{max-width:590px;color:rgba(255,255,255,.86);font-size:clamp(15px,1.2vw,18px);line-height:1.8}
 .hero-fullbleed .hero-note{color:rgba(255,255,255,.8);margin-top:32px}
-.hero-fullbleed .button-dark{background:#f1a184;color:#18232d}
+.hero-fullbleed .button-dark{background:#131313;color:#fff}
 .hero-fullbleed .button-outline{border-color:rgba(255,255,255,.8);color:#fff}
 .hero-fullbleed .hero-carousel-controls{position:absolute;right:max(32px,calc((100vw - 1160px)/2));bottom:30px;display:flex;align-items:center;gap:12px;z-index:3}
-.hero-carousel-arrow,.hero-carousel-pause{width:36px;height:36px;border:1px solid rgba(255,255,255,.5);border-radius:50%;color:#fff;background:rgba(10,20,30,.25);font-size:22px;display:grid;place-items:center}
+.hero-carousel-arrow,.hero-carousel-pause{width:36px;height:36px;border:1px solid rgba(255,255,255,.5);border-radius:50%;color:#fff;background:rgba(0,0,0,.25);font-size:22px;display:grid;place-items:center}
 .hero-carousel-pause{font-size:14px}
 .hero-carousel-dots{display:flex;align-items:center;gap:8px}
 .hero-carousel-dots button{width:8px;height:8px;padding:0;border:0;border-radius:99px;background:rgba(255,255,255,.52);transition:width .25s,background .25s}
 .hero-carousel-dots button.is-active{width:27px;background:#fff}
-.hero-fullbleed button:focus-visible,.hero-fullbleed a:focus-visible{outline:3px solid #ffd1bc;outline-offset:4px}
+.hero-fullbleed button:focus-visible,.hero-fullbleed a:focus-visible{outline:3px solid #ffffff;outline-offset:4px}
 @media(max-width:800px){
   .hero.hero-fullbleed{height:clamp(560px,82svh,720px);min-height:540px;max-height:720px}
   .hero-fullbleed .hero-copy{padding:24px 0 96px;max-width:620px}
   .hero-fullbleed .hero-content{align-items:center}
-  .hero-fullbleed .hero-shade{background:linear-gradient(90deg,rgba(8,20,33,.76),rgba(8,20,33,.28)),linear-gradient(0deg,rgba(8,20,33,.52),transparent 82%)}
+  .hero-fullbleed .hero-shade{background:linear-gradient(90deg,rgba(0,0,0,.76),rgba(0,0,0,.28)),linear-gradient(0deg,rgba(0,0,0,.52),transparent 82%)}
   .hero-fullbleed .hero-carousel-controls{right:0;left:0;bottom:18px;justify-content:center;gap:0;pointer-events:none}
   .hero-fullbleed .hero-carousel-controls>*{pointer-events:auto}
   .hero-fullbleed .hero-carousel-arrow,.hero-fullbleed .hero-carousel-pause{display:none}
-  .hero-fullbleed .hero-carousel-dots{gap:9px;padding:10px 14px;border-radius:99px;background:rgba(10,20,30,.24);backdrop-filter:blur(8px)}
+  .hero-fullbleed .hero-carousel-dots{gap:9px;padding:10px 14px;border-radius:99px;background:rgba(0,0,0,.28);backdrop-filter:blur(8px)}
   .hero-fullbleed .hero-carousel-dots button{width:7px;height:7px}
   .hero-fullbleed .hero-carousel-dots button.is-active{width:23px}
   .hero-fullbleed .hero-text{font-size:14px;line-height:1.7}
@@ -48,3 +48,23 @@
   .hero-fullbleed .hero-actions .button{padding-inline:15px;font-size:11px}
 }
 @media(prefers-reduced-motion:reduce){.hero-fullbleed .hero-slide{transition:none}.hero-carousel-dots button{transition:none}}
+
+/* Mobile split hero (2026-11-12): title over photo, copy + pill CTAs below on white */
+@media (max-width:800px){
+  .hero.hero-fullbleed{--photo-h:min(54svh,460px);height:auto;min-height:0;max-height:none;display:flex;flex-direction:column;background:#fff;color:var(--ink)}
+  .hero-fullbleed .hero-slides{position:relative;inset:auto;height:var(--photo-h);min-height:300px;flex:none;z-index:0}
+  .hero-fullbleed .hero-shade{inset:auto;top:0;left:0;right:0;height:var(--photo-h);z-index:1;background:linear-gradient(0deg,rgba(0,0,0,.58) 0%,rgba(0,0,0,.12) 46%,rgba(0,0,0,0) 72%),linear-gradient(90deg,rgba(0,0,0,.30),rgba(0,0,0,0) 65%)}
+  .hero-fullbleed .hero-content{height:auto;display:block;position:relative;z-index:2}
+  .hero-fullbleed .hero-copy{max-width:none;padding:0 0 10px;margin-top:-140px;color:var(--ink)}
+  .hero-fullbleed .eyebrow{color:#fff;margin-bottom:14px}
+  .hero-fullbleed h1{color:#fff;font-size:clamp(30px,8.2vw,38px);line-height:1.14}
+  .hero-fullbleed h1 em{color:#fff}
+  .hero-fullbleed .hero-text{color:var(--muted);font-size:14px;line-height:1.75;margin-top:26px;max-width:none}
+  .hero-fullbleed .hero-actions{display:flex;flex-wrap:nowrap;gap:12px;margin-top:22px}
+  .hero-fullbleed .hero-actions .button{flex:1;border-radius:999px;min-height:50px;padding:13px 10px;font-size:13.5px;letter-spacing:.01em}
+  .hero-fullbleed .hero-actions .button span{display:none}
+  .hero-fullbleed .button-dark{background:#131313;color:#fff}
+  .hero-fullbleed .button-outline{border:1px solid #131313;color:#131313;background:transparent}
+  .hero-fullbleed .hero-note{color:var(--muted);margin-top:18px;font-size:11.5px}
+  .hero-fullbleed .hero-carousel-controls{top:calc(var(--photo-h) - 38px);bottom:auto;z-index:3}
+}

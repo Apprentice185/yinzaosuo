@@ -21,6 +21,22 @@
     button.setAttribute('aria-expanded', String(open));
   };
 
+  const langBtn = document.querySelector('#languageToggle');
+  if (langBtn) {
+    const homeParent = langBtn.parentNode;
+    const homeNext = langBtn.nextSibling;
+    const mq = window.matchMedia('(max-width: 800px)');
+    const placeLang = () => {
+      if (mq.matches) {
+        if (langBtn.parentNode !== nav) nav.appendChild(langBtn);
+      } else if (langBtn.parentNode !== homeParent) {
+        homeParent.insertBefore(langBtn, homeNext);
+      }
+    };
+    placeLang();
+    if (mq.addEventListener) mq.addEventListener('change', placeLang);
+    else if (mq.addListener) mq.addListener(placeLang);
+  }
   button.addEventListener('click', () => setOpen(!nav.classList.contains('mobile-open')));
   nav.addEventListener('click', event => {
     if (event.target.closest('a')) setOpen(false);
