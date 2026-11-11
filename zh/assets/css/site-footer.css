@@ -214,7 +214,8 @@
   }
 
   .site-footer .footer-links {
-    gap: 12px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
   }
 
   .site-footer .footer-links strong,

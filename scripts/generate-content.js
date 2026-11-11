@@ -598,12 +598,14 @@ function buildCatalog(products) {
     const categoryProducts = visible
       .filter(product => product.category === categoryId)
       .sort((a, b) => a.sort_order - b.sort_order || a.id.localeCompare(b.id));
-    const first = categoryProducts[0] || {};
+    if (!categoryProducts.length) continue;
+    const first = categoryProducts[0];
+    const num = String(catalog.zh.categories.length + 1).padStart(2, '0');
     for (const lang of ['zh', 'en']) {
       const english = lang === 'en';
       catalog[lang].categories.push({
         id: categoryId,
-        num: first.category_num || defaults.num,
+        num,
         title: english ? first.category_title_en || defaults.en : first.category_title || defaults.zh,
         desc: english ? first.category_desc_en || defaults.desc_en : first.category_desc || defaults.desc,
         items: categoryProducts.map(product => ({

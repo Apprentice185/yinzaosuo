@@ -1,7 +1,7 @@
 window.I18N = {
   zh: {
     nav_products: '产品中心', nav_solutions: '场景方案', nav_knowledge: '印刷知识', nav_journal: '品牌资讯', nav_templates: '模板素材',
-    nav_quote: '获取报价 <span>↗</span>', nav_search: '搜索', nav_menu: '打开菜单', nav_main: '主导航',
+    nav_quote: '获取报价 <span>↗</span>', nav_quote_short: '报价', nav_search: '搜索', nav_menu: '打开菜单', nav_main: '主导航',
     brand_home: '印造所首页', lang_switch: '切换到英文', close: '关闭',
     meta_home_title: '写真相纸与喷绘材料批发｜印造所', meta_home_description: '印造所供应光面与绸面写真相纸、PP合成纸、自粘背胶及户外PVC喷绘膜，面向印刷贸易商、广告制作商与标识供应商，支持批量询价。',
     meta_knowledge_title: '印刷知识库｜印造所', meta_knowledge_description: '了解印刷纸张、文件规范、色彩和装订工艺，掌握实用印刷知识。',
@@ -60,7 +60,7 @@ window.I18N = {
     faq_design: '没有设计稿，也能制作吗？', faq_design_answer: '可以提供设计协助。你只需要准备文字、图片和品牌素材，我们会先沟通需求再报价。',
     faq_delivery: '付款和配送方式有哪些？', faq_delivery_answer: '支持微信支付、支付宝、对公转账。成品可配送至中国大陆大部分地区，具体以项目报价为准。',
     faq_quality: '印刷出现问题如何处理？', faq_quality_answer: '生产前会进行文件确认，若因生产质量问题影响使用，我们会优先补印或按情况处理。', faq_mix: '不同产品可以拼单、一起发吗？', faq_mix_answer: '可以。不同材料和成品画面通常可以合并为一个订单，适合拼在一起的也可以合并包装、合并发运。询价时请把完整清单（含尺寸和数量）发过来，拼单组合、包装和合并发运的费用会在报价中书面确认后再下单。', faq_process: '下单流程是怎样的？', faq_process_answer: '共六步：(1) 发送询价，注明产品、尺寸、数量和目的地；(2) 收到报价与形式发票（PI），规格、包装和运费均以书面确认；(3) 按 PI 通过电汇（T/T）付款；(4) 文件与规格确认后进入生产；(5) 发货前发送成品与出口包装照片供确认；(6) 按报价中确认的条款安排发运。', faq_files: '印刷文件有什么要求？', faq_files_answer: '把现有文件发过来即可，每个文件在生产前都会检查，有可能影响成品效果的问题会提前反馈确认。基本检查和简单调整包含在内；大幅修改或原创设计会事先单独报价，确认后再开始，不会产生意外费用。',
-    footer_tagline: '把每一次表达，<br>做成值得留下的东西。', footer_products: '产品与服务', footer_all_products: '全部产品',
+    footer_tagline: '把每一次表达，<br>做成值得留下的东西。', footer_products: '产品', footer_all_products: '全部产品', footer_product_foam_board: 'PVC 发泡板', footer_product_photo_paper: '光面相纸', footer_product_one_way_vision: '单透膜', footer_product_adhesive_vinyl: '自粘背胶', footer_product_pvc_banners: 'PVC 横幅', footer_company: '公司', footer_australia: '澳洲买家', footer_resources: '资源', footer_faq: '常见问题', 
     footer_solutions: '场景方案', footer_process: '服务流程', footer_template_library: '模板素材库', footer_help: '帮助中心',
     footer_knowledge: '印刷知识', footer_journal: '品牌资讯', footer_delivery: '配送说明', footer_about: '关于印造所',
     footer_about_link: '关于我们', footer_contact_link: '联系我们', footer_wechat: '微信扫码咨询',
@@ -106,7 +106,7 @@ window.I18N = {
   },
   en: {
     nav_products: 'Products', nav_solutions: 'Trade Supply', nav_knowledge: 'Materials Guide', nav_journal: 'Insights', nav_templates: 'Resources',
-    nav_quote: 'Get a quote <span>↗</span>', nav_search: 'Search', nav_menu: 'Open menu', nav_main: 'Main navigation',
+    nav_quote: 'Get a quote <span>↗</span>', nav_quote_short: 'Quote', nav_search: 'Search', nav_menu: 'Open menu', nav_main: 'Main navigation',
     brand_home: 'YINZAOSUO home', lang_switch: 'Switch to Chinese', close: 'Close',
     meta_home_title: 'Wholesale Large Format Print Media | YINZAOSUO', meta_home_description: 'Wholesale gloss and satin photo paper, PP synthetic paper, self-adhesive vinyl and outdoor PVC printing film for trade printers, sign makers and print distributors. Request a trade quote.',
     meta_knowledge_title: 'Print Knowledge | YINZAOSUO', meta_knowledge_description: 'Practical guidance on paper, file preparation, color, and print finishing.',
@@ -167,7 +167,7 @@ window.I18N = {
     faq_design: 'Can you help if I do not have a design?', faq_design_answer: 'Yes, design assistance is available. Prepare your text, images, and brand assets; we will discuss the requirements before quoting.',
     faq_delivery: 'What payment and delivery methods are available?', faq_delivery_answer: 'Payment is by bank transfer (T/T) against a proforma invoice, so the specification, quantity and total are agreed in writing before you pay. Production time is confirmed in your quotation; sea freight to main Australian ports typically takes around 40 days in transit. Delivery terms and any import charges for your destination are stated in the quotation before you confirm.',
     faq_quality: 'What if there is a problem with the print?', faq_quality_answer: 'Files and specifications are confirmed before production, and photos of the finished goods and their export packing are shared with you before dispatch. If a production quality issue still affects use, tell us with photos and order details — we will prioritize reprinting or agree on another appropriate solution.', faq_mix: 'Can I combine different products in one order or shipment?', faq_mix_answer: 'Yes — different media and finished graphics can usually be combined into a single order, and where it makes sense they can be packed and shipped together. Send the full list with dimensions and quantities when you enquire; the combination, packing and freight for the combined shipment are confirmed in your quotation before you commit.', faq_process: 'How does ordering work, from enquiry to shipment?', faq_process_answer: 'In six steps: (1) send your enquiry with the product, dimensions, quantity and destination; (2) you receive a quotation and proforma invoice with the specifications, packing and freight confirmed in writing; (3) payment is made by bank transfer (T/T) against the proforma invoice; (4) production runs once files and specifications are confirmed; (5) before dispatch, you receive photos of the finished goods and their export packing for your confirmation; (6) the shipment is then arranged on the terms confirmed in your quotation.', faq_files: 'What do you need from my artwork files?', faq_files_answer: 'Send the artwork you have — every file is checked before production, and anything that could affect the printed result is flagged back to you first. Basic file checks and simple adjustments are included; larger revisions or original design work are quoted separately before any work starts, so there are no surprises in the total.',
-    footer_tagline: 'Print Materials.<br>Global Supply.', footer_products: 'Products & Services', footer_all_products: 'All products',
+    footer_tagline: 'Print Materials.<br>Global Supply.', footer_products: 'Products', footer_all_products: 'All products', footer_product_foam_board: 'PVC Foam Board', footer_product_photo_paper: 'Gloss Photo Paper', footer_product_one_way_vision: 'One-Way Vision Film', footer_product_adhesive_vinyl: 'Self-Adhesive Vinyl', footer_product_pvc_banners: 'Printed PVC Banners', footer_company: 'Company', footer_australia: 'For Australian buyers', footer_resources: 'Resources', footer_faq: 'FAQ', 
     footer_solutions: 'Solutions', footer_process: 'How it works', footer_template_library: 'Template library', footer_help: 'Help',
     footer_knowledge: 'Print knowledge', footer_journal: 'Journal', footer_delivery: 'Delivery', footer_about: 'About',
     footer_about_link: 'About us', footer_contact_link: 'Contact us', footer_wechat: 'WhatsApp Business QR',

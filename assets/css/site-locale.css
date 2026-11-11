@@ -99,6 +99,13 @@
   background: #303030;
 }
 
+.quote-btn-compact {
+  display: none;
+  min-height: 34px;
+  padding: 0 14px;
+  font-size: 11px;
+}
+
 .quote-btn span {
   display: inline-block;
   margin-left: 0;

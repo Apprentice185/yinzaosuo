@@ -2,19 +2,16 @@
   "eyebrow_zh": "面向全球贸易客户的印刷合作伙伴",
   "hero_slides": [
     {
-      "image": "/pic/display-stands.jpg"
+      "image": "assets/images/products/ys-outdoor-pvc-rigid-film.jpg"
     },
     {
-      "image": "/pic/banner.webp"
+      "image": "assets/images/products/ys-one-way-vision.jpg"
     },
     {
-      "image": "pic/pvc-mesh-banner.jpg"
+      "image": "assets/images/products/ys-pvc-foam-board.jpg"
     },
     {
-      "image": "pic/display-stands.jpg"
-    },
-    {
-      "image": "pic/finishing-details.jpg"
+      "image": "assets/images/products/ys-adhesive-vinyl.jpg"
     }
   ],
   "modules": {

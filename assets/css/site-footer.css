@@ -39,7 +39,7 @@
 .site-footer .footer-brand p {
   max-width: 250px;
   margin: 24px 0 0;
-  font-family: Georgia, serif;
+  font-family: 'Fraunces', Georgia, serif;
   font-size: 19px;
   line-height: 1.5;
 }
@@ -214,7 +214,8 @@
   }
 
   .site-footer .footer-links {
-    gap: 12px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
   }
 
   .site-footer .footer-links strong,

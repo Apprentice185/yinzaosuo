@@ -107,7 +107,7 @@
 
   function renderTabs(locale) {
     tabList.replaceChildren();
-    locale.categories.forEach(category => {
+    locale.categories.forEach((category, index) => {
       const button = document.createElement('button');
       button.className = 'product-category-tab';
       button.type = 'button';
@@ -118,7 +118,7 @@
       button.tabIndex = category.id === activeCategory ? 0 : -1;
       const number = document.createElement('span');
       number.className = 'product-category-number';
-      number.textContent = category.num;
+      number.textContent = String(index + 1).padStart(2, '0');
       const label = document.createElement('span');
       label.className = 'product-category-label';
       label.textContent = category.title;
@@ -151,7 +151,7 @@
   }
 
   function renderAll(locale) {
-    allCategories.replaceChildren(...locale.categories.map(category => {
+    allCategories.replaceChildren(...locale.categories.filter(category => category.items.length).map(category => {
       activeCategory = category.id;
       const section = document.createElement('section');
       section.className = 'all-products-category';

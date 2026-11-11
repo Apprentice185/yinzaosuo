@@ -13,7 +13,7 @@
 .product-archive-summary{display:flex;justify-content:space-between;gap:20px;align-items:center;min-height:66px;color:#777;font-size:11px}
 .product-archive-summary span:last-child{font-variant-numeric:tabular-nums;white-space:nowrap}
 .product-archive-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:26px 18px}
-.archive-card{display:block;min-width:0;border:1px solid #d8d8d8;background:#fff;color:inherit;text-decoration:none;cursor:pointer}
+.archive-card{display:flex;flex-direction:column;height:100%;min-width:0;border:1px solid #d8d8d8;background:#fff;color:inherit;text-decoration:none;cursor:pointer}
 .archive-card:focus-visible{outline:2px solid #555;outline-offset:3px}
 .archive-visual{position:relative;overflow:hidden;aspect-ratio:1.28;background:#e8e8e8}
 .archive-visual-placeholder:before{background-image:linear-gradient(135deg,#eee,#d8d8d8)}
@@ -30,7 +30,8 @@
 .archive-chip{display:inline-flex;align-items:center;max-width:100%;padding:4px 7px;border:1px solid #d8d8d8;color:#333;background:#fff;font-size:9px;line-height:1.4}
 .archive-tags:not(.archive-materials-full) .archive-chip{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .archive-chip-more{color:#777}
-.archive-card-content{padding:16px 16px 17px}
+.archive-card-content{display:flex;flex:1;flex-direction:column;padding:16px 16px 17px}
+.archive-card-content .archive-tag-group:last-child{margin-top:auto;padding-top:11px}
 .archive-card-content h3{margin:0;color:#111;font-size:17px;font-weight:600;line-height:1.45;letter-spacing:-.025em}
 .archive-card-summary{min-height:42px;margin:7px 0 14px;color:#666;font-size:11px;line-height:1.7}
 .archive-card-content .archive-tag-group+.archive-tag-group{margin-top:11px}
@@ -42,9 +43,9 @@
 /* Archive cards use clean, unobstructed product photography. */
 .archive-visual{background:#fff !important}
 .archive-visual img{
-  object-fit:contain !important;
+  object-fit:cover !important;
   object-position:center;
-  padding:12px;
+  padding:0;
   filter:none !important;
 }
 .archive-index{display:none !important}

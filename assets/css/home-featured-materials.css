@@ -10,7 +10,7 @@
 .home-material-visual:before,.home-material-visual:after{content:"";position:absolute;display:block}
 .home-material-visual:before{width:72%;height:66%;left:14%;top:17%;transform:rotate(-7deg);border-radius:2px;box-shadow:0 16px 26px #0002}
 .home-material-visual:after{width:62%;height:54%;left:19%;top:23%;transform:rotate(5deg);border:1px solid #ffffff99}
-.home-material-visual>span{position:relative;z-index:1;color:#34312d;font-family:Georgia,serif;font-size:clamp(25px,3vw,40px);letter-spacing:.12em}
+.home-material-visual>span{position:relative;z-index:1;color:#34312d;font-family:'Fraunces',Georgia,serif;font-size:clamp(25px,3vw,40px);letter-spacing:.12em}
 .home-material-visual.gloss{background:linear-gradient(135deg,#f5f2ed,#d7d2c9)}
 .home-material-visual.gloss:before{background:linear-gradient(135deg,#fff 0%,#e9e5dc 38%,#fff 53%,#d9d4cb 100%)}
 .home-material-visual.satin{background:linear-gradient(135deg,#e7e6e1,#c9c8c2)}
@@ -31,12 +31,12 @@
 .home-material-footer>span{color:#777;font-size:10px;line-height:1.6}
 .home-material-footer .text-link{white-space:nowrap}
 @media(max-width:900px){.home-material-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:560px){.home-featured-materials .section-heading{margin-bottom:24px}.home-material-grid{grid-template-columns:1fr;gap:13px}.home-material-card{display:grid;grid-template-columns:112px minmax(0,1fr)}.home-material-visual{min-height:100%;min-height:172px}.home-material-visual>span{font-size:22px}.home-material-copy{padding:15px 14px}.home-material-copy h3{font-size:16px;margin:7px 0 5px}.home-material-copy p{min-height:0;font-size:11px;margin-bottom:10px}.home-material-copy strong{font-size:10px}.home-material-link{margin-top:10px}.home-material-footer{align-items:flex-start;flex-direction:column;gap:8px}}
+@media(max-width:560px){.home-featured-materials .section-heading{margin-bottom:24px}.home-material-grid{grid-template-columns:1fr;gap:13px}.home-material-card{display:flex;flex-direction:column}.home-material-visual{min-height:0}.home-material-visual>span{font-size:22px}.home-material-copy{padding:15px 14px}.home-material-copy h3{font-size:16px;margin:7px 0 5px}.home-material-copy p{min-height:0;font-size:11px;margin-bottom:10px}.home-material-copy strong{font-size:10px}.home-material-link{margin-top:10px}.home-material-footer{align-items:flex-start;flex-direction:column;gap:8px}}
 
 /* Keep the homepage material showcase styles isolated from the legacy archive. */
 
 .home-material-visual img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;display:block;background:#e7e4df}
-.home-material-visual-label{position:absolute;z-index:2;left:12px;bottom:10px;padding:4px 7px;background:#ffffffdf;color:#292929;font-family:Arial,sans-serif;font-size:9px;font-weight:700;letter-spacing:.14em}
+.home-material-visual-label{position:absolute;z-index:2;left:12px;bottom:10px;padding:4px 7px;background:#ffffffdf;color:#292929;font-family:'Inter',Arial,sans-serif;font-size:9px;font-weight:700;letter-spacing:.14em}
 
 .home-image-note{margin:12px 0 0;color:#777;font-size:10px;line-height:1.6}
 .home-material-visual-label{top:10px;bottom:auto;left:auto;right:10px}
@@ -47,9 +47,10 @@
   display:flex;
   align-items:center;
   justify-content:center;
-  min-height:240px;
+  aspect-ratio:4/3;
+  min-height:0;
   overflow:hidden;
-  background:#fff !important;
+  background:#e7e4df;
 }
 .home-material-visual::before,
 .home-material-visual::after{
@@ -57,20 +58,16 @@
   content:none !important;
 }
 .home-material-visual > img{
-  position:relative !important;
-  inset:auto !important;
+  position:absolute !important;
+  inset:0 !important;
   display:block;
   width:100%;
-  height:240px;
-  min-height:240px;
-  padding:12px;
-  object-fit:contain;
+  height:100%;
+  padding:0;
+  object-fit:cover;
   object-position:center;
   z-index:0 !important;
-  background:#fff;
+  background:#e7e4df;
 }
 .home-material-visual-label{display:none !important}
-@media(max-width:560px){
-  .home-material-visual{min-height:172px}
-  .home-material-visual > img{height:172px;min-height:172px;padding:6px}
-}
+
