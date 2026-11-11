@@ -255,3 +255,7 @@
     transition: none;
   }
 }
+
+/* QR card polish (2026-11-11 UI polish) */
+.site-footer .footer-wechat{justify-content:flex-start}
+.site-footer .footer-wechat .qr-code{padding:6px;border-radius:10px;box-shadow:0 8px 20px rgba(0,0,0,.35)}

@@ -14,7 +14,7 @@
   padding:18px;
   overflow:hidden;
   border:1px solid #ededf0;
-  background:#fff !important;
+  background:#f7f8f4 !important;
   color:#66736d;
 }
 .product-detail-image::before,
@@ -30,7 +30,7 @@
   max-height:100%;
   object-fit:contain;
   object-position:center;
-  background:#fff;
+  background:transparent;
 }
 .product-detail-image .product-image-error{
   margin:0;
@@ -44,3 +44,6 @@
 @media(max-width:800px){
   .product-detail-image{height:340px;min-height:0;padding:10px}
 }
+
+/* Sticky enquiry column on desktop (2026-11-11 UI polish) */
+@media(min-width:801px){.product-detail-layout{align-items:start}.product-detail-copy{position:sticky;top:100px}}

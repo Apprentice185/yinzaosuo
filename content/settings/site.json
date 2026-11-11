@@ -25,9 +25,9 @@
       "enabled": true
     },
     {
-      "label_zh": "澳洲买家",
-      "label_en": "Australia",
-      "url": "/australia.html",
+      "label_zh": "运输与交付",
+      "label_en": "Shipping",
+      "url": "/shipping.html",
       "enabled": true
     },
     {
