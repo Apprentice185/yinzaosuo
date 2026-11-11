@@ -32,7 +32,7 @@
   "category_title": "商务印制类",
   "title": "名片 / 特种卡片",
   "id": "PA001",
-  "image": "/new/pic/25a6e287-e36f-4bbc-91e4-dcfcb37f60c4.png",
+  "image": "pic/25a6e287-e36f-4bbc-91e4-dcfcb37f60c4.png",
   "materials_en": [
     "Standard: 300g Coated Art Paper (Matte/Gloss), White Card, Laid, Eggshell, Classic Felt, Gmund, Needlepoint, Bamboo Fiber, Recycled Paper",
     "Premium (355g/710g): Ice White, Classic Linen Ultra White/Chiffon, Swedish White, British Eggshell, Gmund Needlepoint 710g, Elegant White 710g",
@@ -40,6 +40,6 @@
     "PVC Cards: Frosted, Glossy, Matte, Semi-Translucent Single-Frosted"
   ],
   "category": "commercial",
-  "thumb": "/new/pic/25a6e287-e36f-4bbc-91e4-dcfcb37f60c4.png",
+  "thumb": "pic/25a6e287-e36f-4bbc-91e4-dcfcb37f60c4.png",
   "image_zh": "assets/images/products/pa001.jpg"
 }

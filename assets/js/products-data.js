@@ -10,7 +10,7 @@ window.PRODUCTS_DATA = {
           {
             "id": "YS-PVC-BANNER",
             "name": "PVC 横幅喷绘",
-            "image": "/new/pic/pvc-banner.jpg",
+            "image": "pic/pvc-banner.jpg",
             "desc": "按项目尺寸和画面文件生产 PVC 广告横幅，可选多种边缘与安装加工方式。",
             "materials": [],
             "crafts": [
@@ -55,7 +55,7 @@ window.PRODUCTS_DATA = {
           {
             "id": "YS-PVC-MESH",
             "name": "PVC 网格布喷绘",
-            "image": "/new/pic/pvc-mesh-banner.jpg",
+            "image": "pic/pvc-mesh-banner.jpg",
             "desc": "适用于户外围挡、建筑及大型展示场景的定制网格布印刷成品。",
             "materials": [],
             "crafts": [
@@ -100,7 +100,7 @@ window.PRODUCTS_DATA = {
           {
             "id": "YS-SYNTHETIC-PAPER",
             "name": "合成纸印刷",
-            "image": "/new/pic/synthetic-paper.jpg",
+            "image": "pic/synthetic-paper.jpg",
             "desc": "按客户项目要求提供合成纸印刷成品，可选择整卷交付或裁切成单张。",
             "materials": [],
             "crafts": [
@@ -142,7 +142,7 @@ window.PRODUCTS_DATA = {
           {
             "id": "YS-ADHESIVE-VINYL",
             "name": "背胶材料印刷",
-            "image": "/new/pic/self-adhesive-vinyl.jpg",
+            "image": "pic/self-adhesive-vinyl.jpg",
             "desc": "定制背胶印刷成品，可根据项目需求进行裁切、覆膜，并选择卷装或单张交付。",
             "materials": [],
             "crafts": [
@@ -192,7 +192,7 @@ window.PRODUCTS_DATA = {
           {
             "id": "YS-ROLL-UP",
             "name": "易拉宝展示架",
-            "image": "/new/pic/display-stands.jpg",
+            "image": "pic/display-stands.jpg",
             "desc": "可单独采购展示架硬件、替换印刷画面，或选择完整展示套装。",
             "materials": [],
             "crafts": [
@@ -205,7 +205,7 @@ window.PRODUCTS_DATA = {
           {
             "id": "YS-X-BANNER",
             "name": "X 展架",
-            "image": "/new/pic/display-stands.jpg",
+            "image": "pic/display-stands.jpg",
             "desc": "适用于活动、零售及室内展示的 X 型展示架，可按需求单独或成套供应。",
             "materials": [],
             "crafts": [
@@ -218,7 +218,7 @@ window.PRODUCTS_DATA = {
           {
             "id": "YS-DOOR-STAND",
             "name": "门型展示架",
-            "image": "/new/pic/display-stands.jpg",
+            "image": "pic/display-stands.jpg",
             "desc": "门型结构展示架，可提供硬件、印刷画面或完整组合方案。",
             "materials": [],
             "crafts": [
@@ -243,7 +243,7 @@ window.PRODUCTS_DATA = {
           {
             "id": "YS-PVC-BANNER",
             "name": "Printed PVC Banners",
-            "image": "/new/pic/pvc-banner.jpg",
+            "image": "pic/pvc-banner.jpg",
             "desc": "Custom-printed PVC banners produced to your project dimensions, with a choice of practical finishing options.",
             "materials": [],
             "crafts": [
@@ -288,7 +288,7 @@ window.PRODUCTS_DATA = {
           {
             "id": "YS-PVC-MESH",
             "name": "Printed PVC Mesh Banners",
-            "image": "/new/pic/pvc-mesh-banner.jpg",
+            "image": "pic/pvc-mesh-banner.jpg",
             "desc": "Custom-printed mesh banners for outdoor fencing, building wraps and large-format display applications.",
             "materials": [],
             "crafts": [
@@ -333,7 +333,7 @@ window.PRODUCTS_DATA = {
           {
             "id": "YS-SYNTHETIC-PAPER",
             "name": "Synthetic Paper Printing",
-            "image": "/new/pic/synthetic-paper.jpg",
+            "image": "pic/synthetic-paper.jpg",
             "desc": "Custom synthetic paper print production, available as full rolls or cut sheets according to the project.",
             "materials": [],
             "crafts": [
@@ -375,7 +375,7 @@ window.PRODUCTS_DATA = {
           {
             "id": "YS-ADHESIVE-VINYL",
             "name": "Self-Adhesive Vinyl Printing",
-            "image": "/new/pic/self-adhesive-vinyl.jpg",
+            "image": "pic/self-adhesive-vinyl.jpg",
             "desc": "Custom printed self-adhesive graphics with trimming and lamination options, supplied in rolls or cut sheets.",
             "materials": [],
             "crafts": [
@@ -425,7 +425,7 @@ window.PRODUCTS_DATA = {
           {
             "id": "YS-ROLL-UP",
             "name": "Roll-Up Banner Stands",
-            "image": "/new/pic/display-stands.jpg",
+            "image": "pic/display-stands.jpg",
             "desc": "Choose stand hardware, replacement printed graphics, or a complete roll-up display kit.",
             "materials": [],
             "crafts": [
@@ -438,7 +438,7 @@ window.PRODUCTS_DATA = {
           {
             "id": "YS-X-BANNER",
             "name": "X-Banner Stands",
-            "image": "/new/pic/display-stands.jpg",
+            "image": "pic/display-stands.jpg",
             "desc": "Portable X-banner display systems for events, retail and indoor promotions, available separately or as a set.",
             "materials": [],
             "crafts": [
@@ -451,7 +451,7 @@ window.PRODUCTS_DATA = {
           {
             "id": "YS-DOOR-STAND",
             "name": "Door-Type Display Stands",
-            "image": "/new/pic/display-stands.jpg",
+            "image": "pic/display-stands.jpg",
             "desc": "Door-style display frames supplied as hardware, printed graphics, or a complete display set.",
             "materials": [],
             "crafts": [
