@@ -334,7 +334,7 @@ function renderStaticProductList(data) {
     category.items.forEach(item => covered.add(String(item.id)));
     sections.push({ title: category.title, desc: category.desc, items: category.items });
   }
-  const coreOrder = ['YS-SYNTHETIC-PAPER', 'YS-GLOSS-PHOTO-PAPER', 'YS-SATIN-PHOTO-PAPER', 'YS-PVC-MESH', 'YS-PVC-BANNER', 'YS-ADHESIVE-VINYL', 'YS-KT-BOARD', 'YS-OUTDOOR-PVC-RIGID-FILM', 'YS-ROLL-UP', 'YS-X-BANNER', 'YS-DOOR-STAND'];
+  const coreOrder = ['YS-PVC-FOAM-BOARD', 'YS-GLOSS-PHOTO-PAPER', 'YS-SATIN-PHOTO-PAPER', 'YS-ONE-WAY-VISION', 'YS-SYNTHETIC-PAPER', 'YS-COLD-LAMINATION-FILM', 'YS-PVC-MESH', 'YS-PVC-BANNER', 'YS-ADHESIVE-VINYL', 'YS-KT-BOARD', 'YS-OUTDOOR-PVC-RIGID-FILM', 'YS-ROLL-UP', 'YS-X-BANNER', 'YS-DOOR-STAND'];
   const extras = data.catalogue
     .filter(item => !covered.has(String(item.id)))
     .sort((a, b) => coreOrder.indexOf(String(a.id)) - coreOrder.indexOf(String(b.id)))

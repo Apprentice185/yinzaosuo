@@ -1,0 +1,75 @@
+{
+  "desc_en": "Perforated one-way vision film for shopfront windows, vehicle windows and glass partitions: a full printed graphic outside, an open view from inside. Perforation pattern, roll width and pricing are confirmed per quotation.",
+  "desc_zh": "单透膜（穿孔背胶膜），适用于店铺橱窗、车辆玻璃和玻璃隔断：外看完整印刷画面，内看通透。孔位比例、幅宽与价格按询价确认。",
+  "detail_en": {
+    "applications": [
+      "Shopfront and retail window graphics",
+      "Vehicle and fleet window advertising",
+      "Glass partitions and office glazing",
+      "Transit and bus shelter window graphics"
+    ],
+    "artwork": "Please provide print-ready artwork, finished glass dimensions, quantity and destination. Note that fine detail and small text read less clearly through perforations; bold layouts work best.",
+    "brief": "Please specify the finished size, quantity, perforation requirement, whether lamination is needed, packing requirements and destination country or region.",
+    "caveat": "Specific perforation ratio, film thickness, roll width, minimum order quantity and pricing are not listed on this page: they are confirmed against the actual specification of each order, so please state your required specification when enquiring. Vehicle window use must comply with local visibility regulations.",
+    "delivery": [
+      "Standard packing: rolls packed for transport",
+      "Alternative packing can be confirmed per order",
+      "Production and dispatch timing is confirmed per order specification and destination",
+      "Transit time depends on route, forwarder and customs arrangements"
+    ],
+    "finishing": [
+      "Large-format printing on the white face",
+      "Cut to finished glass size",
+      "Optional protective overlamination",
+      "Roll packing"
+    ],
+    "highlights": [
+      "Full printed graphic seen from outside",
+      "View out and daylight kept from inside",
+      "White print face with black adhesive side",
+      "Perforation pattern, roll width and pricing confirmed per quotation"
+    ],
+    "lead": "One-way vision perforated film turns glass into advertising space without closing it off: passers-by see the printed graphic, while people inside keep their view and daylight. Perforation pattern and roll width are confirmed for each order."
+  },
+  "detail_zh": {
+    "applications": [
+      "店铺橱窗与零售玻璃画面",
+      "车辆及车队玻璃广告",
+      "玻璃隔断与办公玻璃装饰",
+      "公交站台等公共交通玻璃画面"
+    ],
+    "artwork": "请提供印刷文件、玻璃成品尺寸、数量及目的地。孔位会弱化细小文字与精细细节，版面以粗放醒目为宜。",
+    "brief": "请提供成品尺寸、数量、孔位比例要求、是否需要覆膜、包装要求及收货国家/地区。",
+    "caveat": "本页未列明具体孔位比例、膜厚、幅宽、起订量及价格：这些参数按每笔订单的实际规格确认，询价时请注明所需规格。用于车辆玻璃时须符合当地透光与可视法规。",
+    "delivery": [
+      "标准包装：卷材运输包装",
+      "具体包装形式可按订单确认",
+      "生产与发货时效按订单规格及目的地确认",
+      "运输时效取决于航线、货代及清关安排"
+    ],
+    "finishing": [
+      "白色面大幅面喷绘印刷",
+      "按玻璃成品尺寸裁切",
+      "可选保护覆膜",
+      "卷材包装"
+    ],
+    "highlights": [
+      "从外看是完整印刷画面",
+      "从内保持通透视野与采光",
+      "白色印刷面、黑色背胶面",
+      "孔位比例、幅宽及价格按询价确认"
+    ],
+    "lead": "单透膜把玻璃变成广告位，又不把光线和视野封死：路人看到的是完整画面，店内的人仍能看向室外。具体孔位比例与幅宽按订单确认。"
+  },
+  "hidden": false,
+  "id": "YS-ONE-WAY-VISION",
+  "image": "assets/images/products/ys-one-way-vision.jpg",
+  "name_en": "One-Way Vision Film (Perforated Window Film)",
+  "name_zh": "单透膜（穿孔背胶膜）",
+  "publish_to": "both",
+  "seo_description_en": "Wholesale one-way vision perforated window film for retail windows, vehicle graphics and glass partitions. Perforation pattern, roll widths and pricing are confirmed per quotation. Enquire about bulk orders and international shipping.",
+  "seo_description_zh": "单透膜（穿孔背胶膜），适用于橱窗画面、车辆玻璃广告及玻璃隔断。面向印刷贸易商与广告制作商，孔位比例、幅宽与价格按询价确认，支持批量采购及国际运输询价。",
+  "seo_title_en": "One-Way Vision Film Wholesale | Specs, Pricing & Printing | YINZAOSUO",
+  "seo_title_zh": "单透膜（穿孔背胶膜）批发｜规格、价格与印刷｜YINZAOSUO",
+  "sort_order": 4
+}

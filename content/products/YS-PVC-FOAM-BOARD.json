@@ -1,0 +1,44 @@
+{
+  "category": "wideformat",
+  "category_desc": "写真相纸、PP合成纸、背胶及PVC喷绘材料，面向印刷贸易与广告制作采购。",
+  "category_desc_en": "Photo papers, PP synthetic paper, self-adhesive vinyl and PVC print media for trade printers and sign makers.",
+  "category_num": "01",
+  "category_title": "写真与大幅面印刷材料",
+  "category_title_en": "Photo & Wide-Format Print Media",
+  "crafts": [
+    "UV平板直印",
+    "切割雕刻",
+    "裱贴覆膜",
+    "按尺寸裁切"
+  ],
+  "crafts_en": [
+    "Direct UV flatbed printing",
+    "Router cutting and engraving",
+    "Mounting and lamination",
+    "Cut to size"
+  ],
+  "desc": "PVC发泡板（雪弗板）硬质板材，表面平整细腻，可直接UV平板印刷，也可切割雕刻成立体字与标识面板，适用于广告标识、展览展示与招牌制作。厚度、尺寸、密度与价格按询价确认。",
+  "desc_en": "Rigid PVC foam board sheets with a smooth, flat surface for direct UV flatbed printing, router-cut lettering and sign panels — for signage, exhibition displays and shop boards. Thickness, sheet size, density and pricing are confirmed per quotation.",
+  "hidden": false,
+  "id": "YS-PVC-FOAM-BOARD",
+  "image": "assets/images/products/ys-pvc-foam-board.jpg",
+  "materials": [
+    "PVC发泡板（雪弗板）",
+    "平整硬质板材",
+    "可切割雕刻"
+  ],
+  "materials_en": [
+    "PVC foam board sheet",
+    "Smooth rigid board",
+    "Router-cutting and engraving"
+  ],
+  "publish_to": "both",
+  "seo_description_en": "Wholesale PVC foam board (rigid PVC sheet) for UV flatbed printing, cut lettering, sign panels and exhibition displays. For trade printers and sign makers; thickness, sheet size, density and pricing confirmed per quotation.",
+  "seo_description_zh": "PVC发泡板（雪弗板）硬质板材，适用于UV平板直印、切割立体字、标识面板与展览展示。面向印刷贸易商与广告制作商，厚度、尺寸、密度与价格按询价确认。",
+  "seo_title_en": "PVC Foam Board Wholesale | Wide-Format Print Media | YINZAOSUO",
+  "seo_title_zh": "PVC发泡板（雪弗板）批发｜写真与大幅面印刷材料｜YINZAOSUO",
+  "show_in_archive": true,
+  "sort_order": 1,
+  "title": "PVC发泡板（雪弗板）",
+  "title_en": "PVC Foam Board (Rigid PVC Sheet)"
+}

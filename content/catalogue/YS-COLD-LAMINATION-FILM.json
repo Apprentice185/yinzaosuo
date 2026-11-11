@@ -1,0 +1,75 @@
+{
+  "desc_en": "Cold lamination film in gloss and matte finishes for protecting printed graphics against scratches, moisture and fading. Roll width, finish and pricing are confirmed per quotation.",
+  "desc_zh": "冷裱膜提供光面与哑面效果，用于保护印刷画面，防刮擦、防潮、防褪色。幅宽、表面效果与价格按询价确认。",
+  "detail_en": {
+    "applications": [
+      "Photo and poster protection",
+      "Mounted display board finishing",
+      "Self-adhesive vinyl graphic protection",
+      "Menus, signs and display overlays"
+    ],
+    "artwork": "For lamination-only supply, tell us the print material, finished size and quantity. For printed-and-laminated work, please provide print-ready artwork; file dimensions and bleed can be checked before production.",
+    "brief": "Please specify the finish (gloss or matte), roll width or finished size, quantity, packing requirements and destination country or region.",
+    "caveat": "Specific film thickness, roll width and length, minimum order quantity and pricing are not listed on this page: they are confirmed against the actual specification of each order, so please state your required specification when enquiring.",
+    "delivery": [
+      "Standard packing: rolls packed for transport",
+      "Alternative packing can be confirmed per order",
+      "Production and dispatch timing is confirmed per order specification and destination",
+      "Transit time depends on route, forwarder and customs arrangements"
+    ],
+    "finishing": [
+      "Cold lamination onto printed graphics",
+      "Lamination for board-mounted displays",
+      "Cut to finished size",
+      "Roll slitting to required width"
+    ],
+    "highlights": [
+      "Protects prints from scratches, moisture and fading",
+      "Applied cold — no heat needed",
+      "Gloss and matte finishes",
+      "Roll width, finish and pricing confirmed per quotation"
+    ],
+    "lead": "Cold lamination film is the protective skin for printed graphics: applied by pressure without heat, it keeps photos, posters and prints from scratching, moisture and fading. Gloss and matte finishes; width confirmed per order."
+  },
+  "detail_zh": {
+    "applications": [
+      "相片与海报保护",
+      "裱板展示画面表面保护",
+      "背胶画面保护",
+      "菜单、标识与展示画面覆膜"
+    ],
+    "artwork": "如只需覆膜材料，请告知画面材质、成品尺寸与数量；如需印刷加覆膜成品，请提供印刷文件，生产前可核对文件尺寸和出血设置。",
+    "brief": "请提供表面效果（光面或哑面）、幅宽或成品尺寸、数量、包装要求及收货国家/地区。",
+    "caveat": "本页未列明具体膜厚、幅宽、卷长、起订量及价格：这些参数按每笔订单的实际规格确认，询价时请注明所需规格。",
+    "delivery": [
+      "标准包装：卷材运输包装",
+      "具体包装形式可按订单确认",
+      "生产与发货时效按订单规格及目的地确认",
+      "运输时效取决于航线、货代及清关安排"
+    ],
+    "finishing": [
+      "印刷画面冷裱覆膜",
+      "裱板展示覆膜",
+      "按成品尺寸裁切",
+      "按需分切幅宽"
+    ],
+    "highlights": [
+      "保护画面防刮擦、防潮、防褪色",
+      "压敏冷裱，无需加热",
+      "光面与哑面两种效果",
+      "幅宽、表面效果及价格按询价确认"
+    ],
+    "lead": "冷裱膜是印刷画面的一层保护皮：靠压力贴合、无需加热，让相片、海报和各类画面防刮、防潮、防褪色。提供光面与哑面，幅宽按订单确认。"
+  },
+  "hidden": false,
+  "id": "YS-COLD-LAMINATION-FILM",
+  "image": "assets/images/products/ys-cold-lamination-film.jpg",
+  "name_en": "Cold Lamination Film",
+  "name_zh": "冷裱膜",
+  "publish_to": "both",
+  "seo_description_en": "Wholesale cold lamination film, gloss and matte, for protecting photos, posters and printed graphics. Roll widths, finishes and pricing are confirmed per quotation. Enquire about bulk orders and international shipping.",
+  "seo_description_zh": "冷裱膜（光面/哑面），适用于相片、海报及印刷画面保护。面向印刷贸易商与广告制作商，幅宽、表面效果与价格按询价确认，支持批量采购及国际运输询价。",
+  "seo_title_en": "Cold Lamination Film Wholesale | Specs, Pricing & Finishes | YINZAOSUO",
+  "seo_title_zh": "冷裱膜批发｜规格、价格与表面效果｜YINZAOSUO",
+  "sort_order": 6
+}

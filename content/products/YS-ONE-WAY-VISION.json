@@ -1,0 +1,44 @@
+{
+  "category": "wideformat",
+  "category_desc": "写真相纸、PP合成纸、背胶及PVC喷绘材料，面向印刷贸易与广告制作采购。",
+  "category_desc_en": "Photo papers, PP synthetic paper, self-adhesive vinyl and PVC print media for trade printers and sign makers.",
+  "category_num": "01",
+  "category_title": "写真与大幅面印刷材料",
+  "category_title_en": "Photo & Wide-Format Print Media",
+  "crafts": [
+    "喷绘印刷",
+    "按尺寸模切",
+    "可选覆膜",
+    "贴膜施工"
+  ],
+  "crafts_en": [
+    "Large-format printing",
+    "Cut to size",
+    "Optional overlamination",
+    "Window application"
+  ],
+  "desc": "单透膜（穿孔背胶膜）：从外看是完整的印刷画面，从内仍可透过孔洞看向室外、保留采光。适用于店铺橱窗、车辆玻璃与玻璃隔断广告。孔位比例、幅宽与价格按询价确认。",
+  "desc_en": "Perforated one-way vision window film: from outside it carries a full printed graphic; from inside, the view out and daylight stay open through the perforations. For shopfront windows, vehicle windows and glass partitions. Perforation pattern, roll width and pricing are confirmed per quotation.",
+  "hidden": false,
+  "id": "YS-ONE-WAY-VISION",
+  "image": "assets/images/products/ys-one-way-vision.jpg",
+  "materials": [
+    "穿孔背胶膜",
+    "白色印刷面、黑色背胶面",
+    "均匀透光孔位"
+  ],
+  "materials_en": [
+    "Perforated self-adhesive vinyl",
+    "White print face, black adhesive side",
+    "Even see-through perforation pattern"
+  ],
+  "publish_to": "both",
+  "seo_description_en": "Wholesale one-way vision perforated window film for shopfront graphics, vehicle windows and glass partitions — full print outside, view out from inside. Perforation pattern, roll width and pricing confirmed per quotation.",
+  "seo_description_zh": "单透膜（穿孔背胶膜），适用于店铺橱窗画面、车辆玻璃广告与玻璃隔断：外看完整画面，内看通透。面向印刷贸易商与广告制作商，孔位比例、幅宽与价格按询价确认。",
+  "seo_title_en": "One-Way Vision Film Wholesale | Wide-Format Print Media | YINZAOSUO",
+  "seo_title_zh": "单透膜（穿孔背胶膜）批发｜写真与大幅面印刷材料｜YINZAOSUO",
+  "show_in_archive": true,
+  "sort_order": 4,
+  "title": "单透膜（穿孔背胶膜）",
+  "title_en": "One-Way Vision Film (Perforated Window Film)"
+}
