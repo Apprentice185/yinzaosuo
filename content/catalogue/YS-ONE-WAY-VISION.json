@@ -10,12 +10,12 @@
     ],
     "artwork": "Please provide print-ready artwork, finished glass dimensions, quantity and destination. Note that fine detail and small text read less clearly through perforations; bold layouts work best.",
     "brief": "Please specify the finished size, quantity, perforation requirement, whether lamination is needed, packing requirements and destination country or region.",
-    "caveat": "Specific perforation ratio, film thickness, roll width, minimum order quantity and pricing are not listed on this page: they are confirmed against the actual specification of each order, so please state your required specification when enquiring. Vehicle window use must comply with local visibility regulations.",
+    "caveat": "The 60/40 and 70/30 perforation ratios are the standard options. Film thickness, roll width, minimum order quantity and pricing are not listed on this page: they are confirmed against the actual specification of each order, so please state your required specification when enquiring. Vehicle window use must comply with local visibility regulations.",
     "delivery": [
-      "Standard packing: rolls packed for transport",
-      "Alternative packing can be confirmed per order",
-      "Production and dispatch timing is confirmed per order specification and destination",
-      "Transit time depends on route, forwarder and customs arrangements"
+      "Production and dispatch timing confirmed per order",
+      "Sea freight to Australian main ports is around 40 days as a reference",
+      "Photos of the finished graphics and the export packing are sent for your confirmation before dispatch",
+      "Standard packing: rolls packed for transport; alternative packing can be confirmed per order"
     ],
     "finishing": [
       "Large-format printing on the white face",
@@ -27,9 +27,10 @@
       "Full printed graphic seen from outside",
       "View out and daylight kept from inside",
       "White print face with black adhesive side",
-      "Perforation pattern, roll width and pricing confirmed per quotation"
+      "Two standard perforation ratios: 60/40 and 70/30",
+      "Perforation ratio, roll width and pricing confirmed per quotation"
     ],
-    "lead": "One-way vision perforated film turns glass into advertising space without closing it off: passers-by see the printed graphic, while people inside keep their view and daylight. Perforation pattern and roll width are confirmed for each order."
+    "lead": "One-way vision perforated film turns glass into advertising space without closing it off: passers-by see the printed graphic, while people inside keep their view and daylight. Two standard perforation ratios are available: 70/30 keeps more printable surface, so the graphic reads fuller; 60/40 opens more of the film, giving a clearer view out and more daylight inside. Choose the ratio for the glazing and the viewing distance; roll width and pricing are confirmed per order."
   },
   "detail_zh": {
     "applications": [
@@ -40,12 +41,12 @@
     ],
     "artwork": "请提供印刷文件、玻璃成品尺寸、数量及目的地。孔位会弱化细小文字与精细细节，版面以粗放醒目为宜。",
     "brief": "请提供成品尺寸、数量、孔位比例要求、是否需要覆膜、包装要求及收货国家/地区。",
-    "caveat": "本页未列明具体孔位比例、膜厚、幅宽、起订量及价格：这些参数按每笔订单的实际规格确认，询价时请注明所需规格。用于车辆玻璃时须符合当地透光与可视法规。",
+    "caveat": "打孔率 60/40 与 70/30 为常规规格；膜厚、幅宽、起订量及价格本页未列明，按每笔订单的实际规格确认，询价时请注明所需规格。需要发票可代开，确认订单时说明即可。用于车辆玻璃时须符合当地透光与可视法规。",
     "delivery": [
-      "标准包装：卷材运输包装",
-      "具体包装形式可按订单确认",
-      "生产与发货时效按订单规格及目的地确认",
-      "运输时效取决于航线、货代及清关安排"
+      "西安同城（以确认下单时间为准）：11:00 前下单当天下午送达，19:00 前次日中午前送达，19:00 后次日下午送达",
+      "三环内必达，三环外多数郊区可达；自有封闭式面包车专送，卷材整卷送货上门",
+      "江浙沪皖由浙江嘉兴海盐合作工厂发货；其他地区时效按订单确认",
+      "标准包装：卷材运输包装；具体包装形式可按订单确认"
     ],
     "finishing": [
       "白色面大幅面喷绘印刷",
@@ -57,9 +58,10 @@
       "从外看是完整印刷画面",
       "从内保持通透视野与采光",
       "白色印刷面、黑色背胶面",
-      "孔位比例、幅宽及价格按询价确认"
+      "打孔率 60/40 与 70/30 两种常规规格可选",
+      "打孔率、幅宽及价格按询价确认"
     ],
-    "lead": "单透膜把玻璃变成广告位，又不把光线和视野封死：路人看到的是完整画面，店内的人仍能看向室外。具体孔位比例与幅宽按订单确认。"
+    "lead": "单透膜把玻璃变成广告位，又不把光线和视野封死：路人看到的是完整画面，店内的人仍能看向室外。常规打孔率有 60/40 与 70/30 两种：70/30 印刷面占比更高、画面更完整；60/40 孔占比更高、从内向外更通透、采光更好。按玻璃场景与观看距离选比例，幅宽与价格按订单确认。"
   },
   "hidden": false,
   "id": "YS-ONE-WAY-VISION",

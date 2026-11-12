@@ -13,14 +13,13 @@
   "seo_description_zh": "自粘背胶写真材料：1520mm 宽幅，120gsm / 140gsm 底纸可选，适用于广告画面、车身贴与橱窗贴。面向广告制作商批量供货，规格与价格按询价确认。",
   "seo_description_en": "Wholesale self-adhesive vinyl in 1520 mm width and 50 m rolls. Choose a 120 gsm or 140 gsm release liner. Reference prices: USD 13.60/m² and USD 14.60/m² respectively. Enquire about bulk orders and international shipping.",
   "detail_zh": {
-    "lead": "自粘背胶写真材料用于标识、促销及展示画面。已确认规格包括1520mm卷宽、50米卷长，以及120gsm或140gsm底纸。",
+    "lead": "自粘背胶写真材料，背面带胶、揭开即贴，用于车身贴与整车车贴、橱窗玻璃贴、墙面贴与展板贴等画面。两类可选：高分子背胶更适合整车车身贴和长期画面，单组份背胶性价比高，适合平面贴附与短期促销。材料类型、幅宽与价格按询价确认。",
     "highlights": [
-      "卷宽1520mm",
-      "材料规格：120gsm或140gsm底纸",
-      "每卷长度50米",
-      "参考价格：120gsm底纸 USD 13.60/m²；140gsm底纸 USD 14.60/m²",
-      "默认使用爱普生兼容替代墨水；可选爱普生原装墨水，价格增加USD 5/m²",
-      "默认覆100gsm PVC冷裱膜，黄底离型纸；可选亮膜或哑膜"
+      "两类可选：高分子背胶、单组份背胶",
+      "整车车身贴与车身广告画面",
+      "橱窗玻璃贴、墙面贴与展板贴等常规应用",
+      "可供材料卷材，也可印制成品画面交付",
+      "材料类型、幅宽与价格按询价确认"
     ],
     "applications": [
       "广告标识及促销画面",
@@ -35,24 +34,23 @@
       "覆膜材料本身具有高透明、低气味、耐水、耐腐蚀、耐磨、耐刮擦及抗UV等特性；这些描述针对覆膜材料，不代表成品具有未经测试的户外使用寿命。"
     ],
     "delivery": [
-      "标准包装：卷装，内置硬质纸筒",
-      "可另行确认纸箱包装",
-      "通常约2天完成生产，工厂备货及发出一般不超过一周",
-      "海运运输约40天，实际时效取决于航线、货代及清关"
+      "西安同城（以确认下单时间为准）：11:00 前下单当天下午送达，19:00 前次日中午前送达，19:00 后次日下午送达",
+      "三环内必达，三环外多数郊区可达；自有封闭式面包车专送，卷材整卷送货上门",
+      "江浙沪皖由浙江嘉兴海盐合作工厂发货；其他地区时效按订单确认",
+      "标准包装：卷装，内置硬质纸筒；具体包装形式可按订单确认"
     ],
     "artwork": "请提供印刷文件、成品尺寸、数量、卷装或裁切要求及目的地。生产前可核对文件尺寸和出血设置。",
     "brief": "请提供材料类型、宽度、数量或面积、是否覆膜、油墨选择、包装要求及收货国家/地区。",
-    "caveat": "最低起订条件为100平方米，或订单货值超过USD 2,000（满足其中一项即可）。价格为参考单价，运费、税费及最终交付时间需按目的地和运输方案确认。 120gsm和140gsm指底纸克重，不是PVC面膜厚度；面膜厚度及胶水具体性能以工厂最终确认为准。"
+    "caveat": "本页未列具体幅宽、面膜厚度、起订量与价格：这些参数按每笔订单的实际规格确认，询价时请注明材料类型与用途（车身、玻璃、墙面或展板）。需要发票可代开，确认订单时说明即可。长期户外使用的适用性需结合材料类型（高分子/单组份）与具体环境确认。"
   },
   "detail_en": {
-    "lead": "Self-adhesive vinyl for signage, promotional graphics and displays. Confirmed specifications include a 1520 mm roll width, 50 m roll length and a 120 gsm or 140 gsm release liner.",
+    "lead": "Self-adhesive vinyl with a peel-and-stick backing for full vehicle wraps and vehicle graphics, window and glass graphics, wall graphics and display-board graphics. Two media types are available: polymeric vinyl for vehicle wraps and longer-term graphics, and monomeric vinyl for flat surfaces and short-term promotions. Media type, roll width and pricing are confirmed per enquiry.",
     "highlights": [
-      "Roll width: 1520mm",
-      "Release liner weight: 120gsm or 140gsm",
-      "Roll length: 50 m",
-      "Reference price: 120gsm liner USD 13.60/m²; 140gsm liner USD 14.60/m²",
-      "Epson-compatible replacement ink is standard; original Epson ink is available at an additional USD 5/m²",
-      "Standard cold lamination uses 100 gsm PVC film with a yellow release liner; gloss or matte finish available"
+      "Two media types: polymeric and monomeric vinyl",
+      "Full vehicle wraps and vehicle-side advertising",
+      "Window and glass graphics, wall graphics and display-board graphics",
+      "Supplied as media rolls or as printed finished graphics",
+      "Media type, roll width and pricing confirmed per quotation"
     ],
     "applications": [
       "Signage and promotional graphics",
@@ -67,13 +65,13 @@
       "The lamination film itself is described as highly transparent, low-odour, water-resistant, corrosion-resistant, abrasion-resistant, scratch-resistant and UV-resistant. These properties describe the film, not an untested outdoor service life for the finished print."
     ],
     "delivery": [
-      "Standard roll packing with a rigid paper tube inside",
-      "Carton packing can be discussed as an alternative",
-      "Production typically takes around 2 days; factory preparation and dispatch generally take no more than one week",
-      "Sea freight is approximately 40 days; actual transit depends on route, forwarder and customs arrangements"
+      "Production and dispatch timing confirmed per order",
+      "Sea freight to Australian main ports is around 40 days as a reference",
+      "Photos of the finished graphics and the export packing are sent for your confirmation before dispatch",
+      "Standard packing: rolls on a rigid paper tube; alternative packing can be confirmed per order"
     ],
     "artwork": "Please provide print-ready artwork, finished dimensions, quantity, roll or cut-sheet requirements and destination. File dimensions and bleed can be checked before production.",
     "brief": "Please specify the media type, width, quantity or area, lamination, ink option, packing requirements and destination country or region.",
-    "caveat": "MOQ is 100 m², or an order goods value above USD 2,000; either condition is sufficient. Prices are reference rates. Freight, duties and final delivery dates must be confirmed for the destination and shipping arrangement. The 120 gsm and 140 gsm figures refer to release-liner weight, not PVC face-film thickness. Face-film thickness and specific adhesive performance must be confirmed with the factory."
+    "caveat": "Roll width, face-film thickness, minimum order quantity and pricing are not listed on this page: they are confirmed against the actual specification of each order, so please state the media type and intended use (vehicle, glass, wall or board) when enquiring. Suitability for long-term outdoor use depends on the media type (polymeric or monomeric) and the installation environment."
   }
 }
