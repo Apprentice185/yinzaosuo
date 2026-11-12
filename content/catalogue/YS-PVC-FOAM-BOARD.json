@@ -10,12 +10,12 @@
     ],
     "artwork": "Please provide print-ready artwork, finished dimensions, quantity, required board thickness and destination. File dimensions and bleed can be checked before production.",
     "brief": "Please specify the board thickness, sheet size, quantity, printing or cutting requirements, packing requirements and destination country or region.",
-    "caveat": "Specific thickness, sheet size, density, minimum order quantity and pricing are not listed on this page: they are confirmed against the actual specification of each order, so please state your required specification when enquiring.",
+    "caveat": "The sheet size above is the maximum; panels are cut to your finished dimensions. Density, minimum order quantity and pricing are not listed on this page: they are confirmed against the actual specification of each order, so please state your required specification when enquiring.",
     "delivery": [
-      "Standard packing: flat stacked sheets with protected faces",
-      "Alternative packing can be confirmed per order",
-      "Production and dispatch timing is confirmed per order specification and destination",
-      "Transit time depends on route, forwarder and customs arrangements"
+      "Production and dispatch timing confirmed per order",
+      "Sea freight to Australian main ports is around 40 days as a reference",
+      "Photos of the finished panels and the export packing are sent for your confirmation before dispatch",
+      "Standard packing: flat stacked sheets with protected faces; alternative packing can be confirmed per order"
     ],
     "finishing": [
       "Direct UV flatbed printing",
@@ -27,9 +27,10 @@
       "Material: rigid PVC foam board",
       "Smooth flat surface for direct UV printing",
       "Cuts and routes cleanly for letters and panels",
-      "Thickness, density, sheet size and pricing confirmed per quotation"
+      "Thicknesses 3mm, 5mm and 10mm; full sheet 1200×2400mm (maximum size), cut to size",
+      "Density and pricing confirmed per quotation"
     ],
-    "lead": "Rigid PVC foam board for sign panels, cut lettering and display work. The smooth, even surface takes direct UV flatbed printing and router cutting cleanly; thickness, density and sheet size are confirmed for each order."
+    "lead": "Rigid PVC foam board for sign panels, cut lettering and display work. The smooth, even surface takes direct UV flatbed printing and router cutting cleanly. Common thicknesses are 3mm, 5mm and 10mm; the full sheet is 1200×2400mm (maximum size) and panels are cut to your dimensions. Density and pricing are confirmed for each order."
   },
   "detail_zh": {
     "applications": [
@@ -40,12 +41,12 @@
     ],
     "artwork": "请提供印刷文件、成品尺寸、数量、板材厚度要求及目的地。生产前可核对文件尺寸和出血设置。",
     "brief": "请提供板材厚度、尺寸、数量、印刷或切割要求、包装要求及收货国家/地区。",
-    "caveat": "本页未列明具体厚度、尺寸、密度、起订量及价格：这些参数按每笔订单的实际规格确认，询价时请注明所需规格。",
+    "caveat": "整板尺寸为最大尺寸，成品按项目尺寸裁切。密度、起订量与价格本页未列，按每笔订单的实际规格确认，询价时请注明所需规格。需要发票可代开，确认订单时说明即可。",
     "delivery": [
-      "标准包装：平张叠放，表面加保护",
-      "具体包装形式可按订单确认",
-      "生产与发货时效按订单规格及目的地确认",
-      "运输时效取决于航线、货代及清关安排"
+      "西安同城（以确认下单时间为准）：11:00 前下单当天下午送达，19:00 前次日中午前送达，19:00 后次日下午送达",
+      "三环内必达，三环外多数郊区可达；自有封闭式面包车专送，整板不裁切、送货上门",
+      "江浙沪皖由浙江嘉兴海盐合作工厂发货；其他地区时效按订单确认",
+      "标准包装：平张叠放，表面加保护；具体包装形式可按订单确认"
     ],
     "finishing": [
       "UV平板直印",
@@ -57,9 +58,10 @@
       "材质：PVC发泡板（雪弗板）",
       "表面平整细腻，适合UV直印",
       "切割雕刻边缘干净，适合立体字与面板",
-      "厚度、密度、板材尺寸及价格按询价确认"
+      "常见厚度 3mm、5mm、10mm；整板 120×240cm 一种（最大尺寸），可按需裁切",
+      "密度与价格按询价确认"
     ],
-    "lead": "PVC发泡板（雪弗板）用于标识面板、切割立体字与展示制作。表面平整细腻，可直接UV平板印刷，切割雕刻干净利落；具体厚度、密度与板材尺寸按订单确认。"
+    "lead": "PVC发泡板（雪弗板）用于标识面板、切割立体字与展示制作。表面平整细腻，可直接UV平板印刷，切割雕刻干净利落。常见厚度 3mm、5mm、10mm，整板 120×240cm 一种（最大尺寸），可按需裁切；密度与价格按订单确认。"
   },
   "hidden": false,
   "id": "YS-PVC-FOAM-BOARD",

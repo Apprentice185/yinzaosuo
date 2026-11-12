@@ -10,12 +10,12 @@
     ],
     "artwork": "Please provide print-ready artwork, finished dimensions, quantity, required board thickness and destination. File dimensions and bleed can be checked before production.",
     "brief": "Please specify the board thickness, sheet size, quantity, printing and mounting requirements, packing requirements and destination country or region.",
-    "caveat": "Specific thickness, sheet size, density, minimum order quantity and pricing are not listed on this page: they are confirmed against the actual specification of each order, so please state your required specification when enquiring. KT board is positioned as an indoor display material; suitability for long-term outdoor use must be confirmed for the intended environment.",
+    "caveat": "The sheet sizes above are maximums; panels are trimmed to your finished dimensions. 10mm board is currently available only from the Haiyan, Zhejiang partner factory serving the Jiangsu-Zhejiang-Shanghai-Anhui region, so confirm the production origin and timing when ordering 10mm. Density, minimum order quantity and pricing are not listed on this page: they are confirmed against the actual specification of each order, so please state your required specification when enquiring. KT board is positioned as an indoor display material; suitability for long-term outdoor use must be confirmed for the intended environment.",
     "delivery": [
-      "Standard packing: flat stacked sheets",
-      "Alternative packing can be confirmed per order",
-      "Production and dispatch timing is confirmed per order specification and destination",
-      "Transit time depends on route, forwarder and customs arrangements"
+      "Production and dispatch timing confirmed per order",
+      "Sea freight to Australian main ports is around 40 days as a reference",
+      "Photos of the finished boards and the export packing are sent for your confirmation before dispatch",
+      "Standard packing: flat stacked sheets; alternative packing can be confirmed per order"
     ],
     "finishing": [
       "Large-format inkjet printing",
@@ -27,9 +27,10 @@
       "Material: PVC foam board (KT board)",
       "Flat surface suited to mounting printed graphics",
       "Lightweight rigid sheet, easy to handle and install",
-      "Thickness, sheet size and pricing confirmed per quotation"
+      "Standard 5mm; full sheets 900×2400mm and 1200×2400mm (maximum sizes), cut to size",
+      "Supplied as finished mounted panels; pricing confirmed per quotation"
     ],
-    "lead": "KT board (PVC foam board) for mounting indoor display graphics, exhibition boards and indoor signage. The sheets are flat and lightweight, easy to trim and install; thickness and sheet size are confirmed for each order."
+    "lead": "KT board for mounting indoor display graphics, exhibition boards and indoor signage. We supply finished panels — your graphic printed, mounted and trimmed — rather than blank board alone. 5mm is the standard thickness; full sheets are 900×2400mm and 1200×2400mm (maximum sizes, cut to your dimensions). 10mm board is currently produced only at our partner factory in Haiyan, Zhejiang, for the Jiangsu-Zhejiang-Shanghai-Anhui region."
   },
   "detail_zh": {
     "applications": [
@@ -40,12 +41,12 @@
     ],
     "artwork": "请提供印刷文件、成品尺寸、数量、板材厚度要求及目的地。生产前可核对文件尺寸和出血设置。",
     "brief": "请提供板材厚度、尺寸、数量、印刷与裱贴要求、包装要求及收货国家/地区。",
-    "caveat": "本页未列明具体厚度、尺寸、密度、起订量及价格：这些参数按每笔订单的实际规格确认，询价时请注明所需规格。KT板定位为室内展示材料，长期户外使用的适用性需结合具体环境另行确认。",
+    "caveat": "整板尺寸为最大尺寸，成品按画面尺寸裁切。10mm 目前仅江浙沪皖海盐工厂可供，下单前请先确认产地与时效。密度、起订量与价格本页未列，按每笔订单的实际规格确认，询价时请注明所需规格。需要发票可代开，确认订单时说明即可。KT板定位为室内展示材料，长期户外使用的适用性需结合具体环境另行确认。",
     "delivery": [
-      "标准包装：平张叠放包装",
-      "具体包装形式可按订单确认",
-      "生产与发货时效按订单规格及目的地确认",
-      "运输时效取决于航线、货代及清关安排"
+      "西安同城（以确认下单时间为准）：11:00 前下单当天下午送达，19:00 前次日中午前送达，19:00 后次日下午送达",
+      "三环内必达，三环外多数郊区可达；自有封闭式面包车专送，整板不裁切、送货上门",
+      "江浙沪皖由浙江嘉兴海盐合作工厂发货；其他地区时效按订单确认",
+      "标准包装：平张叠放包装；具体包装形式可按订单确认"
     ],
     "finishing": [
       "大幅面喷绘印刷",
@@ -57,9 +58,10 @@
       "材质：PVC发泡板（KT板）",
       "表面平整，适合印刷画面裱贴",
       "轻质硬质板材，便于搬运与安装",
-      "厚度、板材尺寸及价格按询价确认"
+      "常用 5mm；整板 90×240cm 与 120×240cm（最大尺寸），可按需裁切",
+      "供裱好画面的成品板；价格按询价确认"
     ],
-    "lead": "KT板（PVC发泡板）用于室内展示画面裱贴、展览展示板及室内标识。板材表面平整、重量轻，便于裁切与安装；具体厚度与板材尺寸按订单确认。"
+    "lead": "KT板用于室内展示画面裱贴、展览展示板及室内标识。我们供的是裱好画面的成品板：文件发来，印刷、裱贴、裁切做好再交付。常用厚度 5mm，整板 90×240cm 与 120×240cm（最大尺寸，可按需裁切）；10mm 目前只有江浙沪皖的海盐工厂能供。"
   },
   "hidden": false,
   "id": "YS-KT-BOARD",
