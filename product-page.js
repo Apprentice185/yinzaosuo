@@ -135,19 +135,19 @@ function renderProductDetails() {
   imageContainer.classList.remove('is-placeholder', 'image-unavailable');
   const productImageFallbacks = {
   "YS-GLOSS-PHOTO-PAPER": [
-    "assets/images/products/ys-gloss-photo-paper.jpg"
+    "assets/images/products/ys-gloss-photo-paper.webp"
   ],
   "YS-SATIN-PHOTO-PAPER": [
-    "assets/images/products/ys-satin-photo-paper.jpg"
+    "assets/images/products/ys-satin-photo-paper.webp"
   ],
   "YS-SYNTHETIC-PAPER": [
-    "assets/images/products/ys-synthetic-paper.jpg"
+    "assets/images/products/ys-synthetic-paper.webp"
   ],
   "YS-ADHESIVE-VINYL": [
-    "assets/images/products/ys-adhesive-vinyl.jpg"
+    "assets/images/products/ys-adhesive-vinyl.webp"
   ],
   "YS-OUTDOOR-PVC-RIGID-FILM": [
-    "assets/images/products/ys-outdoor-pvc-rigid-film.jpg"
+    "assets/images/products/ys-outdoor-pvc-rigid-film.webp"
   ]
 }
   const imageCandidates = [imageSource, ...(productImageFallbacks[product.id] || [])]

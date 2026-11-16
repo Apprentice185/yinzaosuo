@@ -444,7 +444,7 @@ function renderDeliveryMain(delivery) {
   const phoneDigits = String(delivery.contact_phone || '').replace(/[^\d]/g, '');
   const phoneHref = phoneDigits ? `tel:+86${phoneDigits}` : '';
   return `
-    <section class="page-hero page-hero-photo" style="background-image:url('assets/images/products/ys-kt-board.jpg')"><div class="container">
+    <section class="page-hero page-hero-photo" style="background-image:url('assets/images/products/ys-kt-board.webp')"><div class="container">
       <p class="eyebrow">西安本地服务</p>
       <h1>${heading}</h1>
       <p>${escapeHtml(delivery.intro || '')}</p><div class="hero-actions"><button type="button" class="button" data-open-quote>获取报价 <span>↗</span></button><a class="button button-ghost" href="products.html">产品大全</a></div>
@@ -581,7 +581,7 @@ function renderMarkdown(markdown) {
     text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
     text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
     text = text.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-    text = text.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_, alt, url) => `<img src="${safeUrl(url)}" alt="${alt}">`);
+    text = text.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_, alt, url) => `<img src="${safeUrl(url)}" alt="${alt}" loading="lazy" decoding="async">`);
     text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, label, url) => {
       const href = safeUrl(url);
       return href ? `<a href="${href}">${label}</a>` : label;
@@ -746,7 +746,7 @@ function normalizeArticle(item, collection) {
   for (const image of galleryImages) {
     if (!safeUrl(image)) throw new Error(`Solution ${item.id} has an unsupported gallery image URL: ${image}`);
   }
-  const gallery = galleryImages.map(image => `<p><img src="${safeUrl(image)}" alt=""></p>`).join('');
+  const gallery = galleryImages.map(image => `<p><img src="${safeUrl(image)}" alt="" loading="lazy" decoding="async"></p>`).join('');
   const body = `${renderMarkdown(item.body)}${gallery}`;
   const slug = articleSlug(item);
   if (!slug) throw new Error(`Article ${item.id || item.title || ''} needs a URL slug`);
@@ -992,15 +992,16 @@ function writeProductPages(records) {
 }
 
 // Product images are stored in the repository as base64 text files
-// (<name>.jpg.b64) because the push channel only accepts UTF-8 text.
-// Decode them into real .jpg files in the build workspace so the
-// deployed site serves normal images at the usual paths. No-op when
-// the directory or files are absent (e.g. the Chinese build root).
+// (<name>.jpg.b64 / <name>.webp.b64) because the push channel only
+// accepts UTF-8 text. Decode them into real image files in the build
+// workspace so the deployed site serves normal images at the usual
+// paths. No-op when the directory or files are absent (e.g. the
+// Chinese build root).
 function decodeBase64Images() {
   const directory = path.join(root, 'assets', 'images', 'products');
   if (!fs.existsSync(directory)) return;
   const encodedFiles = fs.readdirSync(directory)
-    .filter(file => file.toLowerCase().endsWith('.jpg.b64'))
+    .filter(file => /\.jpe?g\.b64$/i.test(file) || /\.webp\.b64$/i.test(file))
     .sort((a, b) => a.localeCompare(b));
   for (const file of encodedFiles) {
     const encoded = fs.readFileSync(path.join(directory, file), 'utf8');
