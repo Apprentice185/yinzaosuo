@@ -98,10 +98,12 @@ function renderProductDetails() {
   document.querySelector('#productName').textContent = productText('name');
   document.querySelector('#productIntro').textContent = productText('intro') || product.desc;
   document.querySelector('#productPrice').textContent = referencePrice();
-  const structuredData = { '@context': 'https://schema.org', '@type': 'Product', name: productText('name'), description, brand: { '@type': 'Brand', name: 'YINZAOSUO' }, image: product.image || product.thumb || undefined };
-  let schema = document.querySelector('#productStructuredData');
-  if (!schema) { schema = document.createElement('script'); schema.id = 'productStructuredData'; schema.type = 'application/ld+json'; document.head.append(schema); }
-  schema.textContent = JSON.stringify(structuredData);
+  // NOTE (2026-11-16): Product JSON-LD removed — see scripts/generate-content.js.
+  // A bare Product block (no offers/review/aggregateRating) is invalid for
+  // Google's Product rich result and flagged 1 invalid item per page in GSC.
+  // The prerendered pages no longer emit it either; do not re-add it here
+  // without a real published offers.price.
+  document.querySelector('#productStructuredData')?.remove();
 
   const imageContainer = document.querySelector('#productImage');
   imageContainer.replaceChildren();

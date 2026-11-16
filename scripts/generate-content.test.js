@@ -102,6 +102,7 @@ test('static product output includes SEO metadata, canonical URL and readable pr
   assert.ok(html.includes('<link rel="canonical" href="https://yinzaosuo.com/products/ys-gloss-photo-paper/">'));
   assert.ok(html.includes('<h1 id="productName">Gloss Photo Paper</h1>'));
   assert.ok(html.includes('1520 mm width'));
-  assert.ok(html.includes('id="productStructuredData"'));
+  assert.doesNotMatch(html, /"@type":"Product"/);
+  assert.doesNotMatch(html, /id="productStructuredData"/);
   assert.ok(html.includes('hreflang="zh-CN"'));
 });
