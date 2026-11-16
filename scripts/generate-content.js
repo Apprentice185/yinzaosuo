@@ -346,7 +346,7 @@ function renderStaticProductList(records) {
       id: String(item.id),
       name: item.name || item.title,
       desc: item.detail_desc || '',
-      image: item.detail_image || ''
+      image: productGalleryOf(item)[0] || ''
     }));
   if (extras.length) {
     const defaults = categoryDefaults.exhibition;
@@ -656,6 +656,21 @@ function readMarkdownCollection(name) {
 // Visibility is per-language now: an entry exists in exactly one language
 // tree (or both, as two independent files), and `hidden: true` in that
 // tree's file is the only publication switch. There is no publish_to.
+// A product's detail gallery: the Decap `detail_gallery` list when it has
+// entries, otherwise the legacy single detail image, otherwise the list
+// image. List cards borrow the first gallery image, so a product only
+// needs its gallery maintained.
+function productGalleryOf(record) {
+  const entries = Array.isArray(record.detail_gallery) ? record.detail_gallery : [];
+  const gallery = entries
+    .map(entry => (typeof entry === 'string' ? entry : entry?.image))
+    .map(image => safeMediaUrl(String(image || '').trim()))
+    .filter(Boolean);
+  if (gallery.length) return gallery;
+  const single = safeMediaUrl(String(record.detail_image || record.image || '').trim());
+  return single ? [single] : [];
+}
+
 function normalizeProductRecord(record) {
   const item = { ...record, id: String(record.id) };
   item.hidden = record.hidden === true;
@@ -670,7 +685,7 @@ function normalizeProductRecord(record) {
   item.show_in_archive = record.show_in_archive !== false;
   // Merged records carry the old list layer (products) and detail layer
   // (catalogue) in one file; these flags rebuild the two runtime views.
-  item.hasDetail = Boolean(record.name || record.detail || record.detail_desc || record.detail_seo_title || record.detail_seo_description || record.detail_image);
+  item.hasDetail = Boolean(record.name || record.detail || record.detail_desc || record.detail_seo_title || record.detail_seo_description || record.detail_image || (Array.isArray(record.detail_gallery) && record.detail_gallery.length > 0));
   item.hasListLayer = record.category !== undefined || record.sort_order !== undefined || record.show_in_archive !== undefined;
   item.hasCounterpart = false;
   return item;
@@ -691,7 +706,7 @@ function catalogueViewOf(record) {
     hidden: record.hidden,
     status: record.status,
     name: record.name || '',
-    image: record.detail_image || '',
+    image: productGalleryOf(record)[0] || '',
     desc: record.detail_desc || '',
     seo_title: record.detail_seo_title || '',
     seo_description: record.detail_seo_description || '',
@@ -805,7 +820,7 @@ function buildCatalog(records) {
       items: categoryProducts.map(record => ({
         id: record.id,
         name: record.title,
-        image: record.image,
+        image: productGalleryOf(record)[0] || '',
         desc: record.desc,
         materials: record.materials,
         crafts: record.crafts
@@ -906,7 +921,7 @@ function renderRelatedMedia(record, records) {
       const name = item.name || item.title;
       if (!name) return '';
       const desc = item.detail_desc || '';
-      const image = safeMediaUrl(item.detail_image || item.image);
+      const image = productGalleryOf(item)[0] || '';
       const visual = image
         ? `<img src="${escapeHtml(image)}" alt="${escapeHtml(name)}" loading="lazy" decoding="async">`
         : '';
@@ -930,7 +945,8 @@ function renderStaticProduct(record, template, records) {
   const seoTitleBase = String(seoTitle).replace(/\s*(?:\||｜)\s*(?:YINZAOSUO|印造所)\s*$/i, '');
   const intro = record.detail_desc || record.desc || record.intro || description;
   const detail = record.detail;
-  const image = safeMediaUrl(record.detail_image || record.image);
+  const gallery = productGalleryOf(record);
+  const image = gallery[0] || '';
   const imageCredit = record.detail_image_credit || record.image_credit || '';
   const imageUrl = image ? new URL(image, `${siteUrl}/`).href : '';
   const canonicalUrl = `${siteUrl}${sitePrefix}/products/${slug}/`;
@@ -970,6 +986,15 @@ function renderStaticProduct(record, template, records) {
   if (imageCredit) {
     html = html.replace(/(<div class="product-detail-image" id="productImage">[\s\S]*?<\/div>)/, `$1<p class="product-image-credit">${escapeHtml(imageCredit)}</p>`);
     html = html.replace('</head>', '<style>.product-image-credit{margin:8px 2px 0;font-size:12px;line-height:1.5;color:#777}</style></head>');
+  }
+  if (gallery.length > 1) {
+    const thumbs = gallery.map((entry, index) => {
+      const thumbUrl = new URL(entry, `${siteUrl}/`).href;
+      return `<button type="button" class="product-thumb${index === 0 ? ' is-active' : ''}" data-product-image="${escapeHtml(thumbUrl)}" aria-label="${escapeHtml(isEnglish ? `View image ${index + 1}` : `查看第 ${index + 1} 张图`)}"><img src="${escapeHtml(thumbUrl)}" alt="" loading="lazy" decoding="async"></button>`;
+    }).join('');
+    html = html.replace(/(<div class="product-detail-image" id="productImage">[\s\S]*?<\/div>)/, `$1<div class="product-thumbs" id="productThumbs">${thumbs}</div>`);
+    html = html.replace('</head>', '<style>.product-thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.product-thumbs .product-thumb{width:72px;height:72px;padding:0;border:2px solid #e2e2e2;border-radius:8px;overflow:hidden;background:#fff;cursor:pointer}.product-thumbs .product-thumb.is-active{border-color:#17221e}.product-thumbs .product-thumb img{width:100%;height:100%;object-fit:cover;display:block}</style></head>');
+    html = html.replace('</body>', '<script src="assets/js/product-gallery.js"></script></body>');
   }
   if (detail) {
     html = html.replace(/<section class="product-information" id="productInformation"[^>]*>/, '<section class="product-information" id="productInformation">');

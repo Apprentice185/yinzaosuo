@@ -21,7 +21,7 @@ collections:
   - name: "en_products"
     label: "海外版 · Products"
     folder: "content/en/products"
-    summary: "{{title}} · {{category}} · 顺序 {{sort_order}}"
+    summary: "{{title}} · 顺序 {{sort_order}}"
     sortable_fields:
       - { field: sort_order, label: "后台排序", default_sort: asc }
       - title
@@ -32,29 +32,24 @@ collections:
     slug: "{{id}}"
     fields:
       - { label: "Product ID (system identifier)", name: "id", widget: "string" }
-      - { label: "Hide this product", name: "hidden", widget: "boolean", default: false }
       - { label: "Sort order (smaller first)", name: "sort_order", widget: "number", default: 10, value_type: "int", required: false }
-      - { label: "Show in product archive", name: "show_in_archive", widget: "boolean", default: true }
-      - { label: "Category key (e.g. wideformat)", name: "category", widget: "string", required: false }
-      - { label: "Category title", name: "category_title", widget: "string", required: false }
-      - { label: "Category description", name: "category_desc", widget: "text", required: false }
-      - { label: "Category number", name: "category_num", widget: "string", required: false }
-      - { label: "Category label shown on the detail page", name: "category_label", widget: "string", required: false }
       - { label: "List title", name: "title", widget: "string" }
-      - { label: "List image", name: "image", widget: "image", required: false }
       - { label: "List summary", name: "desc", widget: "text", required: false }
-      - { label: "Intro (fallback summary)", name: "intro", widget: "text", required: false }
       - { label: "Material tags", name: "materials", widget: "list", required: false }
       - { label: "Finishing tags", name: "crafts", widget: "list", required: false }
       - { label: "List SEO title", name: "seo_title", widget: "string", required: false }
       - { label: "List SEO description", name: "seo_description", widget: "text", required: false }
-      - { label: "Detail page name (H1)", name: "name", widget: "string", required: false }
-      - { label: "Detail page main image", name: "detail_image", widget: "image", required: false }
+      - label: "Detail gallery (up to 5 images; the first doubles as the list image)"
+        name: "detail_gallery"
+        widget: "list"
+        required: false
+        max: 5
+        summary: "{{fields.image}}"
+        fields:
+          - { label: "Image", name: "image", widget: "image", choose_url: true, required: false }
       - { label: "Detail intro", name: "detail_desc", widget: "text", required: false }
       - { label: "Detail SEO title", name: "detail_seo_title", widget: "string", required: false }
       - { label: "Detail SEO description", name: "detail_seo_description", widget: "text", required: false }
-      - { label: "List image credit", name: "image_credit", widget: "string", required: false }
-      - { label: "Detail image credit", name: "detail_image_credit", widget: "string", required: false }
       - label: "Product details"
         name: "detail"
         widget: "object"
@@ -262,7 +257,7 @@ collections:
   - name: "zh_products"
     label: "国内版 · 产品大全"
     folder: "content/zh/products"
-    summary: "{{title}} · {{category}} · 顺序 {{sort_order}}"
+    summary: "{{title}} · 顺序 {{sort_order}}"
     sortable_fields:
       - { field: sort_order, label: "后台排序", default_sort: asc }
       - title
@@ -273,29 +268,24 @@ collections:
     slug: "{{id}}"
     fields:
       - { label: "产品编号（系统识别）", name: "id", widget: "string" }
-      - { label: "隐藏内容", name: "hidden", widget: "boolean", default: false }
       - { label: "展示顺序（数字越小越靠前）", name: "sort_order", widget: "number", default: 10, value_type: "int", required: false }
-      - { label: "在产品展示中显示", name: "show_in_archive", widget: "boolean", default: true }
-      - { label: "分类键（如 wideformat）", name: "category", widget: "string", required: false }
-      - { label: "分类名称", name: "category_title", widget: "string", required: false }
-      - { label: "分类介绍", name: "category_desc", widget: "text", required: false }
-      - { label: "分类序号", name: "category_num", widget: "string", required: false }
-      - { label: "详情页显示的分类名", name: "category_label", widget: "string", required: false }
       - { label: "列表名称", name: "title", widget: "string" }
-      - { label: "列表图片", name: "image", widget: "image", required: false }
       - { label: "列表简介", name: "desc", widget: "text", required: false }
-      - { label: "介绍（简介备用）", name: "intro", widget: "text", required: false }
       - { label: "材质标签", name: "materials", widget: "list", required: false }
       - { label: "加工工艺标签", name: "crafts", widget: "list", required: false }
       - { label: "列表 SEO 标题", name: "seo_title", widget: "string", required: false }
       - { label: "列表 SEO 描述", name: "seo_description", widget: "text", required: false }
-      - { label: "详情页名称（H1）", name: "name", widget: "string", required: false }
-      - { label: "详情页主图", name: "detail_image", widget: "image", required: false }
+      - label: "详情页图库（最多 5 张，第一张作列表图）"
+        name: "detail_gallery"
+        widget: "list"
+        required: false
+        max: 5
+        summary: "{{fields.image}}"
+        fields:
+          - { label: "图片", name: "image", widget: "image", choose_url: true, required: false }
       - { label: "详情页导语", name: "detail_desc", widget: "text", required: false }
       - { label: "详情 SEO 标题", name: "detail_seo_title", widget: "string", required: false }
       - { label: "详情 SEO 描述", name: "detail_seo_description", widget: "text", required: false }
-      - { label: "列表图片来源说明", name: "image_credit", widget: "string", required: false }
-      - { label: "详情图片来源说明", name: "detail_image_credit", widget: "string", required: false }
       - label: "产品详情"
         name: "detail"
         widget: "object"

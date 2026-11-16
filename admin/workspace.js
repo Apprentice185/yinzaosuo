@@ -1,11 +1,16 @@
 (function () {
   "use strict";
 
+  // Admin workspace helpers. This file intentionally does NOT touch the
+  // entry editor's own toolbar: saving, publishing and deleting run
+  // through Decap's native controls. (The pre-redesign build injected a
+  // custom action bar with a translation button and a proxy Save button
+  // that scraped the DOM for the native one; when Decap's markup moved
+  // on, the proxy Save silently stopped working, so the whole layer was
+  // removed on 2026-11-17.) What remains: row actions on collection
+  // lists (删除 / 复制 / 排序) and the sidebar regrouping below.
+
   var root = document.getElementById("nc-root");
-  var actionBar = null;
-  var nativeSaveButton = null;
-  var saveObserver = null;
-  var editorChangeUnsubscribe = null;
   var pendingAction = null;
   var pendingActionTimer = null;
 
@@ -28,100 +33,11 @@
   function findNativeSave() {
     var nodes = root.querySelectorAll("button,[role='button']");
     for (var i = 0; i < nodes.length; i++) {
-      if ((!actionBar || !actionBar.contains(nodes[i])) && /^(保存|保存中…?|正在保存…?|Save|Saving…?|Save changes|保存更改)$/i.test(text(nodes[i]))) {
+      if (/^(保存|保存中…?|正在保存…?|Save|Saving…?|Save changes|保存更改)$/i.test(text(nodes[i]))) {
         return nodes[i];
       }
     }
     return null;
-  }
-
-  function commonAncestor(first, second) {
-    if (!first || !second) return null;
-    var ancestors = [];
-    for (var node = first; node; node = node.parentElement) ancestors.push(node);
-    for (var other = second; other; other = other.parentElement) {
-      if (ancestors.indexOf(other) !== -1) return other;
-    }
-    return null;
-  }
-
-  function findEditorToolbar() {
-    var status = findStatus();
-    var remove = findButton(/^(删除内容|Delete|Delete entry)$/i);
-    var toolbar = commonAncestor(status, remove);
-    if (toolbar && toolbar !== root) return toolbar;
-
-    var anchor = status || findNativeSave() || remove;
-    for (var node = anchor && anchor.parentElement; node && node !== root; node = node.parentElement) {
-      var rect = node.getBoundingClientRect();
-      if (rect.top <= 100 && rect.height > 0 && rect.height <= 100 && rect.width >= Math.min(480, window.innerWidth * 0.5)) {
-        return node;
-      }
-    }
-    return null;
-  }
-
-  function hideNativeEditorActions(toolbar) {
-    if (!toolbar) return;
-    var labels = /^(已发布|未发布|Published|Unpublished|草稿|Draft|发布|Publish|发布更改|Publish changes|删除内容|Delete|Delete entry|查看发布|View published)[\s▼▾⌄↗]*$/i;
-    var buttons = toolbar.querySelectorAll("button,[role='button'],a");
-    for (var i = 0; i < buttons.length; i++) {
-      if (labels.test(text(buttons[i]))) {
-        buttons[i].classList.add("yinzaosuo-native-action-hidden");
-        buttons[i].setAttribute("aria-hidden", "true");
-        buttons[i].setAttribute("tabindex", "-1");
-      }
-    }
-  }
-
-  function syncSaveState() {
-    if (!actionBar) return;
-    var button = actionBar.querySelector("[data-action=save]");
-    var editor = window.CMS && window.CMS.editor;
-    var snapshot = editor && typeof editor.getCurrentEntry === "function" ? editor.getCurrentEntry() : null;
-    var changed = snapshot && snapshot.hasChanged === true;
-    var nativeSaveEnabled = nativeSaveButton && !nativeSaveButton.disabled;
-    var disabled = !changed && !nativeSaveEnabled;
-    button.disabled = disabled;
-    button.setAttribute("aria-disabled", String(disabled));
-  }
-
-  function save() {
-    var editor = window.CMS && window.CMS.editor;
-    var snapshot = editor && typeof editor.getCurrentEntry === "function" ? editor.getCurrentEntry() : null;
-    var changed = snapshot && snapshot.hasChanged === true;
-    var nativeSaveEnabled = nativeSaveButton && !nativeSaveButton.disabled;
-    if ((!changed && !nativeSaveEnabled) || !nativeSaveButton) return;
-    if (changed && nativeSaveButton.disabled) nativeSaveButton.disabled = false;
-    nativeSaveButton.click();
-  }
-
-  function bindEditorChanges() {
-    var editor = window.CMS && window.CMS.editor;
-    if (!editorChangeUnsubscribe && editor && typeof editor.onEditorChange === "function") {
-      editorChangeUnsubscribe = editor.onEditorChange(syncSaveState);
-    }
-  }
-
-  function scheduleSaveStateSync() {
-    window.setTimeout(syncSaveState, 0);
-  }
-
-  async function translate() {
-    var api = window.YinzaosuoTranslation;
-    var button = actionBar && actionBar.querySelector("[data-action=translate]");
-    if (!api || typeof api.translateCurrentEntry !== "function" || !button || button.disabled) return;
-    button.disabled = true;
-    button.textContent = "翻译中…";
-    try {
-      await api.translateCurrentEntry();
-    } catch (error) {
-      api.showStatus(error.message || "翻译失败", "error");
-    } finally {
-      button.disabled = false;
-      button.textContent = "填入翻译内容";
-      syncSaveState();
-    }
   }
 
   function setRoute(route, action) {
@@ -163,7 +79,7 @@
       window.alert("无法更新字段：" + path);
       return true;
     }
-    window.setTimeout(callback || syncSaveState, 150);
+    window.setTimeout(callback || function () {}, 150);
     return true;
   }
 
@@ -179,8 +95,8 @@
       // Collections whose identifier is the id itself (products, materials)
       // only need the id patched; slug-identified collections (articles)
       // also need a fresh slug.
-      if (collection === "en_products" || collection === "zh_products" || collection === "zh_materials") syncSaveState();
-      else applyPatch("slug", id);
+      if (collection === "en_products" || collection === "zh_products" || collection === "zh_materials") return;
+      applyPatch("slug", id);
     })) {
       pendingAction = null;
     }
@@ -295,46 +211,6 @@
     });
   }
 
-  function mountEditorActions() {
-    if (!/\/collections\/[^/]+\/entries\//.test(window.location.hash)) return;
-    bindEditorChanges();
-    var toolbar = findEditorToolbar();
-    if (!toolbar) return;
-    hideNativeEditorActions(toolbar);
-    var saveButton = findNativeSave();
-    if (actionBar && actionBar.isConnected && nativeSaveButton === saveButton) {
-      syncSaveState();
-      return;
-    }
-    if (actionBar) actionBar.remove();
-    nativeSaveButton = saveButton;
-    if (saveObserver) saveObserver.disconnect();
-    saveObserver = null;
-    if (saveButton) {
-      saveObserver = new MutationObserver(syncSaveState);
-      saveObserver.observe(saveButton, { attributes: true, attributeFilter: ["disabled"] });
-      saveButton.classList.add("yinzaosuo-native-save-hidden");
-    }
-    actionBar = document.createElement("div");
-    actionBar.className = "yinzaosuo-editor-actions";
-
-    var translateAction = document.createElement("button");
-    translateAction.type = "button";
-    translateAction.dataset.action = "translate";
-    translateAction.textContent = "填入翻译内容";
-    translateAction.addEventListener("click", translate);
-
-    var saveAction = document.createElement("button");
-    saveAction.type = "button";
-    saveAction.dataset.action = "save";
-    saveAction.textContent = "保存";
-    saveAction.addEventListener("click", save);
-
-    actionBar.append(translateAction, saveAction);
-    toolbar.appendChild(actionBar);
-    syncSaveState();
-  }
-
   // --- Collections sidebar: regroup Decap's flat list into two visual
   // --- cards (海外版 / 国内版). No Decap-managed node is moved or removed:
   // --- we only retitle the native heading, strip the label prefixes,
@@ -442,7 +318,6 @@
   function mount() {
     if (!root) return;
     addRowActions();
-    mountEditorActions();
     layoutSidebar();
     shortenNewEntryLink();
     if (pendingAction) schedulePendingAction();
@@ -451,18 +326,10 @@
   if (root) {
     var observer = new MutationObserver(mount);
     observer.observe(root, { childList: true, subtree: true });
-    root.addEventListener("input", scheduleSaveStateSync, true);
-    root.addEventListener("change", scheduleSaveStateSync, true);
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", mount, { once: true });
   else mount();
   window.addEventListener("hashchange", function () {
-    actionBar = null;
-    nativeSaveButton = null;
-    if (saveObserver) saveObserver.disconnect();
-    saveObserver = null;
-    if (editorChangeUnsubscribe) editorChangeUnsubscribe();
-    editorChangeUnsubscribe = null;
     window.setTimeout(mount, 0);
     schedulePendingAction(250);
   });
