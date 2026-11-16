@@ -111,19 +111,26 @@
 
 /* Collections sidebar regrouped into two cards (海外版 / 国内版).
    The native card chrome is removed from the <aside> and rebuilt on the
-   group pieces (heading, search row, list items) so the two groups read
-   as separate white cards; a drop-shadow on the aside follows the
-   two-card silhouette. Values mirror Decap's own card / heading /
-   search-input styles. */
+   group pieces (heading, list items) so the two groups read as separate
+   white cards. The drop-shadow sits on the heading and the list rather
+   than on the aside itself: a filter on the aside would make it the
+   containing block for fixed-position descendants, and the native
+   search box (a child of the aside) is pinned to the viewport with
+   position:fixed below. The list's shadow follows the union of its
+   items, so the gap before the domestic group keeps the two-card
+   silhouette. Values mirror Decap's own card / heading styles. */
 #nc-root aside.yz-grouped {
   background: transparent;
   border: none;
   box-shadow: none;
+}
+
+#nc-root aside.yz-grouped > h2,
+#nc-root aside.yz-grouped > ul.yz-group-list {
   filter: drop-shadow(0 2px 6px rgba(68, 74, 87, .06)) drop-shadow(0 1px 3px rgba(68, 74, 87, .05));
 }
 
 #nc-root aside.yz-grouped > h2,
-#nc-root aside.yz-grouped > .yz-group-mid,
 #nc-root aside.yz-grouped > ul.yz-group-list > li {
   background: #fff;
   border-left: 1px solid #e6eae7;
@@ -170,30 +177,56 @@
   }
 }
 
-#nc-root .yz-group-search {
-  position: relative;
-  margin: 6px 12px 10px;
+/* The native global search, lifted out of the sidebar into Decap's top
+   header bar. The node itself is NOT moved — it stays inside the aside
+   where React put it; position:fixed takes it out of the sidebar flow
+   and pins it to the viewport (vertically centred on the ~58px header:
+   the input is ~40px tall, hence top: 9px; horizontally centred,
+   290px wide like the user's mockup). This works because no ancestor
+   carries a transform/filter/will-change — the two-card drop-shadow
+   therefore lives on the heading and the list, not on the aside.
+   z-index 400 sits above the header bar (Decap zIndex300) and below
+   modal layers (zIndex1000). The suggestions dropdown is absolutely
+   positioned inside this same container (Decap renders it in-flow, no
+   portal), so it travels with the box and opens below it, unclipped:
+   no ancestor of the container clips overflow. */
+#nc-root aside.yz-grouped > .yz-topsearch {
+  position: fixed;
+  top: 9px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 290px;
+  margin: 0;
+  z-index: 400;
 }
 
-#nc-root .yz-group-search svg {
-  position: absolute;
-  top: 50%;
-  left: 9px;
-  transform: translateY(-50%);
-  pointer-events: none;
+/* Mid-width screens: shrink the box so it cannot collide with the
+   header's right-hand cluster (quick-new / site name / avatar). */
+@media (min-width: 800px) and (max-width: 1100px) {
+  #nc-root aside.yz-grouped > .yz-topsearch {
+    width: 220px;
+  }
 }
 
-#nc-root .yz-group-search input {
-  box-sizing: border-box;
-  width: 100%;
-  border: none;
-  border-radius: 5px;
-  background-color: #eff0f4;
-  font-size: 14px;
-  padding: 10px 6px 10px 34px;
-}
-
-#nc-root .yz-group-search input:focus {
-  outline: none;
-  box-shadow: inset 0 0 0 2px #4863c6;
+/* Narrow or short viewports: Decap stacks its header into two rows and
+   un-fixes the sidebar there (and the header stops being sticky below
+   500px height), so a viewport-pinned box would overlap or float over
+   scrolled content. The search instead returns to its native place in
+   the sidebar flow, dressed as a plain card piece between the heading
+   and the list (full-bleed white with side borders; the container's
+   padding keeps the input's native 12px inset from the card edges). */
+@media (max-width: 799px), (max-height: 499px) {
+  #nc-root aside.yz-grouped > .yz-topsearch {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    width: auto;
+    margin: 0;
+    padding: 6px 12px 8px;
+    z-index: auto;
+    background: #fff;
+    border-left: 1px solid #e6eae7;
+    border-right: 1px solid #e6eae7;
+  }
 }
