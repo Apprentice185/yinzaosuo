@@ -6,15 +6,17 @@
   "desc_zh": "适用于户外围挡、建筑及大型展示场景的定制网格布印刷成品。",
   "desc_en": "Custom-printed mesh banners for outdoor fencing, building wraps and large-format display applications.",
   "detail_zh": {
-    "lead": "面向户外大型画面的定制 PVC 网格布喷绘成品，适用于项目指定使用网格结构的展示场景。每个订单均按成品尺寸和安装需求评估。",
+    "lead": "定制 PVC 网格布（网眼布）喷绘成品，专为工地围挡、施工围栏和高楼外立面这类大面积户外画面而做。布面带网孔，风能穿过去，大幅画面受风面积大也不容易被撕扯；代价是画面带透光感，要求画面完全不透的场合不要选它。",
     "highlights": [
+      "网孔透风、降低风阻，大幅围挡画面更稳妥",
       "根据项目尺寸定制生产",
-      "短边约 5 米无拼接生产能力，须按画面尺寸评估",
       "支持包边、打鸡眼扣、加绳及穿杆袋",
-      "可按成品尺寸裁切"
+      "可按成品尺寸裁切",
+      "适合围挡、外立面等大面积户外画面"
     ],
     "applications": [
-      "户外围挡及施工现场画面",
+      "工地围挡与施工围栏画面",
+      "高楼外立面与脚手架大幅画面",
       "建筑及周界展示",
       "大型户外宣传安装"
     ],
@@ -26,24 +28,27 @@
       "按尺寸裁切"
     ],
     "delivery": [
-      "卷装交付",
-      "按尺寸裁切成品",
-      "根据订单核算包装和运费"
+      "西安同城（以确认下单制作时间为准）：11:00 前下单当天下午送达，19:00 前次日中午前送达，19:00 后次日下午送达",
+      "三环内必达，三环外多数郊区可达；自有封闭式面包车专送，整卷送货上门",
+      "江浙沪皖由浙江嘉兴海盐合作工厂发货；其他地区时效按订单确认",
+      "卷装交付，成品按尺寸裁切；包装形式按订单确认"
     ],
     "artwork": "客户可以提供印刷文件。基础文件检查和简单调整可免费提供；较大幅度修改或从零设计需单独报价。",
     "brief": "请提供成品尺寸、数量、设计文件、安装方式、加工要求、交付形式及目的地。",
-    "caveat": "约 5 米无拼接能力取决于具体长宽组合。产品是否适合特定安装环境，应结合项目要求确认。"
+    "caveat": "网格布布面带网孔、画面有透光感，不适合要求画面完全不透的场合；围挡高度、固定方式和现场风力都会影响选材，下单前请先确认安装环境。成品尺寸与价格按订单确认，不预设标价。需要发票可代开，确认订单时说明即可。"
   },
   "detail_en": {
-    "lead": "Custom printed PVC mesh banners for large outdoor graphics where a mesh construction is specified. Finished dimensions and installation details are reviewed for each project.",
+    "lead": "Custom printed PVC mesh banners for construction-site fencing, site hoardings and large building-facade graphics. The perforated mesh lets wind pass through, so large graphics carry far less wind load; the trade-off is a semi-transparent image, which makes mesh the wrong choice where a fully opaque graphic is required.",
     "highlights": [
+      "Perforated mesh reduces wind load on large-format graphics",
       "Made to the dimensions of your project",
-      "Approx. 5 m seamless shorter-side capability, subject to artwork dimensions and production assessment",
       "Hemming, eyelets, rope finishing and pole pockets available",
-      "Custom trimming to finished size"
+      "Custom trimming to finished size",
+      "Suited to fencing, hoardings and facade-scale graphics"
     ],
     "applications": [
-      "Outdoor fencing and construction-site graphics",
+      "Construction-site fencing and hoarding graphics",
+      "Building facades and scaffold wraps",
       "Building and perimeter displays",
       "Large-format promotional installations"
     ],
@@ -55,13 +60,14 @@
       "Custom trimming"
     ],
     "delivery": [
-      "Roll delivery",
-      "Cut-to-size finished pieces",
-      "Packing and freight assessed for the order"
+      "Production and dispatch timing confirmed per order",
+      "Sea freight to Australian main ports is around 40 days as a reference",
+      "Photos of the finished mesh banners and the export packing are sent for your confirmation before dispatch",
+      "Rolled packing; banners are trimmed to the finished size before rolling"
     ],
     "artwork": "Print-ready artwork can be supplied by the buyer. Basic file checks and minor adjustments are available at no extra cost; extensive artwork changes or original design work are quoted separately.",
     "brief": "Please share finished dimensions, quantity, artwork, installation method, finishing details, delivery format and destination.",
-    "caveat": "The approximately 5 m seamless capability is subject to the exact width-and-height combination. Suitability for a particular installation should be confirmed against the project requirements."
+    "caveat": "Mesh graphics are perforated and semi-transparent, and are not suitable where a fully opaque image is required. Fence height, fixing method and local wind conditions all affect suitability, so please confirm the installation environment when ordering. Dimensions and pricing are confirmed per order; no list prices are published."
   },
   "seo_title_zh": "网格布喷绘定制｜工地围挡网眼布｜YINZAOSUO",
   "seo_title_en": "Printed PVC Mesh Banners | Outdoor Trade Supply | YINZAOSUO",

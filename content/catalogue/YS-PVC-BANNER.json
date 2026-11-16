@@ -6,14 +6,16 @@
   "desc_zh": "按项目尺寸和画面文件生产 PVC 广告横幅，可选多种边缘与安装加工方式。",
   "desc_en": "Custom-printed PVC banners produced to your project dimensions, with a choice of practical finishing options.",
   "detail_zh": {
-    "lead": "面向贸易订单、活动推广及户外展示的定制 PVC 横幅喷绘成品。提供成品尺寸和画面需求，可按实际安装方式选择后道加工。",
+    "lead": "定制 PVC 横幅喷绘成品：门头招牌、开业条幅、活动宣传与户外广告最常用的画面材料。按成品尺寸和画面文件生产，340 / 440 / 510 三档克重可选，另有 frontlit 与 blockout 两种结构，后道加工按实际安装方式选择。",
     "highlights": [
+      "340 / 440 / 510 三档克重可选，越重越挺括、越抗风",
+      "frontlit 与 blockout 两种结构可选；blockout 不透光，适合双面画面",
       "根据项目需求定制成品尺寸",
-      "短边约 5 米无拼接生产能力，须按画面尺寸评估",
       "支持包边、打鸡眼扣、加绳及穿杆袋",
       "可按指定成品尺寸裁切"
     ],
     "applications": [
+      "门头招牌与开业条幅",
       "户外广告与促销活动",
       "活动、零售及场馆画面",
       "围挡、工地及临时宣传展示"
@@ -26,23 +28,26 @@
       "按尺寸裁切"
     ],
     "delivery": [
-      "卷装交付",
-      "按尺寸裁切成品",
-      "根据订单核算包装和运费"
+      "西安同城（以确认下单制作时间为准）：11:00 前下单当天下午送达，19:00 前次日中午前送达，19:00 后次日下午送达",
+      "三环内必达，三环外多数郊区可达；自有封闭式面包车专送，整卷送货上门",
+      "江浙沪皖由浙江嘉兴海盐合作工厂发货；其他地区时效按订单确认",
+      "卷装交付，成品按尺寸裁切；包装形式按订单确认"
     ],
     "artwork": "客户可以提供印刷文件。基础文件检查和简单调整可免费提供；较大幅度修改或从零设计需单独报价。",
     "brief": "请提供成品宽度和高度、数量、设计文件、加工位置（如有指定鸡眼间距请注明）、交付形式及目的地。",
-    "caveat": "约 5 米无拼接能力并不代表任意长宽组合都能生产。每个画面均需在生产前评估，连续长度和最终包装按订单确认。"
+    "caveat": "克重与结构请按使用场景确认：短期活动和长期户外的选法不同，拿不准时把安装位置和展示时长发来，我们按场景建议。成品尺寸、克重与价格按订单确认，不预设标价。需要发票可代开，确认订单时说明即可。"
   },
   "detail_en": {
-    "lead": "Made-to-order printed PVC banners for trade projects, events, promotions and outdoor displays. Supply the finished dimensions and artwork brief; finishing can be specified to suit the intended installation.",
+    "lead": "Made-to-order printed PVC banners for shopfront signs, opening banners, outdoor advertising, events and promotions. Produced to your finished dimensions from your artwork, in a choice of 340, 440 or 510 gsm weights and frontlit or blockout constructions, with finishing matched to the way the banner will be installed.",
     "highlights": [
+      "Three weights — 340, 440 and 510 gsm; heavier weights hang flatter and handle wind better",
+      "Frontlit and blockout constructions; blockout is opaque, for double-sided graphics",
       "Custom dimensions based on your project brief",
-      "Approx. 5 m seamless shorter-side capability, subject to artwork dimensions and production assessment",
       "Hemming, eyelets, rope finishing and pole pockets available",
       "Cut to the requested finished size"
     ],
     "applications": [
+      "Shopfront signs and opening banners",
       "Outdoor advertising and promotions",
       "Event, retail and venue graphics",
       "Fencing, site and temporary campaign displays"
@@ -55,13 +60,14 @@
       "Custom trimming"
     ],
     "delivery": [
-      "Roll delivery",
-      "Cut-to-size finished pieces",
-      "Packing and freight assessed for the order"
+      "Production and dispatch timing confirmed per order",
+      "Sea freight to Australian main ports is around 40 days as a reference",
+      "Photos of the finished banners and the export packing are sent for your confirmation before dispatch",
+      "Rolled packing; banners are trimmed to the finished size before rolling"
     ],
     "artwork": "Print-ready artwork can be supplied by the buyer. Basic file checks and minor adjustments are available at no extra cost; extensive artwork changes or original design work are quoted separately.",
     "brief": "Please share finished width and height, quantity, artwork, finishing positions (including eyelet spacing if specified), delivery format and destination.",
-    "caveat": "The approximately 5 m seamless capability is not a promise for every width-and-height combination. Each layout is reviewed before production. Continuous lengths and final packing are confirmed against the order."
+    "caveat": "Weight and construction are confirmed against the application: short-term event use and long-term outdoor exposure call for different choices, so share the installation position and display period and we will recommend accordingly. Finished dimensions, weight and pricing are confirmed per order; no list prices are published."
   },
   "seo_title_zh": "横幅喷绘定制｜PVC横幅340/440/510克｜YINZAOSUO",
   "seo_title_en": "Custom PVC Banner Printing | Trade Supply & Finishing | YINZAOSUO",
