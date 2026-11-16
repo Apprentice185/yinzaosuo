@@ -390,6 +390,21 @@ function writeListPages(data) {
   }
 }
 
+// Materials images hosted on Tencent COS: masters are stored uncompressed,
+// the site serves on-the-fly processed variants (resize + WebP) per slot.
+// Non-COS URLs and URLs that already carry a query string pass through.
+const COS_IMAGE_BASE = 'https://yinzaosuo-img-1256424564.cos.ap-shanghai.myqcloud.com/';
+const MATERIAL_IMAGE_PARAMS = {
+  card: 'thumbnail/800x/format/webp/quality/75',
+  main: 'thumbnail/1600x/format/webp/quality/80',
+  thumb: 'thumbnail/300x/format/webp/quality/70'
+};
+function materialImageVariant(url, params) {
+  const value = String(url || '');
+  if (!value.startsWith(COS_IMAGE_BASE) || value.includes('?')) return value;
+  return `${value}?imageMogr2/${params}`;
+}
+
 function normalizeMaterial(item) {
   const gallery = (Array.isArray(item.gallery) ? item.gallery : [])
     .map(entry => (typeof entry === 'string' ? entry : entry?.image))
@@ -489,7 +504,7 @@ function writeDeliveryPage() {
 }
 
 function renderMaterialCard(item) {
-  const cover = item.gallery[0] || '';
+  const cover = materialImageVariant(item.gallery[0], MATERIAL_IMAGE_PARAMS.card);
   const visual = cover
     ? `<div class="long-card-visual has-image" style="background-image:url('${escapeHtml(cover)}')"></div>`
     : `<div class="long-card-visual is-placeholder"><span>素材中心</span></div>`;
@@ -523,8 +538,8 @@ function renderMaterialDetailPage(item, shell) {
   const title = item.title;
   const mainImage = item.gallery[0] || '';
   const gallery = mainImage
-    ? `<div class="material-main"><img id="materialMainImage" src="${escapeHtml(mainImage)}" alt="${escapeHtml(title)}"></div>
-      <div class="material-thumbs" id="materialThumbs">${item.gallery.map((image, index) => `<button type="button" class="material-thumb${index === 0 ? ' is-active' : ''}" data-material-image="${escapeHtml(image)}" aria-label="查看第 ${index + 1} 张图"><img src="${escapeHtml(image)}" alt=""></button>`).join('')}</div>`
+    ? `<div class="material-main"><img id="materialMainImage" src="${escapeHtml(materialImageVariant(mainImage, MATERIAL_IMAGE_PARAMS.main))}" alt="${escapeHtml(title)}"></div>
+      <div class="material-thumbs" id="materialThumbs">${item.gallery.map((image, index) => `<button type="button" class="material-thumb${index === 0 ? ' is-active' : ''}" data-material-image="${escapeHtml(materialImageVariant(image, MATERIAL_IMAGE_PARAMS.main))}" aria-label="查看第 ${index + 1} 张图"><img src="${escapeHtml(materialImageVariant(image, MATERIAL_IMAGE_PARAMS.thumb))}" alt=""></button>`).join('')}</div>`
     : '<div class="material-main material-main-empty"><span>素材中心</span></div>';
   const titled = retitleShell(shell, {
     title: `${title}｜素材中心｜印造所`,

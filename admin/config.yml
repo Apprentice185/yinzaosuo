@@ -388,7 +388,7 @@ collections:
         max: 5
         summary: "{{fields.image}}"
         fields:
-          - { label: "图片", name: "image", widget: "image" }
+          - { label: "图片", name: "image", widget: "image", choose_url: true }
       - { label: "文字介绍", name: "description", widget: "text", required: false }
       - { label: "展示顺序（数字越小越靠前）", name: "sort_order", widget: "number", default: 10, value_type: "int", required: false }
 
