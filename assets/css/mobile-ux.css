@@ -71,3 +71,53 @@
 @media (max-width: 560px) {
   .steps .step p { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 }
+
+/* Mobile pass (2026-11-16): objective layout defects only — iOS input
+   zoom, touch targets, modal reachability, hero dot hit area, safe area. */
+@media (max-width: 800px) {
+  /* Form controls under 16px make iOS Safari zoom the page on focus. */
+  .quote-modal input, .quote-modal select, .quote-modal textarea,
+  .quote-simple-fields input, .quote-simple-fields select, .quote-simple-fields textarea,
+  .option-grid select, .detail-options select { font-size: 16px; }
+  /* Touch targets: standalone links and small controls reach 40px+. */
+  .site-footer .footer-links a { display: flex; align-items: center; min-height: 40px; margin: 0; padding: 5px 0; }
+  .site-footer .footer-contact-item > a { display: flex; align-items: center; min-height: 40px; }
+  .icon-btn, .menu-btn { min-width: 44px; }
+  .filter-tabs button { min-height: 40px; }
+  .category-pills button { display: inline-flex; align-items: center; min-height: 40px; }
+  .back-link { display: inline-flex; align-items: center; min-height: 40px; }
+  .home-article-read, .all-products-back { min-height: 40px; }
+  .long-card .text-link, .aside-box .text-link, .material-back .text-link { display: inline-flex; align-items: center; min-height: 40px; }
+  .mfold-toggle { display: inline-flex; align-items: center; min-height: 40px; }
+  /* Modal close buttons get a full-size hit area. */
+  .modal-close { width: 44px; height: 44px; display: grid; place-items: center; right: 6px; top: 6px; }
+  .search-panel button { width: 44px; height: 44px; }
+  /* Modals without an internal scroll region can now scroll fully into
+     reach on short screens; dvh tracks the visible viewport. */
+  .product-options, .scene-modal-box { max-height: calc(100vh - 40px); max-height: calc(100dvh - 40px); overflow-y: auto; }
+  .quote-modal { max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); }
+  .content-modal-box { max-height: calc(100vh - 40px); max-height: calc(100dvh - 40px); }
+  /* Hero carousel dots: same 7px/23px visuals, 32px hit area per dot. */
+  .hero-fullbleed .hero-carousel-dots { gap: 2px; padding: 4px 10px; }
+  .hero-fullbleed .hero-carousel-dots button { width: 32px; height: 32px; padding: 0; display: grid; place-items: center; background: transparent; border-radius: 99px; }
+  .hero-fullbleed .hero-carousel-dots button::after { content: ''; width: 7px; height: 7px; border-radius: 99px; background: rgba(255,255,255,.52); transition: width .25s, background .25s; }
+  .hero-fullbleed .hero-carousel-dots button.is-active { width: 32px; background: transparent; }
+  .hero-fullbleed .hero-carousel-dots button.is-active::after { width: 23px; background: #fff; }
+  /* Long-form robustness: unbroken strings and code wrap or scroll
+     inside the article instead of widening the page. */
+  .article-detail-body { overflow-wrap: break-word; }
+  .article-detail-body pre { overflow-x: auto; }
+  .article-detail-body code { overflow-wrap: anywhere; }
+  /* Toast clears the iPhone home-indicator zone. */
+  .toast { bottom: max(25px, calc(env(safe-area-inset-bottom) + 10px)); }
+  /* Section rhythm aligned with the rest of the mobile system. */
+  #about.section { padding-block: 58px; }
+  .home-featured-materials { padding-top: 58px; padding-bottom: 58px; }
+}
+@media (max-width: 560px) {
+  #about.section { padding-block: 48px; }
+  .home-featured-materials { padding-top: 48px; padding-bottom: 48px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-fullbleed .hero-carousel-dots button::after { transition: none; }
+}

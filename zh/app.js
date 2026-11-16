@@ -132,10 +132,15 @@ function openScene(id) {
   document.querySelector('#sceneDesc').textContent = productText(product, 'intro');
   document.querySelector('#sceneDetail').href = `product.html?id=${encodeURIComponent(product.id)}`;
   sceneModal.classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
-document.querySelector('#closeScene')?.addEventListener('click', () => sceneModal.classList.remove('open'));
+function closeScene() {
+  sceneModal?.classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.querySelector('#closeScene')?.addEventListener('click', closeScene);
 sceneModal?.addEventListener('click', event => {
-  if (event.target === sceneModal || event.target.id === 'sceneDetail') sceneModal.classList.remove('open');
+  if (event.target === sceneModal || event.target.id === 'sceneDetail') closeScene();
 });
 
 const productModal = document.querySelector('#productModal');
@@ -150,9 +155,11 @@ function openProduct(id) {
     `<label>${escapeContent(window.t(`option_${option.name}`))}<select data-option-index="${index}">${option.values.map(value => `<option>${escapeContent(value)}</option>`).join('')}</select></label>`
   ).join(''));
   productModal.classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
 function closeProduct() {
   productModal?.classList.remove('open');
+  document.body.style.overflow = '';
 }
 document.querySelector('#closeProduct')?.addEventListener('click', closeProduct);
 productModal?.addEventListener('click', event => {
