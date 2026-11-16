@@ -335,10 +335,130 @@
     syncSaveState();
   }
 
+  // --- Collections sidebar: regroup Decap's flat list into two visual
+  // --- cards (海外版 / 国内版). No Decap-managed node is moved or removed:
+  // --- we only retitle the native heading, strip the label prefixes,
+  // --- add marker classes, and insert two foreign <li> rows (group title
+  // --- + filter box) ahead of the domestic group. mount() re-applies
+  // --- everything after React re-renders, and every write is guarded so
+  // --- repeat runs are no-ops.
+  function sidebarGroupOf(name) {
+    if (name.indexOf("en_") === 0) return "en";
+    if (name.indexOf("zh_") === 0) return "zh";
+    return null;
+  }
+
+  function stripSidebarPrefix(link) {
+    for (var i = 0; i < link.childNodes.length; i++) {
+      var node = link.childNodes[i];
+      if (node.nodeType !== 3) continue;
+      var stripped = node.nodeValue.replace(/^\s*(海外版|国内版)\s*·\s*/, "");
+      if (stripped !== node.nodeValue) node.nodeValue = stripped;
+    }
+  }
+
+  function applyDomesticFilter(list) {
+    var input = list.querySelector(".yz-group-search-li input");
+    if (!input) return;
+    var query = input.value.replace(/\s+/g, " ").trim().toLowerCase();
+    var links = list.querySelectorAll('a[data-testid^="zh_"]');
+    Array.prototype.forEach.call(links, function (link) {
+      var item = link.closest("li");
+      if (!item) return;
+      var display = !query || text(link).toLowerCase().indexOf(query) !== -1 ? "" : "none";
+      if (item.style.display !== display) item.style.display = display;
+    });
+  }
+
+  function layoutSidebar() {
+    var links = root.querySelectorAll('a[data-testid][href*="/collections/"]');
+    var entries = [];
+    Array.prototype.forEach.call(links, function (link) {
+      var match = (link.getAttribute("href") || "").match(/#\/collections\/([A-Za-z0-9_]+)$/);
+      if (!match || link.getAttribute("data-testid") !== match[1]) return;
+      var item = link.closest("li");
+      var group = sidebarGroupOf(match[1]);
+      if (group && item) entries.push({ link: link, item: item, group: group });
+    });
+    if (!entries.length) return;
+    var list = entries[0].item.parentElement;
+    if (!list || list.tagName !== "UL") return;
+    for (var i = 0; i < entries.length; i++) {
+      if (entries[i].item.parentElement !== list) return; // unexpected DOM; bail out
+    }
+    var container = list.parentElement;
+    if (!container) return;
+    container.classList.add("yz-grouped");
+    list.classList.add("yz-group-list");
+
+    var heading = container.querySelector(":scope > h2");
+    var searchWrap = null;
+    Array.prototype.forEach.call(container.children, function (child) {
+      if (child !== list && child !== heading && child.querySelector && child.querySelector("input")) {
+        searchWrap = child;
+      }
+    });
+    if (searchWrap) searchWrap.classList.add("yz-group-mid");
+    if (heading) {
+      heading.classList.add("yz-group-start");
+      var headingText = text(heading);
+      if (entries[0].group === "en" && (headingText === "集合" || headingText === "Collections")) {
+        heading.textContent = "海外版";
+      }
+    } else if (searchWrap) {
+      searchWrap.classList.add("yz-group-start");
+    }
+
+    var overseas = [];
+    var domestic = [];
+    entries.forEach(function (entry) {
+      stripSidebarPrefix(entry.link);
+      (entry.group === "en" ? overseas : domestic).push(entry);
+    });
+    if (overseas.length) overseas[overseas.length - 1].item.classList.add("yz-group-end");
+    if (!domestic.length) return;
+    domestic[domestic.length - 1].item.classList.add("yz-group-end");
+    if (!list.querySelector(":scope > .yz-group-title-li")) {
+      var titleItem = document.createElement("li");
+      titleItem.className = "yz-group-title-li yz-group-start";
+      var title = document.createElement("div");
+      title.className = "yz-group-title";
+      title.textContent = "国内版";
+      titleItem.appendChild(title);
+      list.insertBefore(titleItem, domestic[0].item);
+
+      var searchItem = document.createElement("li");
+      searchItem.className = "yz-group-search-li";
+      var searchBox = document.createElement("div");
+      searchBox.className = "yz-group-search";
+      searchBox.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="#8a94a6" stroke-width="2"/><path d="M20 20l-3.8-3.8" stroke="#8a94a6" stroke-width="2" stroke-linecap="round"/></svg>';
+      var input = document.createElement("input");
+      input.type = "search";
+      input.placeholder = "查找集合...";
+      input.setAttribute("aria-label", "筛选国内版集合");
+      input.addEventListener("input", function () { applyDomesticFilter(list); });
+      searchBox.appendChild(input);
+      searchItem.appendChild(searchBox);
+      list.insertBefore(searchItem, domestic[0].item);
+    }
+    applyDomesticFilter(list);
+  }
+
+  function shortenNewEntryLink() {
+    var links = root.querySelectorAll('a[href*="/collections/"][href$="/new"]');
+    Array.prototype.forEach.call(links, function (link) {
+      if (link.children.length) return; // plain-text label only
+      var match = text(link).match(/^[+＋]\s*(海外版|国内版)\s*·\s*(.+)$/);
+      if (match) link.textContent = "+ " + match[2];
+    });
+  }
+
   function mount() {
     if (!root) return;
     addRowActions();
     mountEditorActions();
+    layoutSidebar();
+    shortenNewEntryLink();
     if (pendingAction) schedulePendingAction();
   }
 
