@@ -1,6 +1,11 @@
 (() => {
   const home = window.CMS_CONTENT?.siteSettings?.home || {};
-  const language = () => localStorage.getItem('site_lang') === 'zh' ? 'zh' : 'en';
+  // This tree is the English site only, so the language is pinned here.
+  // The legacy bilingual picker read localStorage 'site_lang', but
+  // yinzaosuo.com/zh shares this origin and its scripts set that key to
+  // 'zh' — after visiting the Chinese site, the FAQ below rendered the
+  // (nonexistent) question_zh/answer_zh fields and came out blank.
+  const language = () => 'en';
   const applyCopy = () => {
     const lang = language();
     const copy = {
