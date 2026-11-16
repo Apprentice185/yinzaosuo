@@ -26,14 +26,29 @@
     const homeParent = langBtn.parentNode;
     const homeNext = langBtn.nextSibling;
     const mq = window.matchMedia('(max-width: 800px)');
+    const spans = [...langBtn.querySelectorAll('[data-language]')];
+    const homeLabels = spans.map(span => span.textContent);
+    const panelLabels = { zh: '中文版', en: 'International' };
     const placeLang = () => {
       if (mq.matches) {
         if (langBtn.parentNode !== nav) nav.appendChild(langBtn);
-      } else if (langBtn.parentNode !== homeParent) {
-        homeParent.insertBefore(langBtn, homeNext);
+        spans.forEach(span => {
+          const label = panelLabels[span.dataset.language];
+          if (label) span.textContent = label;
+        });
+      } else {
+        if (langBtn.parentNode !== homeParent) homeParent.insertBefore(langBtn, homeNext);
+        spans.forEach((span, index) => { span.textContent = homeLabels[index]; });
       }
     };
     placeLang();
+    // site-settings.js re-renders .main-nav on DOMContentLoaded via
+    // replaceChildren(), which detaches the moved toggle on mobile.
+    // Re-place after that render and whenever the nav children change.
+    document.addEventListener('DOMContentLoaded', placeLang);
+    new MutationObserver(() => {
+      if (mq.matches && !nav.contains(langBtn)) placeLang();
+    }).observe(nav, { childList: true });
     if (mq.addEventListener) mq.addEventListener('change', placeLang);
     else if (mq.addListener) mq.addListener(placeLang);
   }

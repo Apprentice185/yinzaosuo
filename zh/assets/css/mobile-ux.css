@@ -27,6 +27,9 @@
   .button, .quote-btn, .language-switch, .menu-btn, .icon-btn {
     min-height: 42px;
   }
+  /* Announcement bar may wrap to two lines on phones; let it grow instead
+     of clipping the second line (fixed height lives in site-locale.css). */
+  .announcement { height: auto; min-height: 32px; line-height: 1.5; padding: 7px 12px; }
 }
 @media (max-width: 560px) {
   .container { width: min(100% - 32px, 520px); }
@@ -56,7 +59,7 @@
   .main-nav .language-switch { margin-top: 16px; display: flex; align-items: stretch; gap: 0; padding: 0; border: 1px solid #131313; border-radius: 999px; overflow: hidden; min-height: 40px; width: 100%; }
   .main-nav .language-switch i { display: none; }
   .main-nav .language-switch span { flex: 1; display: grid; place-items: center; padding: 9px 0; font-size: 11px; color: #131313; background: #fff; }
-  .main-nav .language-switch span.active { background: #131313; color: #fff; }
+  .main-nav .language-switch span.active { background: #131313; color: #fff; order: -1; }
   /* Mobile content folding: full text stays in the DOM, capped only on small screens */
   .mfold-on { position: relative; }
   .mfold-on:not(.is-open) { max-height: 5.6em; overflow: hidden; }

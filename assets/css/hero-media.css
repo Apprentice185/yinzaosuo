@@ -55,11 +55,11 @@
   .hero-fullbleed .hero-slides{position:relative;inset:auto;height:var(--photo-h);min-height:300px;flex:none;z-index:0}
   .hero-fullbleed .hero-shade{inset:auto;top:0;left:0;right:0;height:var(--photo-h);z-index:1;background:linear-gradient(0deg,rgba(0,0,0,.58) 0%,rgba(0,0,0,.12) 46%,rgba(0,0,0,0) 72%),linear-gradient(90deg,rgba(0,0,0,.30),rgba(0,0,0,0) 65%)}
   .hero-fullbleed .hero-content{height:auto;display:block;position:relative;z-index:2}
-  .hero-fullbleed .hero-copy{max-width:none;padding:0 0 10px;margin-top:-140px;color:var(--ink)}
+  .hero-fullbleed .hero-copy{max-width:none;padding:0 0 10px;margin-top:-172px;color:var(--ink)}
   .hero-fullbleed .eyebrow{color:#fff;margin-bottom:14px}
   .hero-fullbleed h1{color:#fff;font-size:clamp(30px,8.2vw,38px);line-height:1.14}
   .hero-fullbleed h1 em{color:#fff}
-  .hero-fullbleed .hero-text{color:var(--muted);font-size:14px;line-height:1.75;margin-top:26px;max-width:none}
+  .hero-fullbleed .hero-text{color:var(--muted);font-size:14px;line-height:1.75;margin-top:66px;max-width:none}
   .hero-fullbleed .hero-actions{display:flex;flex-wrap:nowrap;gap:12px;margin-top:22px}
   .hero-fullbleed .hero-actions .button{flex:1;border-radius:999px;min-height:50px;padding:13px 10px;font-size:13.5px;letter-spacing:.01em}
   .hero-fullbleed .hero-actions .button span{display:none}
