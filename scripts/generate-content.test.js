@@ -2,10 +2,11 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const test = require('node:test');
-const { articleSlug, parseFrontmatter, renderStaticArticle, renderStaticText, slugify } = require('./generate-content');
+const { articleSlug, normalizeMaterial, parseFrontmatter, renderDeliveryPage, renderMaterialDetailPage, renderMaterialsListPage, renderStaticArticle, renderStaticText, slugify } = require('./generate-content');
 
 const articleTemplate = fs.readFileSync(path.join(__dirname, '..', 'article.html'), 'utf8');
 const productTemplate = fs.readFileSync(path.join(__dirname, '..', 'product.html'), 'utf8');
+const xianShell = fs.readFileSync(path.join(__dirname, '..', 'zh', 'xian.html'), 'utf8');
 
 test('article slugs prefer an explicit path and fall back to the title', () => {
   assert.equal(slugify('  Paper & Print: A Guide  '), 'paper-print-a-guide');
@@ -62,6 +63,63 @@ test('static article output includes unique SEO metadata and safe structured dat
   assert.doesNotMatch(html, /article\.html\?type=/);
 });
 
+
+test('materials normalization maps gallery entries and drops unusable images', () => {
+  const item = normalizeMaterial({
+    id: 'SCENE-01',
+    title: '门店橱窗画面',
+    gallery: [{ image: 'assets/images/materials/a.jpg' }, { image: 'javascript:alert(1)' }, 'assets/images/materials/b.jpg', {}],
+    description: '橱窗展示画面。',
+    sort_order: '3'
+  });
+  assert.equal(item.id, 'SCENE-01');
+  assert.deepEqual(item.gallery, ['assets/images/materials/a.jpg', 'assets/images/materials/b.jpg']);
+  assert.equal(item.sort_order, 3);
+  assert.equal(item.hidden, false);
+  assert.equal(normalizeMaterial({ id: 'X', hidden: true }).status, 'hidden');
+});
+
+test('delivery page renders the delivery.json timetable verbatim with its own canonical', () => {
+  const html = renderDeliveryPage({
+    title: '西安广告材料制作，专车整板送到门。',
+    intro: 'KT板等广告材料在西安本地制作交付。',
+    timetable_heading: '西安配送时效：按确认下单时间算',
+    timetable_note: '时效以双方确认下单、开始制作为准。',
+    timetable: [
+      { label: '上午确认', condition: '11:00 前确认下单', body: '当天下午送达。' },
+      { label: '晚间确认', condition: '19:00 后确认下单', body: '次日下午送达。' }
+    ],
+    coverage: '西安三环以内保证送达。',
+    regions_note: '江浙沪皖由浙江嘉兴海盐合作工厂发货。',
+    van_heading: '为什么用专车整板送',
+    van_ours: { title: '整板不裁切，送货上门', body: '自有封闭式大面包车专送。' },
+    van_compare: { title: '快递与自提的麻烦', body: '网购板材走快递，常常被裁成小块发货。' },
+    steps: [{ title: '发需求与文件', body: '发来品类、尺寸、数量和设计文件。' }],
+    faq: [{ question: '能开发票吗？', answer: '可以代开，确认订单时说明即可。' }],
+    contact_phone: '134 0296 9091'
+  }, xianShell);
+  assert.ok(html.includes('<link rel="canonical" href="https://yinzaosuo.com/zh/delivery.html">'));
+  assert.ok(html.includes('11:00 前确认下单'));
+  assert.ok(html.includes('次日下午送达。'));
+  assert.ok(html.includes('西安三环以内保证送达。'));
+  assert.ok(html.includes('href="tel:+8613402969091"'));
+  assert.doesNotMatch(html, /zh\/xian\.html/);
+});
+
+test('materials pages render an honest empty state and a detail page with gallery + quote hook', () => {
+  const list = renderMaterialsListPage([], xianShell);
+  assert.ok(list.includes('素材持续更新中，敬请期待。'));
+  assert.ok(list.includes('<link rel="canonical" href="https://yinzaosuo.com/zh/materials.html">'));
+  const detail = renderMaterialDetailPage(normalizeMaterial({
+    id: 'SCENE-01',
+    title: '门店橱窗画面',
+    gallery: [{ image: 'assets/images/materials/a.jpg' }, { image: 'assets/images/materials/b.jpg' }],
+    description: '橱窗展示画面。'
+  }), xianShell);
+  assert.ok(detail.includes('data-material-title="门店橱窗画面"'));
+  assert.ok(detail.includes('assets/js/material-detail.js'));
+  assert.ok(detail.includes('<link rel="canonical" href="https://yinzaosuo.com/zh/materials/scene-01/">'));
+});
 
 test('static product output includes SEO metadata, canonical URL and readable product details', () => {
   const { renderStaticProduct } = require('./generate-content');

@@ -5,8 +5,8 @@
   "contact_phone": "+86 134 0296 9091",
   "nav_items": [
     {
-      "label_zh": "产品中心",
-      "url": "index.html#products",
+      "label_zh": "产品大全",
+      "url": "products.html",
       "enabled": true
     },
     {
@@ -15,18 +15,18 @@
       "enabled": true
     },
     {
-      "label_zh": "印刷知识",
+      "label_zh": "资讯",
       "url": "knowledge.html",
       "enabled": true
     },
     {
-      "label_zh": "运输与交付",
-      "url": "/shipping.html",
+      "label_zh": "配送时效",
+      "url": "delivery.html",
       "enabled": true
     },
     {
-      "label_zh": "关于我们",
-      "url": "/about.html",
+      "label_zh": "素材中心",
+      "url": "materials.html",
       "enabled": true
     }
   ],

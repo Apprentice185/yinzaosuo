@@ -1,5 +1,5 @@
 {
-  "eyebrow_zh": "面向全球贸易客户的印刷合作伙伴",
+  "eyebrow_zh": "印刷，有所为",
   "hero_image": "assets/images/products/banner.webp",
   "hero_image_alt": "全新机器+原厂油墨",
   "hero_image_alt_en": "Brand new machine + original ink",
@@ -17,9 +17,9 @@
       "image": "assets/images/products/ys-adhesive-vinyl.jpg"
     }
   ],
-  "hero_title_zh": "全球定制印刷与展示供应，为贸易伙伴而协作。",
-  "hero_description_zh": "面向印刷经销商、广告制作商与贸易采购商，提供横幅、网格布、合成纸、背胶印刷及展示架，按订单协调生产与交付。",
-  "hero_note_zh": "定制规格 · 灵活加工 · 国际订单协调",
+  "hero_title_zh": "让每一次传播，都值得被看见。",
+  "hero_description_zh": "从一张名片，到一场品牌展陈。精选材料、专业工艺与稳定交付，让印刷成为品牌表达的一部分。",
+  "hero_note_zh": "材料选型 · 文件校验 · 生产跟进",
   "modules": {
     "trust": true,
     "products": true,
@@ -40,20 +40,20 @@
   ],
   "faq_items": [
     {
-      "question_zh": "可以先确认材料和生产规格吗？",
-      "answer_zh": "可以。请在询价时说明用途和关注的材料规格，我们会根据可供产品确认具体参数及样品安排。"
+      "question_zh": "可以先拿样品确认纸张和效果吗？",
+      "answer_zh": "可以。常规纸张可申请材料样本；重要项目建议先打数码样或实物样，我们会根据用途给出建议。"
     },
     {
       "question_zh": "没有设计稿，也能制作吗？",
-      "answer_zh": "可以提供基础文件检查和简单调整；复杂修改或原创设计会另行报价。"
+      "answer_zh": "可以提供设计协助。你只需要准备文字、图片和品牌素材，我们会先沟通需求再报价。"
     },
     {
-      "question_zh": "如何安排国际运输？",
-      "answer_zh": "我们会根据订单尺寸、重量、包装和目的地协调运输方案，具体费用与交期以项目确认结果为准。"
+      "question_zh": "付款和配送方式有哪些？",
+      "answer_zh": "支持微信支付、支付宝、对公转账。成品可配送至中国大陆大部分地区，具体以项目报价为准。"
     },
     {
-      "question_zh": "如何处理印刷质量问题？",
-      "answer_zh": "生产前会确认文件和规格。如出现影响使用的生产质量问题，请提供照片和订单信息，我们会核实并协商处理方案。"
+      "question_zh": "印刷出现问题如何处理？",
+      "answer_zh": "生产前会进行文件确认，若因生产质量问题影响使用，我们会优先补印或按情况处理。"
     },
     {
       "question_zh": "不同产品可以拼单、一起发吗？",

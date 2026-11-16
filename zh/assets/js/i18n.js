@@ -1,6 +1,6 @@
 window.I18N = {
   zh: {
-    nav_products: '产品中心', nav_solutions: '场景方案', nav_knowledge: '印刷知识', nav_journal: '品牌资讯', nav_templates: '模板素材',
+    nav_products: '产品大全', nav_solutions: '场景方案', nav_knowledge: '资讯', nav_journal: '品牌资讯', nav_templates: '模板素材',
     nav_quote: '获取报价 <span>↗</span>', nav_quote_short: '报价', nav_search: '搜索', nav_menu: '打开菜单', nav_main: '主导航',
     brand_home: '印造所首页', lang_switch: '切换到英文', close: '关闭',
     meta_home_title: '印造所｜让每一次传播，都值得被看见', meta_home_description: '印造所 - 为中国大陆企业提供高品质、好选择、易下单的印刷广告服务。',
@@ -55,9 +55,9 @@ window.I18N = {
     faq_design: '没有设计稿，也能制作吗？', faq_design_answer: '可以提供设计协助。你只需要准备文字、图片和品牌素材，我们会先沟通需求再报价。',
     faq_delivery: '付款和配送方式有哪些？', faq_delivery_answer: '支持微信支付、支付宝、对公转账。成品可配送至中国大陆大部分地区，具体以项目报价为准。',
     faq_quality: '印刷出现问题如何处理？', faq_quality_answer: '生产前会进行文件确认，若因生产质量问题影响使用，我们会优先补印或按情况处理。', faq_mix: '不同产品可以拼单、一起发吗？', faq_mix_answer: '可以。不同材料和成品画面通常可以合并为一个订单，适合拼在一起的也可以合并包装、合并发运。询价时请把完整清单（含尺寸和数量）发过来，拼单组合、包装和合并发运的费用会在报价中书面确认后再下单。', faq_process: '下单流程是怎样的？', faq_process_answer: '共六步：(1) 发送询价，注明产品、尺寸、数量和目的地；(2) 收到报价与形式发票（PI），规格、包装和运费均以书面确认；(3) 按 PI 通过电汇（T/T）付款；(4) 文件与规格确认后进入生产；(5) 发货前发送成品与出口包装照片供确认；(6) 按报价中确认的条款安排发运。', faq_files: '印刷文件有什么要求？', faq_files_answer: '把现有文件发过来即可，每个文件在生产前都会检查，有可能影响成品效果的问题会提前反馈确认。基本检查和简单调整包含在内；大幅修改或原创设计会事先单独报价，确认后再开始，不会产生意外费用。',
-    footer_tagline: '把每一次表达，<br>做成值得留下的东西。', footer_products: '产品', footer_all_products: '全部产品', footer_product_foam_board: 'PVC 发泡板', footer_product_photo_paper: '光面相纸', footer_product_one_way_vision: '单透膜', footer_product_adhesive_vinyl: '自粘背胶', footer_product_pvc_banners: 'PVC 横幅', footer_company: '公司', footer_australia: '澳洲买家', footer_resources: '资源', footer_faq: '常见问题', 
+    footer_tagline: '把每一次表达，<br>做成值得留下的东西。', footer_products: '产品', footer_all_products: '产品大全', footer_product_foam_board: 'PVC 发泡板', footer_product_photo_paper: '光面相纸', footer_product_one_way_vision: '单透膜', footer_product_adhesive_vinyl: '自粘背胶', footer_product_pvc_banners: 'PVC 横幅', footer_company: '公司', footer_australia: '澳洲买家', footer_resources: '资源', footer_faq: '常见问题', 
     footer_solutions: '场景方案', footer_process: '服务流程', footer_template_library: '模板素材库', footer_help: '帮助中心',
-    footer_knowledge: '印刷知识', footer_journal: '品牌资讯', footer_delivery: '配送说明', footer_about: '关于印造所',
+    footer_knowledge: '资讯', footer_journal: '品牌资讯', footer_delivery: '配送说明', footer_about: '关于印造所',
     footer_about_link: '关于我们', footer_contact_link: '联系我们', footer_wechat: '微信扫码咨询',
     footer_phone_label: '咨询专线', footer_phone_note: '微信同号 / 支持加急直连',
     footer_email_label: '联系邮箱', footer_email_note: '接收 AI / PDF / CDR 矢量大尺寸原稿',
@@ -69,7 +69,7 @@ window.I18N = {
     scene_detail: '详细了解该产品 <span>↗</span>', product_options_title: '产品选项', product_option_quote: '带着选项去咨询 <span>↗</span>',
     quote_eyebrow: '开始一个项目', quote_title: '告诉我们你的<br><em>印刷计划。</em>', quote_intro: '留下需求，我们会在一个工作日内联系你确认细节和报价。',
     form_company: '公司名称（选填）', form_company_placeholder: '公司或企业名称', form_name: '联系人', form_name_placeholder: '联系人姓名',
-    form_email: '商务邮箱', form_email_placeholder: 'name@company.com', form_phone: '电话（选填）', form_phone_placeholder: '含国家区号',
+    form_email: '商务邮箱', form_email_placeholder: 'name@company.com', form_phone: '联系电话', form_phone_placeholder: '含国家区号',
     form_country: '国家 / 地区', form_country_placeholder: '例如澳大利亚、美国、德国', form_postcode: '邮政编码（选填）', form_postcode_placeholder: '邮政编码',
     form_service: '所需产品', form_quantity: '预计采购数量', form_quantity_placeholder: '例如500平方米或10卷',
     form_dimensions: '尺寸 / 卷材要求', form_dimensions_placeholder: '宽度、卷长、裁切尺寸等',

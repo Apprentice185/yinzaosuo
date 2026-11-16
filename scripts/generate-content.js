@@ -390,6 +390,176 @@ function writeListPages(data) {
   }
 }
 
+function normalizeMaterial(item) {
+  const gallery = (Array.isArray(item.gallery) ? item.gallery : [])
+    .map(entry => (typeof entry === 'string' ? entry : entry?.image))
+    .map(image => safeMediaUrl(String(image || '').trim()))
+    .filter(Boolean);
+  return {
+    id: String(item.id),
+    title: item.title || '',
+    gallery,
+    description: item.description || '',
+    sort_order: Number.isFinite(Number(item.sort_order)) ? Number(item.sort_order) : 10,
+    hidden: item.hidden === true,
+    status: item.hidden === true ? 'hidden' : 'published'
+  };
+}
+
+// Retitles a copied page shell (zh/xian.html is the layout reference for the
+// new zh pages) with the target page's own metadata.
+function retitleShell(shell, { title, description, url }) {
+  let html = shell.split('https://yinzaosuo.com/zh/xian.html').join(url);
+  html = html.replace(/<title>[\s\S]*?<\/title>/, `<title>${escapeHtml(title)}</title>`);
+  html = html.replace(/<meta name="description" content="[^"]*">/, `<meta name="description" content="${escapeHtml(description)}">`);
+  html = html.replace(/<meta property="og:title" content="[^"]*">/, `<meta property="og:title" content="${escapeHtml(title)}">`);
+  html = html.replace(/<meta property="og:description" content="[^"]*">/, `<meta property="og:description" content="${escapeHtml(description)}">`);
+  html = html.replace(/<meta property="og:url" content="[^"]*">/, `<meta property="og:url" content="${escapeHtml(url)}">`);
+  html = html.replace(/<link rel="canonical" href="[^"]*">/, `<link rel="canonical" href="${escapeHtml(url)}">`);
+  return html;
+}
+
+function replaceShellMain(shell, mainHtml) {
+  return shell.replace(/<main>[\s\S]*?<\/main>/, `<main>\n${mainHtml}\n  </main>`);
+}
+
+// The delivery page (zh only) is generated from content/zh/settings/
+// delivery.json; every visible string comes from that file. Headings and
+// card eyebrow labels that have no delivery.json field （覆盖范围 / 下单流程 /
+// 常见问题 / 我们的做法 / 常见对比 / 西安本地服务） are layout literals copied
+// from the layout reference page zh/xian.html, whose copy delivery.json was
+// transcribed from in phase 1.
+function renderDeliveryMain(delivery) {
+  const title = String(delivery.title || '');
+  const comma = title.indexOf('，');
+  const heading = comma > 0
+    ? `${escapeHtml(title.slice(0, comma + 1))}<em>${escapeHtml(title.slice(comma + 1))}</em>`
+    : escapeHtml(title);
+  const timetableCards = (Array.isArray(delivery.timetable) ? delivery.timetable : []).map(entry => `
+        <article class="long-card"><div class="article-meta">${escapeHtml(entry.label || '')}</div><h3>${escapeHtml(entry.condition || '')}</h3><p>${escapeHtml(entry.body || '')}</p></article>`).join('');
+  const stepCards = (Array.isArray(delivery.steps) ? delivery.steps : []).map((entry, index) => `
+        <article class="long-card"><div class="article-meta">第 ${index + 1} 步</div><h3>${escapeHtml(entry.title || '')}</h3><p>${escapeHtml(entry.body || '')}</p></article>`).join('');
+  const faqItems = (Array.isArray(delivery.faq) ? delivery.faq : []).map(entry => `
+      <p><strong>${escapeHtml(entry.question || '')}</strong>${escapeHtml(entry.answer || '')}</p>`).join('');
+  const phoneDigits = String(delivery.contact_phone || '').replace(/[^\d]/g, '');
+  const phoneHref = phoneDigits ? `tel:+86${phoneDigits}` : '';
+  return `
+    <section class="page-hero page-hero-photo" style="background-image:url('assets/images/products/ys-kt-board.jpg')"><div class="container">
+      <p class="eyebrow">西安本地服务</p>
+      <h1>${heading}</h1>
+      <p>${escapeHtml(delivery.intro || '')}</p><div class="hero-actions"><button type="button" class="button" data-open-quote>获取报价 <span>↗</span></button><a class="button button-ghost" href="products.html">产品大全</a></div>
+    </div></section>
+    <section class="section page-content"><div class="container">
+      <h2>${escapeHtml(delivery.timetable_heading || '')}</h2>
+      <p>${escapeHtml(delivery.timetable_note || '')}</p>
+      <div class="article-page-grid">${timetableCards}
+      </div>
+      <h2>覆盖范围</h2>
+      <p>${escapeHtml(delivery.coverage || '')}</p>
+      <p>${escapeHtml(delivery.regions_note || '')}</p>
+      <h2>${escapeHtml(delivery.van_heading || '')}</h2>
+      <div class="article-page-grid">
+        <article class="long-card"><div class="article-meta">我们的做法</div><h3>${escapeHtml(delivery.van_ours?.title || '')}</h3><p>${escapeHtml(delivery.van_ours?.body || '')}</p></article>
+        <article class="long-card"><div class="article-meta">常见对比</div><h3>${escapeHtml(delivery.van_compare?.title || '')}</h3><p>${escapeHtml(delivery.van_compare?.body || '')}</p></article>
+      </div>
+      <h2>下单流程</h2>
+      <div class="article-page-grid">${stepCards}
+      </div>
+      <h2>常见问题</h2>${faqItems}
+      <div class="hero-actions"><button type="button" class="button" data-open-quote>获取报价 <span>↗</span></button>${phoneHref ? `<a class="button button-ghost" href="${phoneHref}">电话 / 微信：${escapeHtml(delivery.contact_phone)}</a>` : ''}</div>
+    </div></section>`;
+}
+
+function renderDeliveryPage(delivery, shell) {
+  const titled = retitleShell(shell, {
+    title: '西安广告材料配送时效｜印造所',
+    description: String(delivery.intro || ''),
+    url: `${siteUrl}/zh/delivery.html`
+  });
+  return replaceShellMain(titled, renderDeliveryMain(delivery));
+}
+
+function writeDeliveryPage() {
+  if (!isChineseBuild) return;
+  const settingsPath = path.join(contentRoot, 'settings', 'delivery.json');
+  if (!fs.existsSync(settingsPath)) return;
+  const delivery = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
+  const shell = fs.readFileSync(path.join(root, 'xian.html'), 'utf8');
+  fs.writeFileSync(path.join(root, 'delivery.html'), renderDeliveryPage(delivery, shell), 'utf8');
+}
+
+function renderMaterialCard(item) {
+  const cover = item.gallery[0] || '';
+  const visual = cover
+    ? `<div class="long-card-visual has-image" style="background-image:url('${escapeHtml(cover)}')"></div>`
+    : `<div class="long-card-visual is-placeholder"><span>素材中心</span></div>`;
+  return `<article class="long-card">${visual}<h2>${escapeHtml(item.title)}</h2><a class="text-link" href="materials/${slugify(item.id)}/">查看素材 <span>↗</span></a></article>`;
+}
+
+function renderMaterialsListPage(materials, shell) {
+  const cards = materials.length
+    ? materials.map(renderMaterialCard).join('')
+    : '<p class="materials-empty">素材持续更新中，敬请期待。</p>';
+  const titled = retitleShell(shell, {
+    title: '素材中心｜印造所',
+    description: '印造所素材中心：挑选喜欢的画面，点进详情即可询价制作。',
+    url: `${siteUrl}/zh/materials.html`
+  });
+  const withCss = titled.replace('</head>', '<link rel="stylesheet" href="assets/css/materials.css"></head>');
+  const main = `
+    <section class="page-hero"><div class="container">
+      <p class="eyebrow">素材中心</p>
+      <h1>素材中心</h1>
+      <p>选中喜欢的画面，点进详情即可询价制作。</p>
+    </div></section>
+    <section class="section page-content"><div class="container">
+      <div class="knowledge-page-grid" id="materialsGrid">${cards}</div>
+    </div></section>`;
+  return replaceShellMain(withCss, main);
+}
+
+function renderMaterialDetailPage(item, shell) {
+  const slug = slugify(item.id);
+  const title = item.title;
+  const mainImage = item.gallery[0] || '';
+  const gallery = mainImage
+    ? `<div class="material-main"><img id="materialMainImage" src="${escapeHtml(mainImage)}" alt="${escapeHtml(title)}"></div>
+      <div class="material-thumbs" id="materialThumbs">${item.gallery.map((image, index) => `<button type="button" class="material-thumb${index === 0 ? ' is-active' : ''}" data-material-image="${escapeHtml(image)}" aria-label="查看第 ${index + 1} 张图"><img src="${escapeHtml(image)}" alt=""></button>`).join('')}</div>`
+    : '<div class="material-main material-main-empty"><span>素材中心</span></div>';
+  const titled = retitleShell(shell, {
+    title: `${title}｜素材中心｜印造所`,
+    description: item.description || title,
+    url: `${siteUrl}/zh/materials/${slug}/`
+  });
+  const withAssets = titled
+    .replace('</head>', '<link rel="stylesheet" href="assets/css/materials.css"></head>')
+    .replace('</body>', '<script src="assets/js/material-detail.js"></script></body>');
+  const main = `
+    <section class="section material-detail"><div class="container material-detail-layout">
+      <div class="material-gallery">${gallery}
+      </div>
+      <div class="material-copy">
+        <p class="eyebrow">素材中心</p>
+        <h1>${escapeHtml(title)}</h1>
+        <p class="material-description">${escapeHtml(item.description || '')}</p>
+        <button type="button" class="button button-dark" id="materialQuote" data-material-title="${escapeHtml(title)}">咨询这款素材 <span>↗</span></button>
+        <p class="material-back"><a class="text-link" href="materials.html">← 返回素材中心</a></p>
+      </div>
+    </div></section>`;
+  return replaceShellMain(withAssets, main);
+}
+
+function writeMaterialsPages(materials) {
+  if (!isChineseBuild) return;
+  const shell = fs.readFileSync(path.join(root, 'xian.html'), 'utf8');
+  fs.writeFileSync(path.join(root, 'materials.html'), renderMaterialsListPage(materials, shell), 'utf8');
+  for (const item of materials) {
+    const directory = path.join(root, 'materials', slugify(item.id));
+    fs.mkdirSync(directory, { recursive: true });
+    fs.writeFileSync(path.join(directory, 'index.html'), renderMaterialDetailPage(item, shell), 'utf8');
+  }
+}
+
 function safeUrl(url) {
   const value = url.trim();
   return /^(https?:|\/|\.\/|\.\.\/|#)/i.test(value) ? value : '';
@@ -661,6 +831,7 @@ function buildSitemap(data) {
     }
   }
   for (const product of data.records) routes.add(`/products/${slugify(product.id)}/`);
+  for (const material of data.materials || []) routes.add(`/materials/${slugify(material.id)}/`);
   for (const item of [...data.knowledge, ...data.news, ...data.solutions]) routes.add(item.route);
   if (!isChineseBuild) routes.delete('/templates.html');
   const metadata = {
@@ -875,6 +1046,12 @@ function main() {
       faq_items: Array.isArray(homeSettings.faq_items) ? homeSettings.faq_items : []
     }
   };
+  // Company pages content (EN only: Shipping + About) is edited in the
+  // backend as one file collection and rendered client-side from here.
+  const companySettingsFile = path.join(contentRoot, 'settings', 'company.json');
+  if (fs.existsSync(companySettingsFile)) {
+    siteSettings.company = JSON.parse(fs.readFileSync(companySettingsFile, 'utf8'));
+  }
   const requiredProductIds = ['YS-SYNTHETIC-PAPER', 'YS-GLOSS-PHOTO-PAPER', 'YS-SATIN-PHOTO-PAPER', 'YS-PVC-MESH', 'YS-PVC-BANNER', 'YS-ADHESIVE-VINYL', 'YS-KT-BOARD', 'YS-OUTDOOR-PVC-RIGID-FILM', 'YS-ROLL-UP', 'YS-X-BANNER', 'YS-DOOR-STAND'];
   const recordsById = new Map(records.map(record => [record.id, record]));
   const missingProductIds = requiredProductIds.filter(id => !recordsById.has(id));
@@ -894,6 +1071,10 @@ function main() {
   const templates = filesIn('templates', '.json')
     .map(file => normalizeTemplate(JSON.parse(fs.readFileSync(file, 'utf8'))))
     .filter(item => !item.hidden);
+  const materials = filesIn('materials', '.json')
+    .map(file => normalizeMaterial(JSON.parse(fs.readFileSync(file, 'utf8'))))
+    .filter(item => !item.hidden)
+    .sort((a, b) => a.sort_order - b.sort_order || a.id.localeCompare(b.id));
   const solutions = readMarkdownCollection('solutions').map(item => normalizeArticle(item, 'solutions')).filter(item => !item.hidden);
   const knowledge = readMarkdownCollection('knowledge').map(item => normalizeArticle(item, 'knowledge')).filter(item => !item.hidden);
   const news = readMarkdownCollection('news')
@@ -918,7 +1099,8 @@ function main() {
     solutions,
     knowledge,
     news,
-    templates
+    templates,
+    materials
   };
   writeProductPages(records);
   writeArticlePages([
@@ -927,6 +1109,8 @@ function main() {
     { collection: 'solutions', items: solutions }
   ]);
   writeListPages(data);
+  writeDeliveryPage();
+  writeMaterialsPages(materials);
   const { records: _records, ...indexData } = data;
   fs.writeFileSync(outputFile, `window.CMS_CONTENT = ${JSON.stringify(indexData)};\n`, 'utf8');
   buildSitemap(data);
@@ -935,4 +1119,4 @@ function main() {
 
 if (require.main === module) main();
 
-module.exports = { articleSlug, decodeBase64Images, injectStaticList, main, parseFrontmatter, renderRelatedMedia, renderStaticArticle, renderStaticProduct, renderStaticProductList, renderStaticText, slugify };
+module.exports = { articleSlug, decodeBase64Images, injectStaticList, main, normalizeMaterial, parseFrontmatter, renderDeliveryPage, renderMaterialDetailPage, renderMaterialsListPage, renderRelatedMedia, renderStaticArticle, renderStaticProduct, renderStaticProductList, renderStaticText, slugify };
