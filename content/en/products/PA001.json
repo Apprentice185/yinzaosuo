@@ -1,0 +1,29 @@
+{
+  "id": "PA001",
+  "hidden": true,
+  "sort_order": 101,
+  "show_in_archive": true,
+  "category": "commercial",
+  "category_title": "Commercial Print",
+  "category_desc": "Brand identity assets & enterprise print collaterals with bespoke finishes.",
+  "category_num": "01",
+  "category_label": "Commercial Print",
+  "title": "Business Cards / Specialty Cards",
+  "image": "pic/25a6e287-e36f-4bbc-91e4-dcfcb37f60c4.png",
+  "desc": "Standard coated stocks, premium imported textured papers, and ultra-heavy cardstocks.",
+  "intro": "Standard coated stocks, premium imported textured papers, and ultra-heavy cardstocks.",
+  "materials": [
+    "Standard: 300g Coated Art Paper (Matte/Gloss), White Card, Laid, Eggshell, Classic Felt, Gmund, Needlepoint, Bamboo Fiber, Recycled Paper",
+    "Premium (355g/710g): Ice White, Classic Linen Ultra White/Chiffon, Swedish White, British Eggshell, Gmund Needlepoint 710g, Elegant White 710g",
+    "Bespoke Heavyweight: Dutch White 480g, Metallic White Gold 500g, Quarry White 600g, Heavy Black Card 500g",
+    "PVC Cards: Frosted, Glossy, Matte, Semi-Translucent Single-Frosted"
+  ],
+  "crafts": [
+    "Foil Stamping (Gold/Silver)",
+    "Embossing/Debossing",
+    "Spot UV",
+    "Die-Cut",
+    "Rounded Corners"
+  ],
+  "thumb": "pic/25a6e287-e36f-4bbc-91e4-dcfcb37f60c4.png"
+}

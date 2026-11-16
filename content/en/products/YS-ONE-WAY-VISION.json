@@ -1,0 +1,64 @@
+{
+  "id": "YS-ONE-WAY-VISION",
+  "hidden": false,
+  "sort_order": 4,
+  "show_in_archive": true,
+  "category": "wideformat",
+  "category_title": "Photo & Wide-Format Print Media",
+  "category_desc": "Photo papers, PP synthetic paper, self-adhesive vinyl and PVC print media for trade printers and sign makers.",
+  "category_num": "01",
+  "category_label": "Photo & Wide-Format Print Media",
+  "title": "One-Way Vision Film (Perforated Window Film)",
+  "image": "assets/images/products/ys-one-way-vision.jpg",
+  "desc": "Perforated one-way vision window film: from outside it carries a full printed graphic; from inside, the view out and daylight stay open through the perforations. For shopfront windows, vehicle windows and glass partitions. Perforation pattern, roll width and pricing are confirmed per quotation.",
+  "intro": "Perforated one-way vision window film: from outside it carries a full printed graphic; from inside, the view out and daylight stay open through the perforations. For shopfront windows, vehicle windows and glass partitions. Perforation pattern, roll width and pricing are confirmed per quotation.",
+  "materials": [
+    "Perforated self-adhesive vinyl",
+    "White print face, black adhesive side",
+    "Even see-through perforation pattern"
+  ],
+  "crafts": [
+    "Large-format printing",
+    "Cut to size",
+    "Optional overlamination",
+    "Window application"
+  ],
+  "seo_title": "One-Way Vision Film Wholesale | Wide-Format Print Media | YINZAOSUO",
+  "seo_description": "Wholesale one-way vision perforated window film for shopfront graphics, vehicle windows and glass partitions — full print outside, view out from inside. Perforation pattern, roll width and pricing confirmed per quotation.",
+  "name": "One-Way Vision Film (Perforated Window Film)",
+  "detail_image": "assets/images/products/ys-one-way-vision.jpg",
+  "detail_desc": "Perforated one-way vision film for shopfront windows, vehicle windows and glass partitions: a full printed graphic outside, an open view from inside. Perforation pattern, roll width and pricing are confirmed per quotation.",
+  "detail_seo_title": "One-Way Vision Film Wholesale | Specs, Pricing & Printing | YINZAOSUO",
+  "detail_seo_description": "Wholesale one-way vision perforated window film for retail windows, vehicle graphics and glass partitions. Perforation pattern, roll widths and pricing are confirmed per quotation. Enquire about bulk orders and international shipping.",
+  "detail": {
+    "applications": [
+      "Shopfront and retail window graphics",
+      "Vehicle and fleet window advertising",
+      "Glass partitions and office glazing",
+      "Transit and bus shelter window graphics"
+    ],
+    "artwork": "Please provide print-ready artwork, finished glass dimensions, quantity and destination. Note that fine detail and small text read less clearly through perforations; bold layouts work best.",
+    "brief": "Please specify the finished size, quantity, perforation requirement, whether lamination is needed, packing requirements and destination country or region.",
+    "caveat": "The 60/40 and 70/30 perforation ratios are the standard options. Film thickness, roll width, minimum order quantity and pricing are not listed on this page: they are confirmed against the actual specification of each order, so please state your required specification when enquiring. Vehicle window use must comply with local visibility regulations.",
+    "delivery": [
+      "Production and dispatch timing confirmed per order",
+      "Sea freight to Australian main ports is around 40 days as a reference",
+      "Photos of the finished graphics and the export packing are sent for your confirmation before dispatch",
+      "Standard packing: rolls packed for transport; alternative packing can be confirmed per order"
+    ],
+    "finishing": [
+      "Large-format printing on the white face",
+      "Cut to finished glass size",
+      "Optional protective overlamination",
+      "Roll packing"
+    ],
+    "highlights": [
+      "Full printed graphic seen from outside",
+      "View out and daylight kept from inside",
+      "White print face with black adhesive side",
+      "Two standard perforation ratios: 60/40 and 70/30",
+      "Perforation ratio, roll width and pricing confirmed per quotation"
+    ],
+    "lead": "One-way vision perforated film turns glass into advertising space without closing it off: passers-by see the printed graphic, while people inside keep their view and daylight. Two standard perforation ratios are available: 70/30 keeps more printable surface, so the graphic reads fuller; 60/40 opens more of the film, giving a clearer view out and more daylight inside. Choose the ratio for the glazing and the viewing distance; roll width and pricing are confirmed per order."
+  }
+}

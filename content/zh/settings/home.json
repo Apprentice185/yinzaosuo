@@ -1,0 +1,71 @@
+{
+  "eyebrow_zh": "面向全球贸易客户的印刷合作伙伴",
+  "hero_image": "assets/images/products/banner.webp",
+  "hero_image_alt": "全新机器+原厂油墨",
+  "hero_image_alt_en": "Brand new machine + original ink",
+  "hero_slides": [
+    {
+      "image": "assets/images/products/ys-outdoor-pvc-rigid-film.jpg"
+    },
+    {
+      "image": "assets/images/products/ys-one-way-vision.jpg"
+    },
+    {
+      "image": "assets/images/products/ys-pvc-foam-board.jpg"
+    },
+    {
+      "image": "assets/images/products/ys-adhesive-vinyl.jpg"
+    }
+  ],
+  "hero_title_zh": "全球定制印刷与展示供应，为贸易伙伴而协作。",
+  "hero_description_zh": "面向印刷经销商、广告制作商与贸易采购商，提供横幅、网格布、合成纸、背胶印刷及展示架，按订单协调生产与交付。",
+  "hero_note_zh": "定制规格 · 灵活加工 · 国际订单协调",
+  "modules": {
+    "trust": true,
+    "products": true,
+    "process": true,
+    "knowledge": true,
+    "journal": true,
+    "about": true,
+    "faq": true
+  },
+  "module_order": [
+    "trust",
+    "products",
+    "process",
+    "knowledge",
+    "journal",
+    "about",
+    "faq"
+  ],
+  "faq_items": [
+    {
+      "question_zh": "可以先确认材料和生产规格吗？",
+      "answer_zh": "可以。请在询价时说明用途和关注的材料规格，我们会根据可供产品确认具体参数及样品安排。"
+    },
+    {
+      "question_zh": "没有设计稿，也能制作吗？",
+      "answer_zh": "可以提供基础文件检查和简单调整；复杂修改或原创设计会另行报价。"
+    },
+    {
+      "question_zh": "如何安排国际运输？",
+      "answer_zh": "我们会根据订单尺寸、重量、包装和目的地协调运输方案，具体费用与交期以项目确认结果为准。"
+    },
+    {
+      "question_zh": "如何处理印刷质量问题？",
+      "answer_zh": "生产前会确认文件和规格。如出现影响使用的生产质量问题，请提供照片和订单信息，我们会核实并协商处理方案。"
+    },
+    {
+      "question_zh": "不同产品可以拼单、一起发吗？",
+      "answer_zh": "可以。不同材料和成品画面通常可以合并为一个订单，适合拼在一起的也可以合并包装、合并发运。询价时请把完整清单（含尺寸和数量）发过来，拼单组合、包装和合并发运的费用会在报价中书面确认后再下单。"
+    },
+    {
+      "question_zh": "下单流程是怎样的？",
+      "answer_zh": "共六步：(1) 发送询价，注明产品、尺寸、数量和目的地；(2) 收到报价与形式发票（PI），规格、包装和运费均以书面确认；(3) 按 PI 通过电汇（T/T）付款；(4) 文件与规格确认后进入生产；(5) 发货前发送成品与出口包装照片供确认；(6) 按报价中确认的条款安排发运。"
+    },
+    {
+      "question_zh": "印刷文件有什么要求？",
+      "answer_zh": "把现有文件发过来即可，每个文件在生产前都会检查，有可能影响成品效果的问题会提前反馈确认。基本检查和简单调整包含在内；大幅修改或原创设计会事先单独报价，确认后再开始，不会产生意外费用。"
+    }
+  ]
+}

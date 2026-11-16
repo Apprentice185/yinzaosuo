@@ -1,0 +1,55 @@
+{
+  "id": "P003",
+  "hidden": true,
+  "sort_order": 1003,
+  "show_in_archive": false,
+  "category": "commercial",
+  "category_label": "Promotional Print",
+  "title": "Tri-Fold Brochure",
+  "image": "",
+  "desc": "A folded brochure that organizes product and service information into clear panels.",
+  "intro": "A folded brochure that organizes product and service information into clear panels.",
+  "materials": [],
+  "crafts": [],
+  "seo_title": "三折页宣传册",
+  "seo_description": "通过折页结构，把品牌介绍、产品卖点和联系方式组织在一张纸里。",
+  "price": "¥199 起",
+  "name": "Tri-Fold Brochure",
+  "options": [
+    {
+      "name": "成品尺寸",
+      "values": [
+        "210 × 285mm",
+        "A4 三折",
+        "自定义尺寸"
+      ]
+    },
+    {
+      "name": "数量",
+      "values": [
+        "100 本",
+        "500 本",
+        "1000 本"
+      ]
+    },
+    {
+      "name": "纸张",
+      "values": [
+        "157g 铜版纸",
+        "200g 铜版纸"
+      ]
+    },
+    {
+      "name": "折法",
+      "values": [
+        "普通三折",
+        "风琴折",
+        "对门折"
+      ]
+    }
+  ],
+  "tag": "",
+  "thumb": "",
+  "sceneImage": "",
+  "slug": "p003"
+}

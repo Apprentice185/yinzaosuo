@@ -1,0 +1,26 @@
+{
+  "id": "PA006",
+  "hidden": true,
+  "sort_order": 201,
+  "show_in_archive": true,
+  "category": "packaging",
+  "category_title": "包装定制类",
+  "category_desc": "精细盒型结构与高强度瓦楞防护包装一体化打样与批量量产",
+  "category_num": "02",
+  "category_label": "包装定制类",
+  "title": "轻型卡盒 (Cardboard Boxes)",
+  "image": "assets/images/products/pa006.jpg",
+  "desc": "适用于消费品、化妆品、文创及小型器物",
+  "intro": "适用于消费品、化妆品、文创及小型器物",
+  "materials": [
+    "单铜白卡、金银卡纸、牛皮卡纸、触感纸裱糊卡"
+  ],
+  "crafts": [
+    "双插盒",
+    "锁底盒",
+    "自动锁底盒",
+    "平粘盒",
+    "飞机盒",
+    "天地盒"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "PA007",
+  "hidden": true,
+  "sort_order": 202,
+  "show_in_archive": true,
+  "category": "packaging",
+  "category_title": "包装定制类",
+  "category_desc": "精细盒型结构与高强度瓦楞防护包装一体化打样与批量量产",
+  "category_num": "02",
+  "category_label": "包装定制类",
+  "title": "精品箱盒 (Rigid & Corrugated)",
+  "image": "assets/images/products/pa007.jpg",
+  "desc": "高承重抗压、礼品外包装与运输包装方案",
+  "intro": "高承重抗压、礼品外包装与运输包装方案",
+  "materials": [
+    "三层瓦楞(E瓦/B瓦)、五层高强瓦楞、精装灰板裱特种纸"
+  ],
+  "crafts": [
+    "自带手提盒",
+    "塑料提扣盒",
+    "双盖提绳盒",
+    "对插盖提绳盒",
+    "平口盒",
+    "锁底盒",
+    "飞机盒",
+    "天地盖礼盒"
+  ]
+}

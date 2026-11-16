@@ -1,0 +1,26 @@
+{
+  "id": "PA004",
+  "hidden": true,
+  "sort_order": 104,
+  "show_in_archive": true,
+  "category": "commercial",
+  "category_title": "Commercial Print",
+  "category_desc": "Brand identity assets & enterprise print collaterals with bespoke finishes.",
+  "category_num": "01",
+  "category_label": "Commercial Print",
+  "title": "Flyers & Folded Leaflets",
+  "image": "assets/images/products/pa004.png",
+  "desc": "High-precision commercial flyers with diverse folding architectures.",
+  "intro": "High-precision commercial flyers with diverse folding architectures.",
+  "materials": [
+    "Coated Paper: 157g / 200g / 250g / 300g",
+    "Uncoated: 80g / 100g / 120g"
+  ],
+  "crafts": [
+    "Half Fold",
+    "Tri-Fold",
+    "Z-Fold (Accordion)",
+    "Gate Fold",
+    "Custom Die-Cut"
+  ]
+}

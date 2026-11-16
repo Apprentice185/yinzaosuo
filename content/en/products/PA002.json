@@ -1,0 +1,26 @@
+{
+  "id": "PA002",
+  "hidden": true,
+  "sort_order": 102,
+  "show_in_archive": true,
+  "category": "commercial",
+  "category_title": "Commercial Print",
+  "category_desc": "Brand identity assets & enterprise print collaterals with bespoke finishes.",
+  "category_num": "01",
+  "category_label": "Commercial Print",
+  "title": "Adhesive Labels & Stickers",
+  "image": "assets/images/products/pa002.jpg",
+  "desc": "Industrial-grade waterproof, tear-resistant, and high-adhesion roll/sheet labels.",
+  "intro": "Industrial-grade waterproof, tear-resistant, and high-adhesion roll/sheet labels.",
+  "materials": [
+    "Standard: Semi-Gloss Coated Paper, Uncoated Woodfree, 80μm Bright White PVC, Kraft with Water Glue",
+    "High-End: 50μm Ultra-Clear Adhesive, Heavyweight PP Synthetic Paper, Matte Silver PET, Avery Fasson Heavy-Duty, Honeycomb Box Adhesive"
+  ],
+  "crafts": [
+    "Kiss-Cut",
+    "Punch Hole",
+    "Creasing",
+    "Perforation",
+    "Custom Die-Cut"
+  ]
+}

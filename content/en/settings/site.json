@@ -1,0 +1,42 @@
+{
+  "announcement_en": "Custom print production & display supply · Global trade enquiries welcome",
+  "brand_tagline_en": "PRINT PRODUCTION & DISPLAY SUPPLY",
+  "contact_email": "xiaotanqingqing@outlook.com",
+  "contact_phone": "+86 134 0296 9091",
+  "nav_items": [
+    {
+      "label_en": "Products",
+      "url": "index.html#products",
+      "enabled": true
+    },
+    {
+      "label_en": "Solutions",
+      "url": "solutions.html",
+      "enabled": true
+    },
+    {
+      "label_en": "Knowledge",
+      "url": "knowledge.html",
+      "enabled": true
+    },
+    {
+      "label_en": "Shipping",
+      "url": "/shipping.html",
+      "enabled": true
+    },
+    {
+      "label_en": "About",
+      "url": "/about.html",
+      "enabled": true
+    }
+  ],
+  "seo_home_title_en": "Wholesale Photo Paper & Wide-Format Print Media | YINZAOSUO",
+  "seo_home_description_en": "Wholesale gloss and satin photo paper, PP synthetic paper, self-adhesive vinyl and outdoor PVC printing film for Australian and US trade printers, sign makers and large-format print businesses.",
+  "footer_tagline_en": "Custom print production and display solutions for trade partners worldwide.",
+  "footer_hours_en": "Business hours: Monday–Saturday, 09:00–18:00 (China Standard Time)",
+  "footer_delivery_en": "International shipping arranged according to order size and destination.",
+  "footer_copyright_en": "© 2026 YINZAOSUO. All Rights Reserved.",
+  "footer_region_en": "Serving print trade buyers worldwide.",
+  "contact_whatsapp_url": "https://wa.me/8613402969091",
+  "contact_whatsapp_qr": "/pic/WhatsApp%20Business%20QR.jpg"
+}

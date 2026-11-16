@@ -105,10 +105,10 @@
     return createClass({
       render: function () {
         var p = this.props;
-        var title = first(p, ["title", "name_zh"], "文章标题");
-        var category = first(p, ["category", "tag"], "内容分类");
-        var summary = first(p, ["summary", "desc_zh"], "");
-        var cover = imageUrl(p, "cover") || imageUrl(p, "cover_image");
+        var title = first(p, ["title"], "文章标题");
+        var category = first(p, ["category"], "内容分类");
+        var summary = first(p, ["summary"], "");
+        var cover = imageUrl(p, "cover");
         var body = p.widgetFor("body") || h("p", {}, "正文内容将在这里显示");
         return h("div", { className: "site-preview" },
           announcement("印造所内容中心 · 内容详情"),
@@ -142,17 +142,19 @@
     });
   }
 
+  // Merged product record (redesign phase 1): one preview covers both the
+  // list layer (title/image/desc) and the detail layer (name/detail_*).
   var ProductPreview = createClass({
     render: function () {
       var p = this.props;
-      var title = first(p, ["title", "name_zh"], "产品名称");
-      var intro = first(p, ["intro", "desc", "desc_zh"], "");
-      var image = imageUrl(p, "image") || imageUrl(p, "thumb");
-      var price = value(p, "price", "");
+      var title = first(p, ["name", "title"], "产品名称");
+      var intro = first(p, ["detail_desc", "desc", "intro"], "");
+      var image = imageUrl(p, "detail_image") || imageUrl(p, "image");
+      var detail = value(p, "detail", {}) || {};
       var materials = value(p, "materials", []);
       var crafts = value(p, "crafts", []);
       return h("div", { className: "site-preview" },
-        announcement("产品中心 · 选择规格，提交你的印刷计划"),
+        announcement("产品中心 · 产品详情"),
         header(),
         h("main", {},
           h("section", { className: "product-detail-page" },
@@ -162,42 +164,14 @@
                 style: image ? { backgroundImage: "url('" + image + "')" } : {}
               }, !image ? h("strong", {}, "产品主图") : null),
               h("div", { className: "product-detail-copy" },
-                h("p", { className: "eyebrow" }, first(p, ["category_title", "category"], "PRODUCT")),
+                h("p", { className: "eyebrow" }, first(p, ["category_label", "category_title", "category"], "PRODUCT")),
                 h("h1", {}, title),
                 h("p", { className: "product-detail-intro" }, intro || "产品介绍将在这里显示。"),
-                price ? h("strong", { className: "product-detail-price" }, price) : null,
                 h("div", { className: "preview-tags" },
                   (Array.isArray(materials) ? materials : []).concat(Array.isArray(crafts) ? crafts : []).map(function (tag, index) {
                     return h("span", { key: index }, String(tag));
                   })
                 ),
-                h("span", { className: "button button-dark" }, "获取报价 ↗")
-              )
-            )
-          )
-        ),
-        footer()
-      );
-    }
-  });
-
-  var CataloguePreview = createClass({
-    render: function () {
-      var p = this.props;
-      var title = first(p, ["name_zh"], "产品名称");
-      var detail = value(p, "detail_zh", {}) || {};
-      var image = imageUrl(p, "image");
-      return h("div", { className: "site-preview" },
-        announcement("产品中心 · 产品详情"),
-        header(),
-        h("main", {},
-          h("section", { className: "product-detail-page" },
-            h("div", { className: "container product-detail-layout" },
-              h("div", { className: "product-detail-image", style: image ? { backgroundImage: "url('" + image + "')" } : {} }),
-              h("div", { className: "product-detail-copy" },
-                h("p", { className: "eyebrow" }, "PRINT PRODUCTION"),
-                h("h1", {}, title),
-                h("p", { className: "product-detail-intro" }, value(p, "desc_zh", "")),
                 h("span", { className: "button button-dark" }, "获取报价 ↗")
               )
             )
@@ -230,24 +204,67 @@
     }
   });
 
-  var TemplatePreview = createClass({
+  // Domestic materials centre (phase 2 front-end): switchable gallery on
+  // the left, title + introduction + enquiry button on the right.
+  var MaterialPreview = createClass({
     render: function () {
       var p = this.props;
-      var title = first(p, ["title"], "模板素材标题");
-      var image = imageUrl(p, "thumb") || imageUrl(p, "designImage") || imageUrl(p, "sceneImage");
+      var title = first(p, ["title"], "素材标题");
+      var gallery = value(p, "gallery", []);
+      var firstImage = Array.isArray(gallery) && gallery.length ? gallery[0].image : "";
+      var image = firstImage ? assetUrl(p, firstImage) : "";
       return h("div", { className: "site-preview" },
-        announcement("模板素材 · 灵感与设计参考"),
+        announcement("素材中心 · 画面素材展示"),
         header(),
         h("main", { className: "template-detail container" },
-          h("p", { className: "eyebrow" }, first(p, ["type", "category"], "模板素材")),
-          h("h1", {}, title),
+          h("p", { className: "eyebrow" }, "素材中心"),
           h("div", { className: "detail-gallery" },
-            image ? h("img", { className: "detail-image active", src: image, alt: title }) : h("div", { className: "image-placeholder" }, "模板预览图")
+            image ? h("img", { className: "detail-image active", src: image, alt: title }) : h("div", { className: "image-placeholder" }, "素材主图")
           ),
-          h("div", { className: "product-information-notes" },
-            h("article", {}, h("h3", {}, "尺寸规范"), h("p", {}, first(p, ["size_spec", "size"], "待填写"))),
-            h("article", {}, h("h3", {}, "素材说明"), h("p", {}, value(p, "description", "待填写")))
-          )
+          h("h1", {}, title),
+          h("p", {}, value(p, "description", "素材介绍将在这里显示")),
+          h("span", { className: "button button-dark" }, "用这款素材制作画面 ↗")
+        ),
+        footer()
+      );
+    }
+  });
+
+  var CompanyPreview = createClass({
+    render: function () {
+      var p = this.props;
+      var shipping = value(p, "shipping", {}) || {};
+      var about = value(p, "about", {}) || {};
+      return h("div", { className: "site-preview" },
+        announcement("公司信息 · Shipping / About"),
+        header(),
+        h("main", { className: "container global-settings-preview" },
+          h("p", { className: "eyebrow" }, shipping.eyebrow || "SHIPPING"),
+          h("h1", {}, shipping.title || "Shipping page title"),
+          h("p", {}, shipping.intro || ""),
+          h("h2", {}, about.title || "About page title"),
+          h("p", {}, about.intro || "")
+        ),
+        footer()
+      );
+    }
+  });
+
+  var DeliveryPreview = createClass({
+    render: function () {
+      var p = this.props;
+      var timetable = value(p, "timetable", []);
+      return h("div", { className: "site-preview" },
+        announcement("配送时效 · 西安专车整板配送"),
+        header(),
+        h("main", { className: "container global-settings-preview" },
+          h("h1", {}, value(p, "title", "配送时效")),
+          h("p", {}, value(p, "intro", "")),
+          h("h2", {}, value(p, "timetable_heading", "配送时效表")),
+          (Array.isArray(timetable) ? timetable : []).map(function (row, index) {
+            return h("p", { key: index }, (row.label || "") + " · " + (row.condition || "") + " — " + (row.body || ""));
+          }),
+          h("p", {}, value(p, "coverage", ""))
         ),
         footer()
       );
@@ -257,8 +274,8 @@
   var HomePreview = createClass({
     render: function () {
       var p = this.props;
-      var title = first(p, ["hero_title_zh"], "定制印刷生产，服务每一个商业项目");
-      var description = first(p, ["hero_description_zh"], "填写首页介绍后，这里将展示真实首屏文案。");
+      var title = first(p, ["hero_title_zh", "hero_title_en"], "定制印刷生产，服务每一个商业项目");
+      var description = first(p, ["hero_description_zh", "hero_description_en"], "填写首页介绍后，这里将展示真实首屏文案。");
       var slides = value(p, "hero_slides", []);
       var firstSlide = Array.isArray(slides) && slides.length ? slides[0].image : "";
       var image = firstSlide ? assetUrl(p, firstSlide) : "";
@@ -270,7 +287,7 @@
             h("div", { className: "hero-shade" }),
             h("div", { className: "container hero-content" },
               h("div", { className: "hero-copy" },
-                h("p", { className: "eyebrow" }, value(p, "eyebrow_zh", "印造所 · 专业印刷生产")),
+                h("p", { className: "eyebrow" }, first(p, ["eyebrow_zh", "eyebrow_en"], "印造所 · 专业印刷生产")),
                 h("h1", {}, title),
                 h("p", { className: "hero-text" }, description),
                 h("span", { className: "button button-dark" }, "浏览产品 ↗")
@@ -287,28 +304,33 @@
     render: function () {
       var p = this.props;
       return h("div", { className: "site-preview" },
-        announcement(value(p, "announcement_zh", "顶部公告")),
+        announcement(first(p, ["announcement_zh", "announcement_en"], "顶部公告")),
         header(),
         h("main", { className: "container global-settings-preview" },
           h("p", { className: "eyebrow" }, "SITE SETTINGS"),
           h("h1", {}, "全局网站设置预览"),
-          h("h2", {}, value(p, "brand_tagline_zh", "品牌副标题")),
+          h("h2", {}, first(p, ["brand_tagline_zh", "brand_tagline_en"], "品牌副标题")),
           h("p", {}, "联系邮箱：" + value(p, "contact_email", "待填写")),
           h("p", {}, "联系电话：" + value(p, "contact_phone", "待填写")),
-          h("p", {}, "SEO 标题：" + value(p, "seo_home_title_zh", "待填写")),
-          h("p", {}, "SEO 描述：" + value(p, "seo_home_description_zh", "待填写"))
+          h("p", {}, "SEO 标题：" + first(p, ["seo_home_title_zh", "seo_home_title_en"], "待填写")),
+          h("p", {}, "SEO 描述：" + first(p, ["seo_home_description_zh", "seo_home_description_en"], "待填写"))
         ),
         footer()
       );
     }
   });
 
-  CMS.registerPreviewTemplate("products", ProductPreview);
-  CMS.registerPreviewTemplate("catalogue", CataloguePreview);
-  CMS.registerPreviewTemplate("solutions", articlePreview());
-  CMS.registerPreviewTemplate("knowledge", articlePreview());
-  CMS.registerPreviewTemplate("news", articlePreview());
-  CMS.registerPreviewTemplate("templates", TemplatePreview);
-  CMS.registerPreviewTemplate("home", HomePreview);
-  CMS.registerPreviewTemplate("global", GlobalPreview);
+  CMS.registerPreviewTemplate("en_products", ProductPreview);
+  CMS.registerPreviewTemplate("zh_products", ProductPreview);
+  CMS.registerPreviewTemplate("en_solutions", articlePreview());
+  CMS.registerPreviewTemplate("zh_solutions", articlePreview());
+  CMS.registerPreviewTemplate("en_knowledge", articlePreview());
+  CMS.registerPreviewTemplate("zh_knowledge", articlePreview());
+  CMS.registerPreviewTemplate("zh_materials", MaterialPreview);
+  CMS.registerPreviewTemplate("en_home_page", HomePreview);
+  CMS.registerPreviewTemplate("zh_home_page", HomePreview);
+  CMS.registerPreviewTemplate("en_site_global", GlobalPreview);
+  CMS.registerPreviewTemplate("zh_site_global", GlobalPreview);
+  CMS.registerPreviewTemplate("en_company_pages", CompanyPreview);
+  CMS.registerPreviewTemplate("zh_delivery_page", DeliveryPreview);
 })();

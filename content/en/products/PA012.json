@@ -1,0 +1,25 @@
+{
+  "id": "PA012",
+  "hidden": true,
+  "sort_order": 305,
+  "show_in_archive": true,
+  "category": "exhibition",
+  "category_title": "Exhibition & Signage",
+  "category_desc": "Event retail displays, CNC boards, luminous architectural lettering, and signage systems.",
+  "category_num": "03",
+  "category_label": "Exhibition & Signage",
+  "title": "Fabric Displays & Fast Pop-Up Systems",
+  "image": "assets/images/products/pa012.jpg",
+  "desc": "Portable tension fabric exhibition walls, teardrop flags, and conference decor.",
+  "intro": "Portable tension fabric exhibition walls, teardrop flags, and conference decor.",
+  "materials": [
+    "Stands: Roll-Up Banner, X-Banner, Heavy Door-Type Frame",
+    "Tension Fabric: Pop-Up Fabric Wall (Single/Double Sided), Flag Cloth, Satin",
+    "Flags & Banners: Factory Flags, Water-Base Beach Flags, Teardrop Banners, Table Runners"
+  ],
+  "crafts": [
+    "Dye-Sublimation Printing",
+    "Gold Fringe Ceremony Pennants",
+    "Hemmed Edges & Grommets"
+  ]
+}

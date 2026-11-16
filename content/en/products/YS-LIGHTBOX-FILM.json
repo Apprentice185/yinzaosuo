@@ -1,0 +1,61 @@
+{
+  "id": "YS-LIGHTBOX-FILM",
+  "hidden": false,
+  "sort_order": 10,
+  "show_in_archive": true,
+  "category": "wideformat",
+  "category_title": "Photo & Wide-Format Print Media",
+  "category_desc": "Photo papers, PP synthetic paper, self-adhesive vinyl and PVC print media for trade printers and sign makers.",
+  "category_num": "01",
+  "category_label": "Photo & Wide-Format Print Media",
+  "title": "Backlit Film",
+  "image": "assets/images/products/ys-lightbox-film.jpg",
+  "desc": "Backlit film for illuminated displays: colours stay rich and even under backlighting, for mall and airport lightboxes, slim lightboxes, fabric-frame (soft film) lightboxes and shopfront signs. Common types available; widths and prices confirmed per enquiry.",
+  "intro": "Backlit film for illuminated displays: colours stay rich and even under backlighting, for mall and airport lightboxes, slim lightboxes, fabric-frame (soft film) lightboxes and shopfront signs. Common types available; widths and prices confirmed per enquiry.",
+  "materials": [
+    "Backlit film",
+    "Soft-film lightbox media",
+    "Matched to the lightbox type"
+  ],
+  "crafts": [
+    "Large-format printing",
+    "Trimming",
+    "Graphic change-out support"
+  ],
+  "seo_title": "Backlit Film for Lightboxes | Custom Lightbox Graphics | YINZAOSUO",
+  "seo_description": "Backlit film and soft-film lightbox graphics with rich, even colour under backlighting, for retail, airport and transit lightboxes. Types, widths and prices confirmed per enquiry.",
+  "image_credit": "Photo: Vasyatka1 / Wikimedia Commons (CC BY-SA 4.0)",
+  "name": "Backlit Film",
+  "detail_image": "assets/images/products/ys-lightbox-film.jpg",
+  "detail_desc": "Backlit film for lightboxes: rich, even colour under backlighting, for retail and airport lightboxes, slim and fabric-frame lightboxes and shopfront signs. Common types available; specifications confirmed per enquiry.",
+  "detail_seo_title": "Backlit Film for Lightboxes | Custom Lightbox Graphics | YINZAOSUO",
+  "detail_seo_description": "Backlit film and soft-film lightbox graphics with rich, even colour under backlighting, for retail, airport and transit lightboxes. Types, widths and prices confirmed per enquiry.",
+  "detail_image_credit": "Photo: Vasyatka1 / Wikimedia Commons (CC BY-SA 4.0)",
+  "detail": {
+    "applications": [
+      "Retail, airport and transit lightbox advertising",
+      "Slim lightboxes and fabric-frame (soft film) lightboxes",
+      "Shopfront sign lightboxes",
+      "Backlit exhibition graphics"
+    ],
+    "artwork": "Please provide print-ready artwork, the visible frame dimensions, quantity and destination. File dimensions and bleed can be checked before production.",
+    "brief": "Please specify the lightbox type, graphic size, quantity, any installation support needed and the destination.",
+    "caveat": "Film type, width and price are confirmed for the specific lightbox and order; no list prices are published.",
+    "delivery": [
+      "Production and dispatch timing confirmed per order",
+      "Sea freight to Australian main ports is around 40 days as a reference"
+    ],
+    "finishing": [
+      "Large-format printing",
+      "Custom trimming to project dimensions",
+      "Graphic change-out support"
+    ],
+    "highlights": [
+      "Common types available: backlit film, soft-film lightbox media and more",
+      "Rich, even colour under backlighting",
+      "Produced and trimmed to the actual frame size",
+      "Types, widths and prices confirmed per enquiry"
+    ],
+    "lead": "Lightbox graphics live or die by their backlighting: even translucency and rich colour matter most. The film type is matched to the lightbox — slim, fabric-frame, free-standing or shopfront — and produced to the actual frame size."
+  }
+}

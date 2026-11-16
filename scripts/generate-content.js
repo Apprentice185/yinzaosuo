@@ -2,11 +2,20 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const repositoryRoot = path.resolve(__dirname, '..');
-const root = process.env.CMS_SITE_ROOT
-  ? path.resolve(repositoryRoot, process.env.CMS_SITE_ROOT)
-  : repositoryRoot;
-const contentRoot = path.join(repositoryRoot, 'content');
-const isChineseBuild = root !== repositoryRoot;
+// Content is split per language: the English build reads content/en and
+// writes to the repository root; the Chinese build reads content/zh and
+// writes to zh/. Language is chosen explicitly (--lang=zh or CMS_LANG=zh),
+// never inferred from a shared bilingual dataset.
+const lang = (() => {
+  const arg = process.argv.find(entry => entry.startsWith('--lang='));
+  const value = (arg ? arg.slice('--lang='.length) : process.env.CMS_LANG || 'en').toLowerCase();
+  if (!['en', 'zh'].includes(value)) throw new Error(`Unsupported content language: ${value}`);
+  return value;
+})();
+const isChineseBuild = lang === 'zh';
+const root = isChineseBuild ? path.join(repositoryRoot, 'zh') : repositoryRoot;
+const contentRoot = path.join(repositoryRoot, 'content', lang);
+const counterpartRoot = path.join(repositoryRoot, 'content', isChineseBuild ? 'en' : 'zh');
 const sitePrefix = isChineseBuild ? '/zh' : '';
 const outputFile = path.join(root, 'assets', 'js', 'content-index.js');
 const siteUrl = 'https://yinzaosuo.com';
@@ -141,7 +150,7 @@ function articleSlug(item) {
     const slug = slugify(configuredSlug);
     if (slug) return slug;
   }
-  return slugify(item.title_en) || slugify(item.title) || slugify(item.id) || 'article';
+  return slugify(item.title) || slugify(item.id) || 'article';
 }
 
 function decodeHtmlEntities(value) {
@@ -220,17 +229,13 @@ function renderStaticText(html) {
 
 function renderStaticArticle(item, collection, template) {
   const isEnglish = !isChineseBuild;
-  const title = isEnglish
-    ? item.seo_title_en || item.title_en || item.title
-    : item.seo_title || item.title;
-  const heading = isEnglish ? item.title_en || item.title : item.title;
-  const description = isEnglish
-    ? item.seo_description_en || item.summary_en || item.description_en || item.title_en || item.title
-    : item.seo_description || item.excerpt || item.title;
+  const title = item.seo_title || item.title;
+  const heading = item.title;
+  const description = item.seo_description || item.excerpt || item.title;
   const canonicalUrl = `${siteUrl}${item.url}`;
   const image = safeMediaUrl(item.cover);
   const imageUrl = image ? new URL(image, `${siteUrl}/`).href : '';
-  const body = isEnglish ? item.content_en : item.content;
+  const body = item.content;
   const articleType = collection === 'news' ? 'NewsArticle' : 'Article';
   const structuredData = {
     '@context': 'https://schema.org',
@@ -259,7 +264,7 @@ function renderStaticArticle(item, collection, template) {
   html = html.replace(/<meta property="og:description" content="[^"]*"[^>]*>/i, `<meta property="og:description" content="${escapeHtml(description)}">`);
   html = html.replace(/<meta property="og:url" content="[^"]*"[^>]*>/i, `<meta property="og:url" content="${escapeHtml(canonicalUrl)}">`);
   html = html.replace(/<link rel="canonical" href="[^"]*"[^>]*>/i, `<link rel="canonical" href="${escapeHtml(canonicalUrl)}">`);
-  if (item.publish_to === 'both') {
+  if (item.hasCounterpart) {
     const englishUrl = `${siteUrl}/articles/${encodeURIComponent(item.slug)}/`;
     const chineseUrl = `${siteUrl}/zh/articles/${encodeURIComponent(item.slug)}/`;
     html = html.replace('</head>', `<link rel="alternate" hreflang="en" href="${englishUrl}"><link rel="alternate" hreflang="zh-CN" href="${chineseUrl}"><link rel="alternate" hreflang="x-default" href="${englishUrl}"></head>`);
@@ -270,11 +275,11 @@ function renderStaticArticle(item, collection, template) {
     '<main id="articlePage">',
     `<main id="articlePage" data-article-type="${escapeHtml(collection === 'knowledge' ? 'knowledge' : collection === 'news' ? 'articles' : 'solutions')}" data-article-id="${escapeHtml(item.id)}">`
   );
-  html = html.replace(/<p class="eyebrow" id="articleCategory">[\s\S]*?<\/p>/, `<p class="eyebrow" id="articleCategory">${escapeHtml(isEnglish ? item.category_en || item.category : item.category)}</p>`);
+  html = html.replace(/<p class="eyebrow" id="articleCategory">[\s\S]*?<\/p>/, `<p class="eyebrow" id="articleCategory">${escapeHtml(item.category)}</p>`);
   html = html.replace(/<h1 id="articleTitle">[\s\S]*?<\/h1>/, `<h1 id="articleTitle">${escapeHtml(heading)}</h1>`);
   html = html.replace(
     /<p class="article-date" id="articleDate">[\s\S]*?<\/p>/,
-    `<p class="article-date" id="articleDate">${escapeHtml([isEnglish ? item.category_en || item.category : item.category, item.date].filter(Boolean).join(' · '))}</p>`
+    `<p class="article-date" id="articleDate">${escapeHtml([item.category, item.date].filter(Boolean).join(' · '))}</p>`
   );
   html = html.replace(
     /<img id="articleCover"[^>]*>/,
@@ -304,9 +309,9 @@ function writeArticlePages(collections) {
 
 function renderStaticArticleCard(item, index) {
   const isEnglish = !isChineseBuild;
-  const category = isEnglish ? item.category_en || item.category : item.category;
-  const title = isEnglish ? item.title_en || item.title : item.title;
-  const excerpt = isEnglish ? item.excerpt_en || item.excerpt : item.excerpt;
+  const category = item.category;
+  const title = item.title;
+  const excerpt = item.excerpt;
   const cover = safeMediaUrl(item.cover);
   const visual = cover
     ? `<div class="long-card-visual visual-${index % 4} has-image" style="background-image:url('${escapeHtml(cover)}')"></div>`
@@ -325,24 +330,23 @@ function renderStaticProductCard(item) {
   return `<a class="archive-card" href="products/${slugify(item.id)}/" data-product-id="${escapeHtml(String(item.id))}"><div class="archive-visual">${visual}</div><div class="archive-card-content"><h3>${escapeHtml(name)}</h3><p class="archive-card-summary">${escapeHtml(item.desc || '')}</p></div></a>`;
 }
 
-function renderStaticProductList(data) {
-  const lang = isChineseBuild ? 'zh' : 'en';
+function renderStaticProductList(records) {
   const covered = new Set();
   const sections = [];
-  for (const category of data.catalog[lang].categories) {
+  for (const category of buildCatalog(records).categories) {
     if (!category.items.length) continue;
     category.items.forEach(item => covered.add(String(item.id)));
     sections.push({ title: category.title, desc: category.desc, items: category.items });
   }
   const coreOrder = ['YS-PVC-FOAM-BOARD', 'YS-GLOSS-PHOTO-PAPER', 'YS-SATIN-PHOTO-PAPER', 'YS-ONE-WAY-VISION', 'YS-SYNTHETIC-PAPER', 'YS-COLD-LAMINATION-FILM', 'YS-PVC-MESH', 'YS-PVC-BANNER', 'YS-ADHESIVE-VINYL', 'YS-KT-BOARD', 'YS-OUTDOOR-PVC-RIGID-FILM', 'YS-ROLL-UP', 'YS-X-BANNER', 'YS-DOOR-STAND'];
-  const extras = data.catalogue
-    .filter(item => !covered.has(String(item.id)))
+  const extras = records
+    .filter(item => item.hasDetail && !covered.has(String(item.id)))
     .sort((a, b) => coreOrder.indexOf(String(a.id)) - coreOrder.indexOf(String(b.id)))
     .map(item => ({
       id: String(item.id),
-      name: isChineseBuild ? item.name_zh || item.name_en : item.name_en || item.name_zh,
-      desc: isChineseBuild ? item.desc_zh || item.desc_en : item.desc_en || item.desc_zh,
-      image: item.image
+      name: item.name || item.title,
+      desc: item.detail_desc || '',
+      image: item.detail_image || ''
     }));
   if (extras.length) {
     const defaults = categoryDefaults.exhibition;
@@ -365,7 +369,7 @@ function injectStaticList(html, containerId, pageKey, innerHtml) {
 
 function writeListPages(data) {
   const pages = [
-    { file: 'products.html', container: 'allProductCategories', render: () => renderStaticProductList(data) },
+    { file: 'products.html', container: 'allProductCategories', render: () => renderStaticProductList(data.records) },
     { file: 'solutions.html', container: 'solutionsGrid', render: () => data.solutions.map(renderStaticArticleCard).join('') },
     { file: 'knowledge.html', container: 'knowledgeGrid', render: () => data.knowledge.map(renderStaticArticleCard).join('') },
     { file: 'journal.html', container: 'articleGrid', render: () => data.news.map(renderStaticArticleCard).join('') }
@@ -464,78 +468,88 @@ function readMarkdownCollection(name) {
   });
 }
 
-const publicationTargets = new Set(['both', 'domestic', 'international']);
-const publicationStatuses = new Set(['published', 'hidden']);
-
-function normalizePublication(item) {
-  const publishTo = item.publish_to || 'both';
-  const status = typeof item.hidden === 'boolean'
-    ? item.hidden ? 'hidden' : 'published'
-    : item.status || 'published';
-  if (!publicationTargets.has(publishTo)) {
-    throw new Error(`Content ${item.id || item.slug || ''} has an invalid publish_to value: ${publishTo}`);
-  }
-  if (!publicationStatuses.has(status)) {
-    throw new Error(`Content ${item.id || item.slug || ''} has an invalid status value: ${status}`);
-  }
-  return { ...item, publish_to: publishTo, status };
+// Visibility is per-language now: an entry exists in exactly one language
+// tree (or both, as two independent files), and `hidden: true` in that
+// tree's file is the only publication switch. There is no publish_to.
+function normalizeProductRecord(record) {
+  const item = { ...record, id: String(record.id) };
+  item.hidden = record.hidden === true;
+  item.status = item.hidden ? 'hidden' : 'published';
+  item.title = record.title || record.name || '';
+  item.image = typeof record.image === 'string' ? record.image : '';
+  item.desc = record.desc || record.intro || '';
+  item.intro = record.intro || record.desc || '';
+  item.materials = Array.isArray(record.materials) ? record.materials : [];
+  item.crafts = Array.isArray(record.crafts) ? record.crafts : [];
+  item.sort_order = Number.isFinite(Number(record.sort_order)) ? Number(record.sort_order) : 10;
+  item.show_in_archive = record.show_in_archive !== false;
+  // Merged records carry the old list layer (products) and detail layer
+  // (catalogue) in one file; these flags rebuild the two runtime views.
+  item.hasDetail = Boolean(record.name || record.detail || record.detail_desc || record.detail_seo_title || record.detail_seo_description || record.detail_image);
+  item.hasListLayer = record.category !== undefined || record.sort_order !== undefined || record.show_in_archive !== undefined;
+  item.hasCounterpart = false;
+  return item;
 }
 
-function isPublishedForCurrentSite(item) {
-  if (item.status !== 'published') return false;
-  if (item.publish_to === 'both') return true;
-  return isChineseBuild ? item.publish_to === 'domestic' : item.publish_to === 'international';
+function deduplicateRecords(records) {
+  const unique = new Map();
+  for (const record of records) {
+    const id = String(record.id);
+    if (!unique.has(id)) unique.set(id, record);
+  }
+  return [...unique.values()];
 }
 
-function normalizeProduct(product) {
+function catalogueViewOf(record) {
   return {
-    ...normalizePublication(product),
-    id: String(product.id),
-    title: product.title || product.name || '',
-    title_en: product.title_en || product.name_en || product.title || product.name || '',
-    image: isChineseBuild && typeof product.image_zh === 'string'
-      ? product.image_zh
-      : typeof product.image === 'string' ? product.image : product.thumb || '',
-    desc: product.desc || product.intro || '',
-    desc_en: product.desc_en || product.intro_en || product.desc || product.intro || '',
-    intro: product.intro || product.desc || '',
-    intro_en: product.intro_en || product.desc_en || product.intro || product.desc || '',
-    category_legacy: product.category_legacy || product.category_title || product.category,
-    category_legacy_en: product.category_legacy_en || product.category_title_en || product.category,
-    materials: Array.isArray(product.materials) ? product.materials : [],
-    materials_en: Array.isArray(product.materials_en) ? product.materials_en : product.materials || [],
-    crafts: Array.isArray(product.crafts) ? product.crafts : [],
-    crafts_en: Array.isArray(product.crafts_en) ? product.crafts_en : product.crafts || [],
-    sort_order: Number.isFinite(Number(product.sort_order)) ? Number(product.sort_order) : 10,
-    show_in_archive: product.show_in_archive !== false
+    id: record.id,
+    hidden: record.hidden,
+    status: record.status,
+    name: record.name || '',
+    image: record.detail_image || '',
+    desc: record.detail_desc || '',
+    seo_title: record.detail_seo_title || '',
+    seo_description: record.detail_seo_description || '',
+    detail: record.detail,
+    image_credit: record.detail_image_credit || record.image_credit || '',
+    sort_order: record.sort_order
   };
 }
 
-function deduplicateProducts(products) {
-  const unique = new Map();
-  for (const { file, product } of products) {
-    const current = unique.get(product.id);
-    if (!current) {
-      unique.set(product.id, { file, product });
-      continue;
-    }
-
-    const currentHasImage = Boolean(current.product.image);
-    const candidateHasImage = Boolean(product.image);
-    const currentHasCanonicalPath = path.basename(current.file, '.json') === product.id;
-    const candidateHasCanonicalPath = path.basename(file, '.json') === product.id;
-    if (
-      (candidateHasImage && !currentHasImage) ||
-      (candidateHasImage === currentHasImage && candidateHasCanonicalPath && !currentHasCanonicalPath)
-    ) {
-      unique.set(product.id, { file, product });
-    }
+// hreflang counterpart detection: a page links to its other-language twin
+// only when a visible entry with the same id/slug exists in the other
+// language's content tree.
+function counterpartProductIds() {
+  const directory = path.join(counterpartRoot, 'products');
+  if (!fs.existsSync(directory)) return new Set();
+  const ids = new Set();
+  for (const file of fs.readdirSync(directory).filter(entry => entry.toLowerCase().endsWith('.json'))) {
+    try {
+      const record = JSON.parse(fs.readFileSync(path.join(directory, file), 'utf8'));
+      if (record && record.id && record.hidden !== true) ids.add(String(record.id));
+    } catch { /* best-effort: a broken counterpart file just means no hreflang */ }
   }
-  return [...unique.values()].map(entry => entry.product);
+  return ids;
+}
+
+function counterpartArticleSlugs(collection) {
+  const directory = path.join(counterpartRoot, collection);
+  if (!fs.existsSync(directory)) return new Set();
+  const slugs = new Set();
+  for (const file of fs.readdirSync(directory).filter(entry => entry.toLowerCase().endsWith('.md'))) {
+    try {
+      const { fields } = parseFrontmatter(fs.readFileSync(path.join(directory, file), 'utf8'));
+      if (fields.hidden === true) continue;
+      const slug = articleSlug({ ...fields, id: fields.id || fields.slug || path.basename(file, '.md') });
+      if (slug) slugs.add(slug);
+    } catch { /* best-effort, as above */ }
+  }
+  return slugs;
 }
 
 function normalizeTemplate(template) {
-  const item = normalizePublication({ ...template, id: String(template.id) });
+  const item = { ...template, id: String(template.id), hidden: template.hidden === true };
+  item.status = item.hidden ? 'hidden' : 'published';
   if (item.file_url && !/^(https?:\/\/|\/|\.\/|\.\.\/)/i.test(item.file_url)) {
     throw new Error(`Template ${item.id} has an unsupported file_url: ${item.file_url}`);
   }
@@ -564,103 +578,56 @@ function normalizeArticle(item, collection) {
   }
   const gallery = galleryImages.map(image => `<p><img src="${safeUrl(image)}" alt=""></p>`).join('');
   const body = `${renderMarkdown(item.body)}${gallery}`;
-  const bodyEn = `${renderMarkdown(item.body_en)}${gallery}`;
   const slug = articleSlug(item);
   if (!slug) throw new Error(`Article ${item.id || item.title || ''} needs a URL slug`);
   return {
-    ...normalizePublication(item),
+    ...item,
     id: String(item.id),
     slug,
     route: `/articles/${encodeURIComponent(slug)}/`,
     url: `${sitePrefix}/articles/${encodeURIComponent(slug)}/`,
     title: item.title || '',
-    title_en: item.title_en || item.title || '',
-    category_en: item.category_en || item.tag_en || item.category || item.tag || (isKnowledge ? 'Print Knowledge' : 'News'),
+    category: item.category || (isKnowledge
+      ? (isChineseBuild ? '印前知识' : 'Print Knowledge')
+      : (isChineseBuild ? '品牌动态' : 'News')),
     seo_title: item.seo_title || '',
-    seo_title_en: item.seo_title_en || '',
     seo_description: item.seo_description || '',
-    seo_description_en: item.seo_description_en || '',
-    category: item.category || item.tag || (isKnowledge ? '印前知识' : '品牌动态'),
     date: item.date || '',
     cover: item.cover || item.thumbnail || item.cover_image || '',
     excerpt: item.summary || item.description || '',
-    excerpt_en: item.summary_en || item.description_en || item.summary || item.description || '',
     sort_order: Number.isFinite(Number(item.sort_order)) ? Number(item.sort_order) : 10,
-    content: body,
-    content_en: bodyEn
+    hidden: item.hidden === true,
+    status: item.hidden === true ? 'hidden' : 'published',
+    hasCounterpart: false,
+    content: body
   };
 }
 
-function buildCatalog(products) {
-  const visible = products.filter(product => product.show_in_archive && categoryDefaults[product.category]);
-  const catalog = { zh: { categories: [] }, en: { categories: [] } };
+function buildCatalog(records) {
+  const visible = records.filter(record => record.show_in_archive && categoryDefaults[record.category]);
+  const catalog = { categories: [] };
   for (const [categoryId, defaults] of Object.entries(categoryDefaults)) {
     const categoryProducts = visible
-      .filter(product => product.category === categoryId)
+      .filter(record => record.category === categoryId)
       .sort((a, b) => a.sort_order - b.sort_order || a.id.localeCompare(b.id));
     if (!categoryProducts.length) continue;
     const first = categoryProducts[0];
-    const num = String(catalog.zh.categories.length + 1).padStart(2, '0');
-    for (const lang of ['zh', 'en']) {
-      const english = lang === 'en';
-      catalog[lang].categories.push({
-        id: categoryId,
-        num,
-        title: english ? first.category_title_en || defaults.en : first.category_title || defaults.zh,
-        desc: english ? first.category_desc_en || defaults.desc_en : first.category_desc || defaults.desc,
-        items: categoryProducts.map(product => ({
-          id: product.id,
-          name: english ? product.title_en : product.title,
-          image: product.image,
-          desc: english ? product.desc_en : product.desc,
-          materials: english ? product.materials_en : product.materials,
-          crafts: english ? product.crafts_en : product.crafts
-        }))
-      });
-    }
+    catalog.categories.push({
+      id: categoryId,
+      num: String(catalog.categories.length + 1).padStart(2, '0'),
+      title: first.category_title || (isChineseBuild ? defaults.zh : defaults.en),
+      desc: first.category_desc || (isChineseBuild ? defaults.desc : defaults.desc_en),
+      items: categoryProducts.map(record => ({
+        id: record.id,
+        name: record.title,
+        image: record.image,
+        desc: record.desc,
+        materials: record.materials,
+        crafts: record.crafts
+      }))
+    });
   }
   return catalog;
-}
-
-function buildTranslations(products, knowledge, news, templates, solutions) {
-  const translations = { zh: {}, en: {} };
-  const add = (type, items, fields) => {
-    for (const lang of ['zh', 'en']) {
-      translations[lang][type] ||= {};
-      for (const item of items) {
-        const values = {};
-        for (const [field, source] of Object.entries(fields)) {
-          const value = item[lang === 'en' ? source.en : source.zh];
-          if (value !== undefined && value !== '') values[field] = value;
-        }
-        translations[lang][type][item.id] = values;
-      }
-    }
-  };
-  add('products', products, {
-    name: { zh: 'title', en: 'title_en' }, title: { zh: 'title', en: 'title_en' },
-    desc: { zh: 'desc', en: 'desc_en' }, intro: { zh: 'intro', en: 'intro_en' },
-    category: { zh: 'category_legacy', en: 'category_legacy_en' },
-    materials: { zh: 'materials', en: 'materials_en' }, crafts: { zh: 'crafts', en: 'crafts_en' }
-  });
-  add('knowledge', knowledge, {
-    title: { zh: 'title', en: 'title_en' }, category: { zh: 'category', en: 'category_en' },
-    excerpt: { zh: 'excerpt', en: 'excerpt_en' }, content: { zh: 'content', en: 'content_en' }
-  });
-  add('articles', news, {
-    title: { zh: 'title', en: 'title_en' }, category: { zh: 'category', en: 'tag_en' },
-    excerpt: { zh: 'excerpt', en: 'excerpt_en' }, content: { zh: 'content', en: 'content_en' }
-  });
-  add('templates', templates, {
-    title: { zh: 'title', en: 'title_en' }, category: { zh: 'category', en: 'type_en' },
-    style: { zh: 'style', en: 'style_en' }, size: { zh: 'size', en: 'size_en' },
-    tags: { zh: 'tags', en: 'tags_en' }, tone: { zh: 'tone', en: 'tone_en' }
-  });
-  add('solutions', solutions, {
-    title: { zh: 'title', en: 'title_en' }, category: { zh: 'tag', en: 'tag_en' },
-    excerpt: { zh: 'summary', en: 'summary_en' }, content: { zh: 'content', en: 'content_en' }
-  });
-  return translations;
 }
 
 function buildSitemap(data) {
@@ -693,7 +660,7 @@ function buildSitemap(data) {
       queue.push(relativeTarget);
     }
   }
-  for (const product of [...data.products, ...data.catalogue]) routes.add(`/products/${slugify(product.id)}/`);
+  for (const product of data.records) routes.add(`/products/${slugify(product.id)}/`);
   for (const item of [...data.knowledge, ...data.news, ...data.solutions]) routes.add(item.route);
   if (!isChineseBuild) routes.delete('/templates.html');
   const metadata = {
@@ -739,19 +706,21 @@ const RELATED_MEDIA_FALLBACK = {
   'YS-PVC-MESH': { name_en: 'Printed PVC Mesh Banners', name_zh: 'PVC 网格布喷绘' }
 };
 
-function renderRelatedMedia(product, catalogueItem, catalogue) {
-  const currentId = String(product.id || catalogueItem.id);
+function renderRelatedMedia(record, records) {
+  const currentId = String(record.id);
   if (!RELATED_MEDIA_IDS.includes(currentId)) return '';
   const isEnglish = !isChineseBuild;
-  const byId = new Map((Array.isArray(catalogue) ? catalogue : []).map(item => [String(item.id), item]));
+  const byId = new Map((Array.isArray(records) ? records : []).map(item => [String(item.id), item]));
   const cards = RELATED_MEDIA_IDS
     .filter(otherId => otherId !== currentId)
     .map(otherId => {
-      const item = byId.get(otherId) || RELATED_MEDIA_FALLBACK[otherId] || {};
-      const name = isEnglish ? item.name_en || item.name_zh : item.name_zh || item.name_en;
+      const found = byId.get(otherId);
+      const fallback = RELATED_MEDIA_FALLBACK[otherId] || {};
+      const item = found || { name: isEnglish ? fallback.name_en : fallback.name_zh, detail_desc: '', detail_image: '' };
+      const name = item.name || item.title;
       if (!name) return '';
-      const desc = isEnglish ? item.desc_en || '' : item.desc_zh || '';
-      const image = safeMediaUrl(item.image);
+      const desc = item.detail_desc || '';
+      const image = safeMediaUrl(item.detail_image || item.image);
       const visual = image
         ? `<img src="${escapeHtml(image)}" alt="${escapeHtml(name)}" loading="lazy" decoding="async">`
         : '';
@@ -765,34 +734,24 @@ function renderRelatedMedia(product, catalogueItem, catalogue) {
   return `<section class="section product-related-media"><div class="container"><p class="eyebrow">${eyebrow}</p><h2>${heading}</h2><div class="product-archive-grid">${cards}</div></div></section>`;
 }
 
-function renderStaticProduct(product, catalogueItem, template, catalogue) {
+function renderStaticProduct(record, template, records) {
   const isEnglish = !isChineseBuild;
-  const id = String(product.id || catalogueItem.id);
+  const id = String(record.id);
   const slug = slugify(id);
-  const name = isEnglish
-    ? catalogueItem.name_en || product.title_en || product.title || catalogueItem.name_zh
-    : catalogueItem.name_zh || product.title || product.title_en || catalogueItem.name_en;
-  const description = isEnglish
-    ? catalogueItem.seo_description_en || product.seo_description_en || catalogueItem.desc_en || product.desc_en || name
-    : catalogueItem.seo_description_zh || product.seo_description_zh || catalogueItem.desc_zh || product.desc || name;
-  const seoTitle = isEnglish
-    ? catalogueItem.seo_title_en || product.seo_title_en || name
-    : catalogueItem.seo_title_zh || product.seo_title_zh || name;
+  const name = record.name || record.title;
+  const description = record.detail_seo_description || record.seo_description || record.detail_desc || record.desc || name;
+  const seoTitle = record.detail_seo_title || record.seo_title || name;
   const seoTitleBase = String(seoTitle).replace(/\s*(?:\||｜)\s*(?:YINZAOSUO|印造所)\s*$/i, '');
-  const intro = isEnglish
-    ? catalogueItem.desc_en || product.desc_en || product.intro_en || description
-    : catalogueItem.desc_zh || product.desc || product.intro || description;
-  const detail = isEnglish ? catalogueItem.detail_en : catalogueItem.detail_zh;
-  const image = safeMediaUrl(catalogueItem.image || product.image);
-  const imageCredit = isEnglish
-    ? catalogueItem.image_credit_en || product.image_credit_en || ''
-    : catalogueItem.image_credit_zh || product.image_credit_zh || '';
+  const intro = record.detail_desc || record.desc || record.intro || description;
+  const detail = record.detail;
+  const image = safeMediaUrl(record.detail_image || record.image);
+  const imageCredit = record.detail_image_credit || record.image_credit || '';
   const imageUrl = image ? new URL(image, `${siteUrl}/`).href : '';
   const canonicalUrl = `${siteUrl}${sitePrefix}/products/${slug}/`;
-  const category = isEnglish
-    ? product.category_legacy_en || product.category_legacy || (product.category === 'wideformat' ? 'Photo & Wide-Format Print Media' : product.category) || 'Print Media'
-    : product.category_legacy || (product.category === 'wideformat' ? '写真与大幅面印刷材料' : product.category) || '印刷材料';
-  const price = product.price && (!isEnglish || /^USD\s/i.test(product.price)) ? product.price : '';
+  const category = record.category_label
+    || (record.category === 'wideformat' ? (isEnglish ? 'Photo & Wide-Format Print Media' : '写真与大幅面印刷材料') : record.category)
+    || (isEnglish ? 'Print Media' : '印刷材料');
+  const price = record.price && (!isEnglish || /^USD\s/i.test(record.price)) ? record.price : '';
   // NOTE (2026-11-16): no Product JSON-LD here. Google's Product rich result
   // requires offers/review/aggregateRating; these are quote-only B2B pages
   // with no published price, so emitting a bare Product block makes GSC
@@ -811,7 +770,7 @@ function renderStaticProduct(product, catalogueItem, template, catalogue) {
   if (imageUrl) {
     html = html.replace('</head>', `<meta property="og:image" content="${escapeHtml(imageUrl)}"><meta property="og:image:alt" content="${escapeHtml(name)}"></head>`);
   }
-  if (product.publish_to === 'both' || catalogueItem.publish_to === 'both') {
+  if (record.hasCounterpart) {
     const englishUrl = `${siteUrl}/products/${slug}/`;
     const chineseUrl = `${siteUrl}/zh/products/${slug}/`;
     html = html.replace('</head>', `<link rel="alternate" hreflang="en" href="${englishUrl}"><link rel="alternate" hreflang="zh-CN" href="${chineseUrl}"><link rel="alternate" hreflang="x-default" href="${englishUrl}"></head>`);
@@ -846,35 +805,18 @@ function renderStaticProduct(product, catalogueItem, template, catalogue) {
   } else {
     html = html.replace(/<section class="product-information" id="productInformation"[^>]*>/, '<section class="product-information" id="productInformation" hidden>');
   }
-  const relatedMedia = renderRelatedMedia(product, catalogueItem, catalogue);
+  const relatedMedia = renderRelatedMedia(record, records);
   if (relatedMedia) html = html.replace('</main>', `${relatedMedia}</main>`);
   return html;
 }
 
-function writeProductPages(data) {
-  const templatePath = path.join(root, isChineseBuild ? 'product.html' : 'product.html');
-  const template = fs.readFileSync(templatePath, 'utf8');
-  const products = new Map();
-  for (const item of data.products) products.set(String(item.id), item);
-  for (const item of data.catalogue) {
-    const id = String(item.id);
-    const existing = products.get(id) || {
-      id,
-      title: item.name_zh || '',
-      title_en: item.name_en || '',
-      desc: item.desc_zh || '',
-      desc_en: item.desc_en || '',
-      image: item.image || '',
-      publish_to: item.publish_to || 'both'
-    };
-    products.set(id, existing);
-  }
-  for (const [id, product] of products) {
-    const catalogueItem = data.catalogue.find(item => String(item.id) === id) || {};
-    const slug = slugify(id);
+function writeProductPages(records) {
+  const template = fs.readFileSync(path.join(root, 'product.html'), 'utf8');
+  for (const record of records) {
+    const slug = slugify(String(record.id));
     const output = path.join(root, 'products', slug, 'index.html');
     fs.mkdirSync(path.dirname(output), { recursive: true });
-    fs.writeFileSync(output, renderStaticProduct(product, catalogueItem, template, data.catalogue), 'utf8');
+    fs.writeFileSync(output, renderStaticProduct(record, template, records), 'utf8');
   }
 }
 
@@ -898,13 +840,13 @@ function decodeBase64Images() {
 
 function main() {
   decodeBase64Images();
-  const products = deduplicateProducts(filesIn('products', '.json')
-    .map(file => ({
-      file,
-      product: normalizeProduct(JSON.parse(fs.readFileSync(file, 'utf8')))
-    })))
-    .filter(isPublishedForCurrentSite)
+  const records = deduplicateRecords(filesIn('products', '.json')
+    .map(file => JSON.parse(fs.readFileSync(file, 'utf8'))))
+    .map(normalizeProductRecord)
+    .filter(record => !record.hidden)
     .sort((a, b) => a.sort_order - b.sort_order || a.id.localeCompare(b.id));
+  const productCounterparts = counterpartProductIds();
+  for (const record of records) record.hasCounterpart = productCounterparts.has(record.id);
   const settingsFile = path.join(contentRoot, 'settings', 'home.json');
   const homeSettings = fs.existsSync(settingsFile)
     ? JSON.parse(fs.readFileSync(settingsFile, 'utf8'))
@@ -933,53 +875,60 @@ function main() {
       faq_items: Array.isArray(homeSettings.faq_items) ? homeSettings.faq_items : []
     }
   };
-  const catalogue = filesIn('catalogue', '.json').map(file => normalizePublication(JSON.parse(fs.readFileSync(file, 'utf8')))).filter(item => item && item.id).filter(isPublishedForCurrentSite);
-  const requiredCatalogueIds = ['YS-SYNTHETIC-PAPER', 'YS-GLOSS-PHOTO-PAPER', 'YS-SATIN-PHOTO-PAPER', 'YS-PVC-MESH', 'YS-PVC-BANNER', 'YS-ADHESIVE-VINYL', 'YS-KT-BOARD', 'YS-OUTDOOR-PVC-RIGID-FILM', 'YS-ROLL-UP', 'YS-X-BANNER', 'YS-DOOR-STAND'];
-  const catalogueById = new Map(catalogue.map(item => [String(item.id), item]));
-  const missingCatalogueIds = requiredCatalogueIds.filter(id => !catalogueById.has(id));
-  if (missingCatalogueIds.length) throw new Error(`Missing core catalogue records: ${missingCatalogueIds.join(', ')}`);
-  for (const id of requiredCatalogueIds) {
-    const item = catalogueById.get(id);
-    for (const lang of ['zh', 'en']) {
-      const detail = item[`detail_${lang}`];
-      if (!item[`name_${lang}`] || !item[`desc_${lang}`] || !detail || !detail.lead || !detail.artwork || !detail.brief || !detail.caveat) {
-        throw new Error(`Core catalogue record ${id} is missing required ${lang} content`);
-      }
-      for (const field of ['highlights', 'applications', 'finishing', 'delivery']) {
-        if (!Array.isArray(detail[field]) || detail[field].length === 0) {
-          throw new Error(`Core catalogue record ${id} has no ${lang} ${field}`);
-        }
+  const requiredProductIds = ['YS-SYNTHETIC-PAPER', 'YS-GLOSS-PHOTO-PAPER', 'YS-SATIN-PHOTO-PAPER', 'YS-PVC-MESH', 'YS-PVC-BANNER', 'YS-ADHESIVE-VINYL', 'YS-KT-BOARD', 'YS-OUTDOOR-PVC-RIGID-FILM', 'YS-ROLL-UP', 'YS-X-BANNER', 'YS-DOOR-STAND'];
+  const recordsById = new Map(records.map(record => [record.id, record]));
+  const missingProductIds = requiredProductIds.filter(id => !recordsById.has(id));
+  if (missingProductIds.length) throw new Error(`Missing core product records: ${missingProductIds.join(', ')}`);
+  for (const id of requiredProductIds) {
+    const item = recordsById.get(id);
+    const detail = item.detail;
+    if (!item.name || !item.detail_desc || !detail || !detail.lead || !detail.artwork || !detail.brief || !detail.caveat) {
+      throw new Error(`Core product record ${id} is missing required ${lang} content`);
+    }
+    for (const field of ['highlights', 'applications', 'finishing', 'delivery']) {
+      if (!Array.isArray(detail[field]) || detail[field].length === 0) {
+        throw new Error(`Core product record ${id} has no ${lang} ${field}`);
       }
     }
   }
   const templates = filesIn('templates', '.json')
     .map(file => normalizeTemplate(JSON.parse(fs.readFileSync(file, 'utf8'))))
-    .filter(isPublishedForCurrentSite);
-  const solutions = readMarkdownCollection('solutions').map(item => normalizeArticle(item, 'solutions')).filter(isPublishedForCurrentSite);
-  const knowledge = readMarkdownCollection('knowledge').map(item => normalizeArticle(item, 'knowledge')).filter(isPublishedForCurrentSite);
+    .filter(item => !item.hidden);
+  const solutions = readMarkdownCollection('solutions').map(item => normalizeArticle(item, 'solutions')).filter(item => !item.hidden);
+  const knowledge = readMarkdownCollection('knowledge').map(item => normalizeArticle(item, 'knowledge')).filter(item => !item.hidden);
   const news = readMarkdownCollection('news')
     .map(item => normalizeArticle(item, 'news'))
-    .filter(isPublishedForCurrentSite)
+    .filter(item => !item.hidden)
     .sort((a, b) => a.sort_order - b.sort_order || a.id.localeCompare(b.id));
+  for (const [collection, items] of [['solutions', solutions], ['knowledge', knowledge], ['news', news]]) {
+    const counterparts = counterpartArticleSlugs(collection);
+    for (const item of items) item.hasCounterpart = counterparts.has(item.slug);
+  }
+  const products = records.filter(record => record.hasListLayer);
+  const catalogue = [...records]
+    .sort((a, b) => a.id.localeCompare(b.id))
+    .filter(record => record.hasDetail)
+    .map(catalogueViewOf);
   const data = {
     products,
     siteSettings,
-    catalog: buildCatalog(products),
+    catalog: { [lang]: buildCatalog(records) },
     catalogue,
+    records,
     solutions,
     knowledge,
     news,
-    templates,
-    translations: buildTranslations(products, knowledge, news, templates, solutions)
+    templates
   };
-  writeProductPages(data);
+  writeProductPages(records);
   writeArticlePages([
     { collection: 'knowledge', items: knowledge },
     { collection: 'news', items: news },
     { collection: 'solutions', items: solutions }
   ]);
   writeListPages(data);
-  fs.writeFileSync(outputFile, `window.CMS_CONTENT = ${JSON.stringify(data)};\n`, 'utf8');
+  const { records: _records, ...indexData } = data;
+  fs.writeFileSync(outputFile, `window.CMS_CONTENT = ${JSON.stringify(indexData)};\n`, 'utf8');
   buildSitemap(data);
   console.log(`Generated ${path.relative(root, outputFile)} and sitemap.xml (${products.length} products, ${knowledge.length} knowledge articles, ${news.length} news, ${templates.length} templates, ${solutions.length} solutions).`);
 }

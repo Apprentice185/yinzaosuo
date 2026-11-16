@@ -1,0 +1,26 @@
+{
+  "id": "PA011",
+  "hidden": true,
+  "sort_order": 304,
+  "show_in_archive": true,
+  "category": "exhibition",
+  "category_title": "Exhibition & Signage",
+  "category_desc": "Event retail displays, CNC boards, luminous architectural lettering, and signage systems.",
+  "category_num": "03",
+  "category_label": "Exhibition & Signage",
+  "title": "Illuminated Channel Letters",
+  "image": "assets/images/products/pa011.png",
+  "desc": "Bespoke 3D dimensional lettering and commercial shopfront signboards.",
+  "intro": "Bespoke 3D dimensional lettering and commercial shopfront signboards.",
+  "materials": [
+    "Fabricated Stainless Steel, Cast Acrylic, High-Output LED Modules, Flexible Neon"
+  ],
+  "crafts": [
+    "Trimless Channel Letters",
+    "Face-Lit Stainless Steel",
+    "Halo Backlit",
+    "Standoff Backlit",
+    "Acrylic Lightboxes",
+    "Custom LED Neon"
+  ]
+}

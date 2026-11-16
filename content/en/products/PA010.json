@@ -1,0 +1,26 @@
+{
+  "id": "PA010",
+  "hidden": true,
+  "sort_order": 303,
+  "show_in_archive": true,
+  "category": "exhibition",
+  "category_title": "Exhibition & Signage",
+  "category_desc": "Event retail displays, CNC boards, luminous architectural lettering, and signage systems.",
+  "category_num": "03",
+  "category_label": "Exhibition & Signage",
+  "title": "Fabric Lightboxes & Acrylic Badges",
+  "image": "assets/images/products/pa010.png",
+  "desc": "Frameless SEG fabric lightboxes and precision laser-engraved plaques.",
+  "intro": "Frameless SEG fabric lightboxes and precision laser-engraved plaques.",
+  "materials": [
+    "SEG Fabric Lightboxes: Indoor/Outdoor Slim Profile (Silver/Black Aluminum, 6cm/8cm/10cm)",
+    "Engraved Acrylic: Cast Clear Acrylic, Two-Color Plastic Sheet Laminate",
+    "Metal Plaques: Brushed/Mirror Titanium Gold, Brushed/Mirror Silver (0.4x0.6m / 0.3x1.8m / 0.3x0.4m)",
+    "UV Crystal Badges / Architectural Wall Feature Panels"
+  ],
+  "crafts": [
+    "Laser Precision Cutting",
+    "UV Micro-Relief Print",
+    "Beveled Edge Polishing"
+  ]
+}

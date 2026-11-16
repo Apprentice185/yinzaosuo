@@ -1,0 +1,57 @@
+{
+  "id": "P001",
+  "hidden": true,
+  "sort_order": 1001,
+  "show_in_archive": false,
+  "category": "commercial",
+  "category_label": "Business Cards",
+  "title": "Classic Coated Business Cards",
+  "image": "assets/images/products/prod-cards-cotton-letterpress-01.jpg",
+  "desc": "A versatile business card with a choice of paper stocks and premium finishes.",
+  "intro": "A versatile business card with a choice of paper stocks and premium finishes.",
+  "materials": [],
+  "crafts": [],
+  "seo_title": "经典铜版纸名片",
+  "seo_description": "适合企业、个人和日常商务沟通的经典名片，色彩稳定，制作效率高。",
+  "price": "¥49 起",
+  "name": "Classic Coated Business Cards",
+  "options": [
+    {
+      "name": "尺寸",
+      "values": [
+        "90 × 54mm",
+        "90 × 50mm",
+        "自定义尺寸"
+      ]
+    },
+    {
+      "name": "数量",
+      "values": [
+        "100 张",
+        "500 张",
+        "1000 张",
+        "5000 张"
+      ]
+    },
+    {
+      "name": "纸张",
+      "values": [
+        "300g 铜版纸",
+        "350g 铜版纸",
+        "哑粉纸"
+      ]
+    },
+    {
+      "name": "工艺",
+      "values": [
+        "暂不添加",
+        "覆膜",
+        "圆角"
+      ]
+    }
+  ],
+  "tag": "",
+  "thumb": "assets/images/products/prod-cards-cotton-letterpress-01.jpg",
+  "sceneImage": "",
+  "slug": "p001"
+}

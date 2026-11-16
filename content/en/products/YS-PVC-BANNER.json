@@ -1,0 +1,47 @@
+{
+  "id": "YS-PVC-BANNER",
+  "hidden": false,
+  "title": "Printed PVC Banners",
+  "image": "/pic/pvc-banner.jpg",
+  "desc": "Custom-printed PVC banners produced to your project dimensions, with a choice of practical finishing options.",
+  "intro": "Custom-printed PVC banners produced to your project dimensions, with a choice of practical finishing options.",
+  "materials": [],
+  "crafts": [],
+  "name": "Printed PVC Banners",
+  "detail_image": "/pic/pvc-banner.jpg",
+  "detail_desc": "Custom-printed PVC banners produced to your project dimensions, with a choice of practical finishing options.",
+  "detail_seo_title": "Custom PVC Banner Printing | Trade Supply & Finishing | YINZAOSUO",
+  "detail_seo_description": "Custom printed PVC banners for trade projects, with made-to-order dimensions, hemming, eyelets, rope finishing and pole pockets.",
+  "detail": {
+    "lead": "Made-to-order printed PVC banners for shopfront signs, opening banners, outdoor advertising, events and promotions. Produced to your finished dimensions from your artwork, in a choice of 340, 440 or 510 gsm weights and frontlit or blockout constructions, with finishing matched to the way the banner will be installed.",
+    "highlights": [
+      "Three weights — 340, 440 and 510 gsm; heavier weights hang flatter and handle wind better",
+      "Frontlit and blockout constructions; blockout is opaque, for double-sided graphics",
+      "Custom dimensions based on your project brief",
+      "Hemming, eyelets, rope finishing and pole pockets available",
+      "Cut to the requested finished size"
+    ],
+    "applications": [
+      "Shopfront signs and opening banners",
+      "Outdoor advertising and promotions",
+      "Event, retail and venue graphics",
+      "Fencing, site and temporary campaign displays"
+    ],
+    "finishing": [
+      "Hemming",
+      "Eyelets / Grommets",
+      "Rope finishing",
+      "Pole pockets",
+      "Custom trimming"
+    ],
+    "delivery": [
+      "Production and dispatch timing confirmed per order",
+      "Sea freight to Australian main ports is around 40 days as a reference",
+      "Photos of the finished banners and the export packing are sent for your confirmation before dispatch",
+      "Rolled packing; banners are trimmed to the finished size before rolling"
+    ],
+    "artwork": "Print-ready artwork can be supplied by the buyer. Basic file checks and minor adjustments are available at no extra cost; extensive artwork changes or original design work are quoted separately.",
+    "brief": "Please share finished width and height, quantity, artwork, finishing positions (including eyelet spacing if specified), delivery format and destination.",
+    "caveat": "Weight and construction are confirmed against the application: short-term event use and long-term outdoor exposure call for different choices, so share the installation position and display period and we will recommend accordingly. Finished dimensions, weight and pricing are confirmed per order; no list prices are published."
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "id": "YS-DOOR-STAND",
+  "hidden": false,
+  "title": "Door-Type Display Stands",
+  "image": "/pic/display-stands.jpg",
+  "desc": "Door-style display frames supplied as hardware, printed graphics, or a complete display set.",
+  "intro": "Door-style display frames supplied as hardware, printed graphics, or a complete display set.",
+  "materials": [],
+  "crafts": [],
+  "name": "Door-Type Display Stands",
+  "detail_image": "/pic/display-stands.jpg",
+  "detail_desc": "Door-style display frames supplied as hardware, printed graphics, or a complete display set.",
+  "detail_seo_title": "Door-Type Display Stands | Event Frames & Graphics | YINZAOSUO",
+  "detail_seo_description": "Door-type display frames supplied as hardware, printed graphics or complete sets. Dimensions and installation requirements depend on the selected model.",
+  "detail": {
+    "lead": "A door-type display stand uses a doorway-style frame to create a freestanding display area. It can be used for event entrances, backdrop graphics and indoor promotions. Hardware, printed graphics or a complete configuration can be supplied to suit the project.",
+    "highlights": [
+      "Freestanding doorway-style display structure",
+      "Hardware and printed graphics can be specified separately",
+      "Graphic fit is confirmed against the selected frame design",
+      "Dimensions, connections and accessories depend on the model"
+    ],
+    "applications": [
+      "Event entrances and registration areas",
+      "Exhibitions, launches and brand events",
+      "Indoor backdrops and promotional displays"
+    ],
+    "finishing": [
+      "Frame structure and accessory supply",
+      "Graphic printing and size trimming",
+      "Hardware and graphics combined to the confirmed configuration"
+    ],
+    "delivery": [
+      "Hardware and graphics may be packed separately by order",
+      "Complete configurations follow the confirmed frame and component list",
+      "Packing and freight are assessed by order volume, quantity and destination"
+    ],
+    "artwork": "Please provide artwork after the frame and graphic dimensions are confirmed. If the graphic requires panels or sections, confirm the layout and installation orientation before production. Basic file checks and minor adjustments can be assisted; extensive changes or original design are confirmed separately.",
+    "brief": "Please share the installation setting, overall dimensions or a reference image, quantity, whether you need hardware and printed graphics, artwork, installation method and destination.",
+    "caveat": "Door-type stands may use different frame constructions, connectors and graphic attachment methods. Dimensions, stability requirements, installation conditions and transport packing must be confirmed for the selected model and intended environment."
+  }
+}

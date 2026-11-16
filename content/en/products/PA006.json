@@ -1,0 +1,26 @@
+{
+  "id": "PA006",
+  "hidden": true,
+  "sort_order": 201,
+  "show_in_archive": true,
+  "category": "packaging",
+  "category_title": "Bespoke Packaging",
+  "category_desc": "Structural cardboard folding cartons and heavy-duty corrugated shipping solutions.",
+  "category_num": "02",
+  "category_label": "Bespoke Packaging",
+  "title": "Cardboard Folding Cartons",
+  "image": "assets/images/products/pa006.jpg",
+  "desc": "Optimized for retail cosmetics, consumer electronics, and cultural gifts.",
+  "intro": "Optimized for retail cosmetics, consumer electronics, and cultural gifts.",
+  "materials": [
+    "SBS Cardboard, Gold/Silver Foil Card, Kraft Card, Soft-Touch Laminated Board"
+  ],
+  "crafts": [
+    "Straight Tuck",
+    "Snap Lock Bottom",
+    "Auto-Lock Bottom",
+    "Side Glue Box",
+    "Mailer Box",
+    "Rigid Lid & Base"
+  ]
+}

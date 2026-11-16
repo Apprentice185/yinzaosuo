@@ -1,0 +1,24 @@
+{
+  "id": "PA008",
+  "hidden": true,
+  "sort_order": 301,
+  "show_in_archive": true,
+  "category": "exhibition",
+  "category_title": "Exhibition & Signage",
+  "category_desc": "Event retail displays, CNC boards, luminous architectural lettering, and signage systems.",
+  "category_num": "03",
+  "category_label": "Exhibition & Signage",
+  "title": "KT & Foamex Rigid Display Panels",
+  "image": "assets/images/products/pa008.jpg",
+  "desc": "Welcome boards, event backdrops, and freestanding retail cutouts.",
+  "intro": "Welcome boards, event backdrops, and freestanding retail cutouts.",
+  "materials": [
+    "Anti-Bubble High-Density KT Board, Closed-Cell PVC Foam Board (3mm / 5mm / 8mm / 10mm)"
+  ],
+  "crafts": [
+    "Vinyl Mounted (Matte/Gloss)",
+    "Direct UV Flatbed Print",
+    "CNC Contour Cut",
+    "Water-Weighted Adjustable Base Support"
+  ]
+}

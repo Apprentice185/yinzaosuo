@@ -1,0 +1,56 @@
+{
+  "id": "P008",
+  "hidden": true,
+  "sort_order": 1008,
+  "show_in_archive": false,
+  "category": "exhibition",
+  "category_label": "展架与海报",
+  "title": "KT 板写真海报",
+  "image": "",
+  "desc": "尺寸灵活，应用广泛",
+  "intro": "适用于活动背景、门店展示、展会布置和拍照打卡等场景。",
+  "materials": [],
+  "crafts": [],
+  "seo_title": "KT 板写真海报",
+  "seo_description": "适用于活动背景、门店展示、展会布置和拍照打卡等场景。",
+  "price": "¥80 起",
+  "name": "KT 板写真海报",
+  "options": [
+    {
+      "name": "尺寸",
+      "values": [
+        "A3",
+        "A2",
+        "A1",
+        "自定义尺寸"
+      ]
+    },
+    {
+      "name": "数量",
+      "values": [
+        "1 张",
+        "5 张",
+        "10 张"
+      ]
+    },
+    {
+      "name": "板材",
+      "values": [
+        "5mm KT 板",
+        "10mm KT 板",
+        "PVC 板"
+      ]
+    },
+    {
+      "name": "画面",
+      "values": [
+        "高清写真",
+        "哑膜写真"
+      ]
+    }
+  ],
+  "tag": "",
+  "thumb": "",
+  "sceneImage": "",
+  "slug": "p008"
+}

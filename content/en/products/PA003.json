@@ -1,0 +1,28 @@
+{
+  "id": "PA003",
+  "hidden": true,
+  "sort_order": 103,
+  "show_in_archive": true,
+  "category": "commercial",
+  "category_title": "Commercial Print",
+  "category_desc": "Brand identity assets & enterprise print collaterals with bespoke finishes.",
+  "category_num": "01",
+  "category_label": "Commercial Print",
+  "title": "Brochures & Hardcover Books",
+  "image": "assets/images/products/pa003.jpg",
+  "desc": "From saddle-stitched manuals to archival collector-grade monographs.",
+  "intro": "From saddle-stitched manuals to archival collector-grade monographs.",
+  "materials": [
+    "Covers: Specialty Paper / 300g Coated / Linen Hardcover",
+    "Inner: 157g/200g Matte Art Paper / Woodfree"
+  ],
+  "crafts": [
+    "Saddle Stitch",
+    "Perfect Binding",
+    "Section Sewn",
+    "Exposed Spine Sewn",
+    "Hardcover Case Bound",
+    "Wire-O",
+    "Thread Stitch"
+  ]
+}

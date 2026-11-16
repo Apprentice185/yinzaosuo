@@ -169,14 +169,17 @@
 
   function finishDuplicate(route) {
     var collection = route.split("/")[2];
-    var idPrefix = { products: "P", templates: "T", knowledge: "K", news: "N", solutions: "S" }[collection];
+    var idPrefix = { en_products: "P", zh_products: "P", en_knowledge: "K", zh_knowledge: "K", en_solutions: "S", zh_solutions: "S", zh_materials: "M" }[collection];
     if (!idPrefix) {
       pendingAction = null;
       return;
     }
     var id = idPrefix + Date.now().toString(36).toUpperCase();
     if (applyPatch("id", id, function () {
-      if (collection === "products") syncSaveState();
+      // Collections whose identifier is the id itself (products, materials)
+      // only need the id patched; slug-identified collections (articles)
+      // also need a fresh slug.
+      if (collection === "en_products" || collection === "zh_products" || collection === "zh_materials") syncSaveState();
       else applyPatch("slug", id);
     })) {
       pendingAction = null;
@@ -275,10 +278,6 @@
         button.type = "button";
         button.textContent = item[1];
         button.dataset.action = item[0];
-        if (item[0] === "duplicate" && route.collection === "catalogue") {
-          button.disabled = true;
-          button.title = "此产品集合不支持新增条目";
-        }
         button.addEventListener("click", function (event) {
           event.preventDefault();
           event.stopPropagation();

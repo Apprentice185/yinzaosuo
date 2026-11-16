@@ -1,0 +1,29 @@
+{
+  "id": "PA011",
+  "hidden": true,
+  "sort_order": 304,
+  "show_in_archive": true,
+  "category": "exhibition",
+  "category_title": "广告加工制作类",
+  "category_desc": "商业美陈、展示道具、标识标牌与立体发光字全案制作",
+  "category_num": "03",
+  "category_label": "广告加工制作类",
+  "title": "商业发光字工程",
+  "image": "assets/images/products/pa011.png",
+  "desc": "店铺招牌、建筑外立面与室内形象墙字模",
+  "intro": "店铺招牌、建筑外立面与室内形象墙字模",
+  "materials": [
+    "不锈钢、亚克力、高亮度LED模组、柔性霓虹管"
+  ],
+  "crafts": [
+    "无边字",
+    "不锈钢发光字",
+    "不锈钢侧发光字",
+    "不锈钢平面字",
+    "不锈钢背光字",
+    "高脚不锈钢发光字",
+    "不锈钢灯箱",
+    "亚克力通体灯箱",
+    "霓虹灯"
+  ]
+}

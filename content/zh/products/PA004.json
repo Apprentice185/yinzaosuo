@@ -1,0 +1,26 @@
+{
+  "id": "PA004",
+  "hidden": true,
+  "sort_order": 104,
+  "show_in_archive": true,
+  "category": "commercial",
+  "category_title": "商务印制类",
+  "category_desc": "品牌视觉落地与商务事务物料，提供标准及特种工艺解决方案",
+  "category_num": "01",
+  "category_label": "商务印制类",
+  "title": "宣传单页 / 折页",
+  "image": "assets/images/products/pa004.png",
+  "desc": "全克重宣传品高效批量印制",
+  "intro": "全克重宣传品高效批量印制",
+  "materials": [
+    "铜版纸: 157g / 200g / 250g / 300g",
+    "双胶纸: 80g / 100g / 120g"
+  ],
+  "crafts": [
+    "对折页",
+    "三折页",
+    "风琴折",
+    "三折页-荷包折",
+    "自定模切"
+  ]
+}

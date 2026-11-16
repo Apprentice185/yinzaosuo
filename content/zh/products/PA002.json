@@ -1,0 +1,26 @@
+{
+  "id": "PA002",
+  "hidden": true,
+  "sort_order": 102,
+  "show_in_archive": true,
+  "category": "commercial",
+  "category_title": "商务印制类",
+  "category_desc": "品牌视觉落地与商务事务物料，提供标准及特种工艺解决方案",
+  "category_num": "01",
+  "category_label": "商务印制类",
+  "title": "标签 / 不干胶",
+  "image": "assets/images/products/pa002.jpg",
+  "desc": "高粘度、防水防撕及特种工业包装贴签",
+  "intro": "高粘度、防水防撕及特种工业包装贴签",
+  "materials": [
+    "常规: 白底铜板面不干胶、丰华不干胶、书写纸不干胶、8丝光白PVC不干胶、牛皮面黄底水胶",
+    "高端: 5丝透明不干胶、厚底PP合成纸不干胶、哑银不干胶(不印白)、艾利不干胶(强粘)、蜂窝箱贴胶"
+  ],
+  "crafts": [
+    "圆角",
+    "打孔",
+    "压痕",
+    "齿刀",
+    "数控模切"
+  ]
+}

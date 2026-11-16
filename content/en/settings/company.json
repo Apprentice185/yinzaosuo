@@ -1,0 +1,127 @@
+{
+  "shipping": {
+    "eyebrow": "SHIPPING & DELIVERY",
+    "title": "Made in China, shipped to print businesses worldwide.",
+    "intro": "FOB, CIF or DDP — every order is packed for export with obsessive care, photographed before dispatch, and shipped on the terms confirmed in your quotation, whether it is heading to Sydney, Auckland, London or Los Angeles.",
+    "steps_heading": "From confirmed quotation to your dock.",
+    "steps": [
+      {
+        "title": "Confirmed in writing first",
+        "body": "Product, specifications, quantity, packing, freight and delivery terms are confirmed in your quotation and proforma invoice before production starts."
+      },
+      {
+        "title": "Production & checking",
+        "body": "Your order is produced with the partner facility matched to the job, and checked against the confirmed specification."
+      },
+      {
+        "title": "Photos before dispatch",
+        "body": "You receive photos of the finished goods and the export packing for your confirmation before anything leaves — no surprises on arrival."
+      },
+      {
+        "title": "Shipment & documents",
+        "body": "Goods are shipped on the terms in your quotation, with the commercial invoice and packing list provided for your customs clearance and records."
+      }
+    ],
+    "trade_terms_heading": "FOB, CIF or DDP — your choice.",
+    "trade_terms_intro": "We work with the trade terms that suit how you buy. Whichever you choose, the full cost is confirmed in writing in your quotation before production — no surprises added later.",
+    "trade_terms": [
+      {
+        "term": "FOB",
+        "title": "You run the freight",
+        "body": "We deliver your goods to the departure port in China and handle export clearance; your own forwarder arranges the main carriage."
+      },
+      {
+        "term": "CIF",
+        "title": "We ship to your port",
+        "body": "We arrange and pay the freight and insurance to your destination port; you handle import clearance and duties on arrival."
+      },
+      {
+        "term": "DDP",
+        "title": "One landed price, door to door",
+        "body": "We handle everything — freight, customs clearance and import duties — and deliver to your door for one confirmed landed price. Even on DDP terms, our core media typically lands around 40% below local trade prices: the saving survives the freight."
+      }
+    ],
+    "transit_heading": "No generic freight promises. Your quotation is the promise.",
+    "transit_body": "Freight depends on what you order, how much of it, and where it is going — so it is arranged and priced per order rather than read off a rate card. As a reference point, sea freight to main Australian ports typically takes around 40 days in transit; production time is confirmed separately in your quotation. Air freight can be arranged for urgent orders and is quoted separately, as it prices very differently from sea freight.",
+    "australia_note": "Ordering from Australia? See the page for Australian buyers for the media and process most relevant to you.",
+    "packing_heading": "Packed like it matters — because it does.",
+    "packing": [
+      {
+        "title": "Rolls travel as rolls",
+        "body": "Banner, mesh, vinyl, photo paper and films ship in roll form — compact and weight-efficient, the most economical way to move wide-format media by sea."
+      },
+      {
+        "title": "Boards packed flat & protected",
+        "body": "Board products are packed flat, with protection against bending and corner damage for the journey."
+      },
+      {
+        "title": "Waterproof goods, kept that way",
+        "body": "Every media line we export is waterproof and moisture-proof by nature — and packed to stay that way, with moisture protection inside the pack for the sea journey."
+      },
+      {
+        "title": "Checked before it closes",
+        "body": "The packing itself is photographed as part of your pre-dispatch confirmation, so you can see exactly how your goods were packed."
+      }
+    ]
+  },
+  "about": {
+    "eyebrow": "ABOUT YINZAOSUO",
+    "title": "An independent print production studio, run personally, from enquiry to shipment.",
+    "intro": "YINZAOSUO coordinates wide-format print production in China for print businesses overseas — one person, one point of contact, and your order followed through at every step.",
+    "studio_heading": "Small on purpose. Direct by design.",
+    "studio_paragraphs": [
+      "YINZAOSUO is the trading name of an independent print production studio run by Wang Chi in China. It is a one-person studio, not a factory and not a trading company with a sales team — and this page would rather say that plainly than dress it up.",
+      "Production itself runs through partner production facilities in China that I work with order by order. My job sits between you and those facilities: I confirm the right material and specifications for your job, check your files before anything is printed, follow production, check the finished goods and packing myself, and arrange the export shipment. When you write to YINZAOSUO, you write to the person who will actually handle your order.",
+      "For trade buyers, that structure has a practical upside: nothing is handed off between departments, specifications are confirmed in writing before production, and if something needs attention, you already know exactly who to ask.",
+      "How I work is deliberately simple, and it is the same on a small order as on a large one. Every specification that matters — material, dimensions, quantity, finishing and packing — is confirmed with you in writing before production starts, and I follow the order personally while it is being produced with the partner facility matched to the job. Nothing is dispatched on trust: before anything leaves, the finished goods and their export packing are checked and photographed, and those photos go to you for confirmation first.",
+      "Freight is coordinated the same way — arranged per order, around what you have ordered and where it is going, with the transit timing and delivery terms stated in your quotation rather than promised in general terms here. Because the studio is one person, you are never handed from a salesperson to a production desk to a shipping desk: the person who quoted your order is the person who checks it, photographs it and arranges its shipment, and the one you write to if anything needs attention."
+    ],
+    "steps_heading": "From enquiry to shipment, step by step.",
+    "steps": [
+      {
+        "title": "Enquiry",
+        "body": "Tell me the product, dimensions, quantity and destination. The more specific the brief, the more accurate the quotation."
+      },
+      {
+        "title": "File check",
+        "body": "Your artwork is checked personally before production, and anything that could affect the result is flagged back to you first."
+      },
+      {
+        "title": "Quotation & confirmation",
+        "body": "Material, specifications, packing and freight are confirmed in writing, so both sides know exactly what has been agreed."
+      },
+      {
+        "title": "Production",
+        "body": "Your order is produced with the partner facility matched to the job, and I follow its progress through production."
+      },
+      {
+        "title": "QC photos",
+        "body": "Before dispatch, you receive photos of the finished goods and the packing, so you can see what is leaving and how it is protected."
+      },
+      {
+        "title": "Export packing & shipment",
+        "body": "Goods are packed for export and the shipment is arranged as confirmed in your order, with the shipping documents prepared for your side."
+      }
+    ],
+    "audience_heading": "Built for the trade, not the end customer.",
+    "audience_intro": "YINZAOSUO supplies businesses that sell or manage print for their own clients:",
+    "audience": [
+      {
+        "title": "Print management companies",
+        "body": "That need a reliable China production contact for wide-format media and finished graphics, coordinated order by order."
+      },
+      {
+        "title": "Print brokers",
+        "body": "That place client work with producers and need specifications, pricing and progress confirmed by one accountable contact."
+      },
+      {
+        "title": "Resellers & trade buyers",
+        "body": "That stock or resell print media and want roll specifications and packing confirmed before they commit."
+      }
+    ],
+    "audience_note": "Trade buyers in Australia can also read the dedicated supply page for the Australian trade.",
+    "cta_heading": "Start with a specification, not a sales pitch.",
+    "cta_body": "Send the product, dimensions, quantity and destination for the job you are planning. You will get a quotation with the specifications, packing and freight confirmed in writing — and a straight answer if something cannot be confirmed.",
+    "contact_email": "xiaotanqingqing@outlook.com"
+  }
+}

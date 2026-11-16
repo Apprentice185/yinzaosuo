@@ -24,7 +24,10 @@ test("registers shared production styles in the CMS preview iframe", () => {
 });
 
 test("registers a custom preview for every content collection and settings file", () => {
-  for (const name of ["products", "catalogue", "solutions", "knowledge", "news", "templates", "home", "global"]) {
+  for (const name of [
+    "en_products", "en_solutions", "en_knowledge", "en_home_page", "en_site_global", "en_company_pages",
+    "zh_products", "zh_solutions", "zh_knowledge", "zh_materials", "zh_delivery_page", "zh_home_page", "zh_site_global",
+  ]) {
     assert.ok(registrations.has(name), "missing preview: " + name);
   }
 });
@@ -39,14 +42,19 @@ function props(data = {}) {
 
 test("all preview templates render with partial or empty content", () => {
   const samples = {
-    products: { title: "样品产品", image: "pic/product.jpg", materials: ["铜版纸"] },
-    catalogue: { name_zh: "PVC 横幅", detail_zh: { lead: "产品导语", highlights: ["可定制"] } },
-    solutions: { title: "活动方案", cover_image: "pic/cover.jpg", body: "正文" },
-    knowledge: { title: "印刷知识", cover: "pic/cover.jpg", body: "正文" },
-    news: { title: "品牌资讯", cover: "pic/cover.jpg", body: "正文" },
-    templates: { title: "迎宾牌模板", thumb: "pic/template.jpg" },
-    home: { hero_title_zh: "首页标题", hero_slides: [{ image: "pic/banner.jpg" }] },
-    global: { announcement_zh: "公告", contact_email: "hello@example.com" },
+    en_products: { name: "PVC Banner", title: "PVC Banner", detail_image: "pic/product.jpg", materials: ["PVC"], detail: { lead: "Lead", highlights: ["Custom sizes"] } },
+    zh_products: { name: "PVC 横幅", title: "PVC 横幅", image: "pic/product.jpg", materials: ["铜版纸"], detail: { lead: "产品导语", highlights: ["可定制"] } },
+    en_solutions: { title: "Event solution", cover: "pic/cover.jpg", body: "Body" },
+    zh_solutions: { title: "活动方案", cover: "pic/cover.jpg", body: "正文" },
+    en_knowledge: { title: "Print knowledge", cover: "pic/cover.jpg", body: "Body" },
+    zh_knowledge: { title: "印刷知识", cover: "pic/cover.jpg", body: "正文" },
+    zh_materials: { title: "开业海报素材", gallery: [{ image: "pic/material.jpg" }], description: "素材介绍" },
+    en_home_page: { hero_title_en: "Homepage title", hero_slides: [{ image: "pic/banner.jpg" }] },
+    zh_home_page: { hero_title_zh: "首页标题", hero_slides: [{ image: "pic/banner.jpg" }] },
+    en_site_global: { announcement_en: "Announcement", contact_email: "hello@example.com" },
+    zh_site_global: { announcement_zh: "公告", contact_email: "hello@example.com" },
+    en_company_pages: { shipping: { title: "Shipping", intro: "Intro" }, about: { title: "About", intro: "Intro" } },
+    zh_delivery_page: { title: "配送时效", intro: "导语", timetable: [{ label: "上午确认", condition: "11:00 前", body: "当天下午送达" }] },
   };
 
   for (const [name, component] of registrations.entries()) {

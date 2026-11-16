@@ -1,0 +1,24 @@
+{
+  "id": "PA009",
+  "hidden": true,
+  "sort_order": 302,
+  "show_in_archive": true,
+  "category": "exhibition",
+  "category_title": "Exhibition & Signage",
+  "category_desc": "Event retail displays, CNC boards, luminous architectural lettering, and signage systems.",
+  "category_num": "03",
+  "category_label": "Exhibition & Signage",
+  "title": "Roll Media & Large-Format UV",
+  "image": "assets/images/products/pa009.png",
+  "desc": "Ultra-clear window graphics, vehicle graphics, and durable vinyl banners.",
+  "intro": "Ultra-clear window graphics, vehicle graphics, and durable vinyl banners.",
+  "materials": [
+    "Indoor/Outdoor Vinyl, 550 Frontlit, Blackback Banner, Mesh, Blockout Flex",
+    "Roll UV: Frosted Film, Ultra-Clear Vinyl, Static Cling, PET Outdoor Cling"
+  ],
+  "crafts": [
+    "UV Multi-Layer White Ink",
+    "Double-Sided Print",
+    "Weatherproof & UV-Resistant"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "id": "PA005",
+  "hidden": true,
+  "sort_order": 105,
+  "show_in_archive": true,
+  "category": "commercial",
+  "category_title": "Commercial Print",
+  "category_desc": "Brand identity assets & enterprise print collaterals with bespoke finishes.",
+  "category_num": "01",
+  "category_label": "Commercial Print",
+  "title": "Corporate Merchandise & Bags",
+  "image": "assets/images/products/pa005.png",
+  "desc": "Custom tote bags, PP fans, and promotional brand touchpoints.",
+  "intro": "Custom tote bags, PP fans, and promotional brand touchpoints.",
+  "materials": [
+    "Totes: Kraft / White Cardboard Paper Bags, Non-Woven, Canvas",
+    "Fans: PP Round Fans, Riveted Plastic Fans, Handheld Fans"
+  ],
+  "crafts": [
+    "Silkscreen Printing",
+    "Full-Color UV",
+    "Reinforced Handles"
+  ]
+}

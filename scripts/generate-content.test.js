@@ -7,9 +7,9 @@ const { articleSlug, parseFrontmatter, renderStaticArticle, renderStaticText, sl
 const articleTemplate = fs.readFileSync(path.join(__dirname, '..', 'article.html'), 'utf8');
 const productTemplate = fs.readFileSync(path.join(__dirname, '..', 'product.html'), 'utf8');
 
-test('article slugs prefer an explicit path and fall back to the English title', () => {
+test('article slugs prefer an explicit path and fall back to the title', () => {
   assert.equal(slugify('  Paper & Print: A Guide  '), 'paper-print-a-guide');
-  assert.equal(articleSlug({ id: 'K1234567890', slug: 'K1234567890', title: '印刷指南', title_en: 'A Print Guide' }), 'a-print-guide');
+  assert.equal(articleSlug({ id: 'K1234567890', slug: 'K1234567890', title: 'A Print Guide' }), 'a-print-guide');
   assert.equal(articleSlug({ id: 'K1', slug: 'custom-print-guide', title: '印刷指南' }), 'custom-print-guide');
 });
 
@@ -39,17 +39,14 @@ test('static article output includes unique SEO metadata and safe structured dat
     id: 'K1',
     slug: 'safe-print-guide',
     url: '/articles/safe-print-guide/',
-    publish_to: 'both',
-    title: '印刷指南',
-    title_en: 'A practical print guide',
-    seo_title_en: 'Custom SEO title',
-    seo_description_en: 'A useful guide for print buyers.',
-    category: '工艺解析',
-    category_en: 'Print knowledge',
+    hasCounterpart: true,
+    title: 'A practical print guide',
+    seo_title: 'Custom SEO title',
+    seo_description: 'A useful guide for print buyers.',
+    category: 'Print knowledge',
     date: '2026-03-09',
     cover: '/assets/images/content/guide-cover.jpg',
-    content: '<p>中文正文</p>',
-    content_en: '<h2>Safe &amp; useful</h2><script>window.pwned=1</script><p>Print article.</p><ul><li>First item</li><li>Second item</li></ul>'
+    content: '<h2>Safe &amp; useful</h2><script>window.pwned=1</script><p>Print article.</p><ul><li>First item</li><li>Second item</li></ul>'
   }, 'knowledge', articleTemplate);
 
   assert.match(html, /<title>Custom SEO title \| YINZAOSUO<\/title>/);
@@ -70,22 +67,16 @@ test('static product output includes SEO metadata, canonical URL and readable pr
   const { renderStaticProduct } = require('./generate-content');
   const html = renderStaticProduct({
     id: 'YS-GLOSS-PHOTO-PAPER',
-    title: '光面写真相纸',
-    title_en: 'Gloss Photo Paper',
-    desc: '光面写真相纸规格。',
-    desc_en: 'Gloss photo paper for posters.',
+    title: 'Gloss Photo Paper',
+    name: 'Gloss Photo Paper',
+    desc: 'Gloss photo paper for posters.',
+    detail_seo_title: 'Gloss Photo Paper Wholesale',
+    detail_seo_description: '1520 mm wide, 200 gsm, 50 m rolls.',
+    detail_desc: 'Gloss photo paper for posters and displays.',
+    detail_image: '/pic/gloss-photo-paper.jpg',
     price: 'USD 18.60/m²',
-    publish_to: 'both'
-  }, {
-    id: 'YS-GLOSS-PHOTO-PAPER',
-    name_zh: '光面写真相纸',
-    name_en: 'Gloss Photo Paper',
-    seo_title_en: 'Gloss Photo Paper Wholesale',
-    seo_description_en: '1520 mm wide, 200 gsm, 50 m rolls.',
-    desc_en: 'Gloss photo paper for posters and displays.',
-    image: '/pic/gloss-photo-paper.jpg',
-    publish_to: 'both',
-    detail_en: {
+    hasCounterpart: true,
+    detail: {
       lead: 'For posters and retail displays.',
       highlights: ['1520 mm width', '200 gsm', '50 m per roll'],
       applications: ['Posters'],
@@ -95,7 +86,7 @@ test('static product output includes SEO metadata, canonical URL and readable pr
       brief: 'Share dimensions and quantity.',
       caveat: 'Confirm freight by destination.'
     }
-  }, productTemplate);
+  }, productTemplate, []);
 
   assert.ok(html.includes('<title>Gloss Photo Paper Wholesale | YINZAOSUO</title>'));
   assert.ok(html.includes('<meta name="description" content="1520 mm wide, 200 gsm, 50 m rolls.">'));

@@ -1,0 +1,63 @@
+{
+  "id": "YS-COLD-LAMINATION-FILM",
+  "hidden": false,
+  "sort_order": 6,
+  "show_in_archive": true,
+  "category": "wideformat",
+  "category_title": "Photo & Wide-Format Print Media",
+  "category_desc": "Photo papers, PP synthetic paper, self-adhesive vinyl and PVC print media for trade printers and sign makers.",
+  "category_num": "01",
+  "category_label": "Photo & Wide-Format Print Media",
+  "title": "Cold Lamination Film",
+  "image": "assets/images/products/ys-cold-lamination-film.jpg",
+  "desc": "Pressure-sensitive cold lamination film that protects printed graphics without heat — guarding photos, posters and prints against scratches, moisture and fading. Gloss and matte finishes as standard, with satin and other finishes available on request; roll width and pricing are confirmed per quotation.",
+  "intro": "Pressure-sensitive cold lamination film that protects printed graphics without heat — guarding photos, posters and prints against scratches, moisture and fading. Gloss and matte finishes as standard, with satin and other finishes available on request; roll width and pricing are confirmed per quotation.",
+  "materials": [
+    "PVC cold lamination film",
+    "Gloss and matte finishes (satin on request)",
+    "Pressure-sensitive adhesive"
+  ],
+  "crafts": [
+    "Cold lamination",
+    "Board mounting lamination",
+    "Cut to size",
+    "Roll slitting"
+  ],
+  "seo_title": "Cold Lamination Film Wholesale | Wide-Format Print Media | YINZAOSUO",
+  "seo_description": "Wholesale cold lamination film (gloss and matte; satin on request) for protecting photos, posters and printed graphics from scratches, moisture and fading. Roll width, finish and pricing confirmed per quotation.",
+  "name": "Cold Lamination Film",
+  "detail_image": "assets/images/products/ys-cold-lamination-film.jpg",
+  "detail_desc": "Cold lamination film in gloss and matte finishes (satin and other finishes on request) for protecting printed graphics against scratches, moisture and fading. Roll width, finish and pricing are confirmed per quotation.",
+  "detail_seo_title": "Cold Lamination Film Wholesale | Specs, Pricing & Finishes | YINZAOSUO",
+  "detail_seo_description": "Wholesale cold lamination film, gloss and matte (satin on request), for protecting photos, posters and printed graphics. Roll widths, finishes and pricing are confirmed per quotation. Enquire about bulk orders and international shipping.",
+  "detail": {
+    "applications": [
+      "Photo and poster protection",
+      "Mounted display board finishing",
+      "Self-adhesive vinyl graphic protection",
+      "Menus, signs and display overlays"
+    ],
+    "artwork": "For lamination-only supply, tell us the print material, finished size and quantity. For printed-and-laminated work, please provide print-ready artwork; file dimensions and bleed can be checked before production.",
+    "brief": "Please specify the finish (gloss or matte as standard; satin or another finish on request), roll width or finished size, quantity, packing requirements and destination country or region.",
+    "caveat": "Specific film thickness, roll width and length, minimum order quantity and pricing are not listed on this page: they are confirmed against the actual specification of each order, so please state your required specification when enquiring.",
+    "delivery": [
+      "Standard packing: rolls packed for transport",
+      "Alternative packing can be confirmed per order",
+      "Production and dispatch timing is confirmed per order specification and destination",
+      "Transit time depends on route, forwarder and customs arrangements"
+    ],
+    "finishing": [
+      "Cold lamination onto printed graphics",
+      "Lamination for board-mounted displays",
+      "Cut to finished size",
+      "Roll slitting to required width"
+    ],
+    "highlights": [
+      "Protects prints from scratches, moisture and fading",
+      "Applied cold — no heat needed",
+      "Gloss and matte finishes (satin on request)",
+      "Roll width, finish and pricing confirmed per quotation"
+    ],
+    "lead": "Cold lamination film is the protective skin for printed graphics: applied by pressure without heat, it keeps photos, posters and prints from scratching, moisture and fading. Gloss and matte finishes (satin on request); width confirmed per order."
+  }
+}

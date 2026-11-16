@@ -1,0 +1,25 @@
+{
+  "id": "PA008",
+  "hidden": true,
+  "sort_order": 301,
+  "show_in_archive": true,
+  "category": "exhibition",
+  "category_title": "广告加工制作类",
+  "category_desc": "商业美陈、展示道具、标识标牌与立体发光字全案制作",
+  "category_num": "03",
+  "category_label": "广告加工制作类",
+  "title": "KT板 / 雪弗板展板",
+  "image": "assets/images/products/pa008.jpg",
+  "desc": "商业迎宾牌、活动展板及美陈立牌",
+  "intro": "商业迎宾牌、活动展板及美陈立牌",
+  "materials": [
+    "高密抗起泡KT板、PVC微发泡雪弗板 (3mm / 5mm / 8mm / 10mm)"
+  ],
+  "crafts": [
+    "KT板裱写真(亮膜/哑膜)",
+    "雪弗板裱写真",
+    "高精度板材UV直喷",
+    "CNC异形裁切",
+    "配套注水伸缩支架"
+  ]
+}

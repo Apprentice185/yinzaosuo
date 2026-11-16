@@ -1,0 +1,64 @@
+{
+  "id": "YS-ADHESIVE-VINYL",
+  "hidden": false,
+  "sort_order": 7,
+  "show_in_archive": true,
+  "category": "wideformat",
+  "category_title": "Photo & Wide-Format Print Media",
+  "category_desc": "Photo papers, PP synthetic paper, self-adhesive vinyl and PVC print media for trade printers and sign makers.",
+  "category_num": "01",
+  "category_label": "Photo & Wide-Format Print Media",
+  "title": "Self-Adhesive Vinyl",
+  "image": "assets/images/products/ys-adhesive-vinyl.jpg",
+  "desc": "Self-adhesive vinyl in 1520 mm width and 50 m rolls, with a 120 gsm or 140 gsm release liner.",
+  "intro": "Self-adhesive vinyl in 1520 mm width and 50 m rolls, with a 120 gsm or 140 gsm release liner.",
+  "materials": [
+    "120 gsm or 140 gsm release liner",
+    "1520 mm",
+    "50 m per roll"
+  ],
+  "crafts": [
+    "Large-format printing",
+    "Trimming",
+    "Optional gloss or matte cold lamination",
+    "Roll packing with rigid paper tube"
+  ],
+  "seo_title": "Self-Adhesive Vinyl Wholesale | Wide-Format Print Media | YINZAOSUO",
+  "seo_description": "Self-adhesive vinyl in 1520 mm width and 50 m rolls, with a 120 gsm or 140 gsm release liner. For trade printers and sign makers. Enquire about bulk orders and international shipping.",
+  "name": "Self-Adhesive Vinyl",
+  "detail_image": "assets/images/products/ys-adhesive-vinyl.jpg",
+  "detail_desc": "Self-adhesive vinyl in 1520 mm rolls, supplied in 50 m lengths with a 120 gsm or 140 gsm release liner. Pricing is confirmed per quotation.",
+  "detail_seo_title": "Self-Adhesive Vinyl Wholesale | Specs, Pricing & Custom Printing | YINZAOSUO",
+  "detail_seo_description": "Wholesale self-adhesive vinyl in 1520 mm width and 50 m rolls. Choose a 120 gsm or 140 gsm release liner. Pricing confirmed per quotation. Enquire about bulk orders and international shipping.",
+  "detail": {
+    "lead": "Self-adhesive vinyl with a peel-and-stick backing for full vehicle wraps and vehicle graphics, window and glass graphics, wall graphics and display-board graphics. Two media types are available: polymeric vinyl for vehicle wraps and longer-term graphics, and monomeric vinyl for flat surfaces and short-term promotions. Media type, roll width and pricing are confirmed per enquiry.",
+    "highlights": [
+      "Two media types: polymeric and monomeric vinyl",
+      "Full vehicle wraps and vehicle-side advertising",
+      "Window and glass graphics, wall graphics and display-board graphics",
+      "Supplied as media rolls or as printed finished graphics",
+      "Media type, roll width and pricing confirmed per quotation"
+    ],
+    "applications": [
+      "Signage and promotional graphics",
+      "Retail displays",
+      "Custom graphics requiring an adhesive backing"
+    ],
+    "finishing": [
+      "Large-format inkjet printing",
+      "Custom trimming to project dimensions",
+      "Standard 100 gsm PVC cold lamination with yellow release liner; gloss or matte finish",
+      "Standard roll packing with a rigid paper tube inside",
+      "The lamination film itself is described as highly transparent, low-odour, water-resistant, corrosion-resistant, abrasion-resistant, scratch-resistant and UV-resistant. These properties describe the film, not an untested outdoor service life for the finished print."
+    ],
+    "delivery": [
+      "Production and dispatch timing confirmed per order",
+      "Sea freight to Australian main ports is around 40 days as a reference",
+      "Photos of the finished graphics and the export packing are sent for your confirmation before dispatch",
+      "Standard packing: rolls on a rigid paper tube; alternative packing can be confirmed per order"
+    ],
+    "artwork": "Please provide print-ready artwork, finished dimensions, quantity, roll or cut-sheet requirements and destination. File dimensions and bleed can be checked before production.",
+    "brief": "Please specify the media type, width, quantity or area, lamination, ink option, packing requirements and destination country or region.",
+    "caveat": "Roll width, face-film thickness, minimum order quantity and pricing are not listed on this page: they are confirmed against the actual specification of each order, so please state the media type and intended use (vehicle, glass, wall or board) when enquiring. Suitability for long-term outdoor use depends on the media type (polymeric or monomeric) and the installation environment."
+  }
+}

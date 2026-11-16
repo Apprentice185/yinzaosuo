@@ -1,0 +1,42 @@
+{
+  "id": "YS-ROLL-UP",
+  "hidden": false,
+  "title": "Roll-Up Banner Stands",
+  "image": "/pic/display-stands.jpg",
+  "desc": "Choose stand hardware, replacement printed graphics, or a complete roll-up display kit.",
+  "intro": "Choose stand hardware, replacement printed graphics, or a complete roll-up display kit.",
+  "materials": [],
+  "crafts": [],
+  "name": "Roll-Up Banner Stands",
+  "detail_image": "/pic/display-stands.jpg",
+  "detail_desc": "Choose stand hardware, replacement printed graphics, or a complete roll-up display kit.",
+  "detail_seo_title": "Roll-Up Banner Stands & Replacement Graphics | YINZAOSUO",
+  "detail_seo_description": "Trade supply of roll-up banner stand hardware, replacement printed graphics and complete display kits. Specifications depend on the selected model.",
+  "detail": {
+    "lead": "A roll-up banner is a portable display format with a graphic that retracts into its base. It is suited to indoor promotions that need quick setup and repeat use. Hardware, replacement graphics, or a complete kit can be supplied according to the project.",
+    "highlights": [
+      "Stand hardware can be supplied separately",
+      "Replacement printed graphics can be produced separately",
+      "Hardware and graphic can be combined as a complete kit",
+      "Exact construction, specifications and accessories depend on the selected model"
+    ],
+    "applications": [
+      "Trade shows and event venues",
+      "Retail stores and product presentations",
+      "Reception areas, meetings and indoor promotions"
+    ],
+    "finishing": [
+      "Stand hardware supply",
+      "Graphic printing and trimming",
+      "Hardware and graphic supplied as a coordinated set"
+    ],
+    "delivery": [
+      "Hardware and printed graphics may be packed separately by order",
+      "Complete kits are supplied in the confirmed configuration",
+      "Packing and freight are assessed for the order and destination"
+    ],
+    "artwork": "You may supply print-ready artwork. File dimensions and bleed should be checked against the selected graphic size. Basic file checks and minor adjustments can be assisted; extensive changes or original design are confirmed separately.",
+    "brief": "Please specify the intended use, quantity, whether you need hardware, a replacement graphic or a complete kit, the graphic size or a reference model, artwork and destination.",
+    "caveat": "Base construction, support poles, graphic dimensions and accessories vary by model. Confirm the selected model and graphic compatibility before ordering; universal interchangeability is not assumed."
+  }
+}

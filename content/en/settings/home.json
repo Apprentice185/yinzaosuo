@@ -1,0 +1,71 @@
+{
+  "eyebrow_en": "YOUR GLOBAL PRINT PRODUCTION PARTNER",
+  "hero_image": "assets/images/products/banner.webp",
+  "hero_image_alt": "全新机器+原厂油墨",
+  "hero_image_alt_en": "Brand new machine + original ink",
+  "hero_slides": [
+    {
+      "image": "assets/images/products/ys-outdoor-pvc-rigid-film.jpg"
+    },
+    {
+      "image": "assets/images/products/ys-one-way-vision.jpg"
+    },
+    {
+      "image": "assets/images/products/ys-pvc-foam-board.jpg"
+    },
+    {
+      "image": "assets/images/products/ys-adhesive-vinyl.jpg"
+    }
+  ],
+  "hero_title_en": "Custom Print Production, Ready for Your Business.",
+  "hero_description_en": "Printed graphics and display solutions for print resellers, agencies and trade buyers worldwide.",
+  "hero_note_en": "Custom specifications · Flexible finishing · Global order support",
+  "modules": {
+    "trust": true,
+    "products": true,
+    "process": true,
+    "knowledge": true,
+    "journal": true,
+    "about": true,
+    "faq": true
+  },
+  "module_order": [
+    "trust",
+    "products",
+    "process",
+    "knowledge",
+    "journal",
+    "about",
+    "faq"
+  ],
+  "faq_items": [
+    {
+      "question_en": "Can I confirm materials and specifications before ordering?",
+      "answer_en": "Tell us the application and the specifications you need to confirm, and we will confirm the available options before you commit. Material samples or a printed proof can be arranged for most media — ask when you request your quotation."
+    },
+    {
+      "question_en": "Can you help if I do not have print-ready artwork?",
+      "answer_en": "We can provide basic file checks and simple adjustments. Complex revisions or original design work are quoted separately."
+    },
+    {
+      "question_en": "What payment and delivery methods are available?",
+      "answer_en": "Payment is by bank transfer (T/T) against a proforma invoice, so the specification, quantity and total are agreed in writing before you pay. Production time is confirmed in your quotation; sea freight to main Australian ports typically takes around 40 days in transit. Delivery terms and any import charges for your destination are stated in the quotation before you confirm."
+    },
+    {
+      "question_en": "What if there is a print quality issue?",
+      "answer_en": "Files and specifications are confirmed before production, and photos of the finished goods and their export packing are shared with you before dispatch. If a production quality issue still affects use, tell us with photos and order details — we will prioritize reprinting or agree on another appropriate solution."
+    },
+    {
+      "question_en": "Can I combine different products in one order or shipment?",
+      "answer_en": "Yes — different media and finished graphics can usually be combined into a single order, and where it makes sense they can be packed and shipped together. Send the full list with dimensions and quantities when you enquire; the combination, packing and freight for the combined shipment are confirmed in your quotation before you commit."
+    },
+    {
+      "question_en": "How does ordering work, from enquiry to shipment?",
+      "answer_en": "In six steps: (1) send your enquiry with the product, dimensions, quantity and destination; (2) you receive a quotation and proforma invoice with the specifications, packing and freight confirmed in writing; (3) payment is made by bank transfer (T/T) against the proforma invoice; (4) production runs once files and specifications are confirmed; (5) before dispatch, you receive photos of the finished goods and their export packing for your confirmation; (6) the shipment is then arranged on the terms confirmed in your quotation."
+    },
+    {
+      "question_en": "What do you need from my artwork files?",
+      "answer_en": "Send the artwork you have — every file is checked before production, and anything that could affect the printed result is flagged back to you first. Basic file checks and simple adjustments are included; larger revisions or original design work are quoted separately before any work starts, so there are no surprises in the total."
+    }
+  ]
+}
