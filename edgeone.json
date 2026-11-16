@@ -1,0 +1,1 @@
+{"buildCommand":"npm run content:build && node zh/scripts/generate-content.js","installCommand":"npm install","nodeVersion":"20.18.0","outputDirectory":"./","redirects":[{"destination":"/zh/","source":"/","statusCode":302}]}
