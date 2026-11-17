@@ -90,4 +90,4 @@
 @media(max-width:560px){.product-archive-section .product-archive-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 /* Mobile, homepage archive only: cards keep only image, title and summary (2026-11-17, owner request; products page unchanged) */
-@media(max-width:800px){.product-archive-section .archive-materials,.product-archive-section .archive-crafts{display:none}}
+@media(max-width:800px){.product-archive-section .archive-tag-group{display:none}}
