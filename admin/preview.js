@@ -230,18 +230,180 @@
     }
   });
 
+  // --- Full-page previews for the EN Shipping / About entries ---------
+  // These mirror shipping.html / about.html section for section with the
+  // production class names (the preview iframe loads the site's own
+  // stylesheets), so the editor shows each page as it will be published.
+  // Inline <em> / <a> segments are preserved with the same rule the live
+  // company-settings.js uses: the static segment text is looked up in
+  // the edited value and wrapped back into an element.
+
+  function richEm(valueText, emText) {
+    if (!valueText) return "";
+    if (emText && valueText.indexOf(emText) !== -1) {
+      var at = valueText.indexOf(emText);
+      var parts = [];
+      if (at > 0) parts.push(valueText.slice(0, at));
+      parts.push(h("em", { key: "em" }, emText));
+      var rest = valueText.slice(at + emText.length);
+      if (rest) parts.push(rest);
+      return parts;
+    }
+    return valueText;
+  }
+
+  function richLink(valueText, linkText, href, className, arrow) {
+    if (!valueText) return "";
+    if (linkText && valueText.indexOf(linkText) !== -1) {
+      var at = valueText.indexOf(linkText);
+      var parts = [];
+      if (at > 0) parts.push(valueText.slice(0, at));
+      var linkChildren = arrow ? [linkText, h("span", { key: "arr" }, " ↗")] : linkText;
+      var linkProps = { key: "link", href: href };
+      if (className) linkProps.className = className;
+      parts.push(h("a", linkProps, linkChildren));
+      var rest = valueText.slice(at + linkText.length);
+      if (rest) parts.push(rest);
+      return parts;
+    }
+    return valueText;
+  }
+
+  function listOf(props, key) {
+    var result = value(props, key, []);
+    return Array.isArray(result) ? result : [];
+  }
+
+  function stepCards(items, marker) {
+    return h("div", { className: "steps" }, items.map(function (item, index) {
+      var mark = marker === "term" ? (item.term || "") : marker === "dot" ? "·" : ("0" + (index + 1)).slice(-2);
+      return h("div", { className: "step", key: index },
+        h("span", {}, mark),
+        h("h3", {}, item.title || ""),
+        h("p", {}, item.body || "")
+      );
+    }));
+  }
+
+  function enAnnouncement(spanText, restText) {
+    return h("div", { className: "announcement" }, h("span", {}, spanText), " · " + restText);
+  }
+
+  function enHeader(active) {
+    var links = ["Products", "Solutions", "Knowledge", "Shipping", "About"];
+    return h("header", { className: "site-header" },
+      h("div", { className: "container nav-wrap" },
+        h("a", { className: "brand", href: "#" },
+          h("span", { className: "brand-mark" }, "印"),
+          h("span", {}, "YINZAOSUO", h("small", {}, "PRINT PRODUCTION & DISPLAY SUPPLY"))
+        ),
+        h("nav", { className: "main-nav" }, links.map(function (label) {
+          var props = { key: label, href: "#" };
+          if (active === label) props.className = "active";
+          return h("a", props, label);
+        })),
+        h("div", { className: "nav-actions" },
+          h("span", { className: "language-switch" }, "CN / EN"),
+          h("span", { className: "quote-btn" }, "Get a quote ↗")
+        )
+      )
+    );
+  }
+
+  function enFooter() {
+    return h("footer", { className: "site-footer" },
+      h("div", { className: "container footer-top" },
+        h("div", { className: "footer-brand" },
+          h("a", { className: "brand brand-light", href: "#" },
+            h("span", { className: "brand-mark" }, "印"),
+            h("span", {}, "YINZAOSUO", h("small", {}, "PRINT PRODUCTION & DISPLAY SUPPLY"))
+          ),
+          h("p", {}, "Print Materials.", h("br", {}), "Global Supply.")
+        ),
+        h("nav", { className: "footer-links" },
+          h("div", {}, h("strong", {}, "Products"),
+            h("a", { href: "#" }, "All products"),
+            h("a", { href: "#" }, "PVC Foam Board"),
+            h("a", { href: "#" }, "Gloss Photo Paper"),
+            h("a", { href: "#" }, "One-Way Vision Film"),
+            h("a", { href: "#" }, "Self-Adhesive Vinyl"),
+            h("a", { href: "#" }, "Printed PVC Banners")),
+          h("div", {}, h("strong", {}, "Company"),
+            h("a", { href: "#" }, "About us"),
+            h("a", { href: "#" }, "Shipping & delivery"),
+            h("a", { href: "#" }, "Contact us")),
+          h("div", {}, h("strong", {}, "Resources"),
+            h("a", { href: "#" }, "Print knowledge"),
+            h("a", { href: "#" }, "Solutions"),
+            h("a", { href: "#" }, "FAQ"),
+            h("a", { href: "#" }, "Delivery"))),
+        h("div", { className: "footer-contact" },
+          h("div", { className: "footer-contact-content" },
+            h("div", { className: "footer-contact-details" },
+              h("div", { className: "footer-contact-item" },
+                h("span", {}, "Business email"),
+                h("a", { href: "#" }, "xiaotanqingqing@outlook.com"),
+                h("small", {}, "For quotations, artwork files and order details")),
+              h("div", { className: "footer-contact-item" },
+                h("span", {}, "Phone"),
+                h("a", { href: "#" }, "+86 134 0296 9091"),
+                h("small", {}, "International calls are welcome"))),
+            h("div", { className: "footer-wechat" },
+              h("span", { className: "footer-contact-label" }, "WhatsApp QR"),
+              h("img", { className: "qr-code footer-whatsapp-qr", src: "/pic/whatsapp-qr-placeholder.svg", alt: "WhatsApp QR" }),
+              h("small", {}, "Scan to start a WhatsApp chat."))))
+      ),
+      h("div", { className: "container footer-bottom" },
+        h("span", {}, "© 2026 印造所 YINZAOSUO. All Rights Reserved."),
+        h("span", {}, "Commercial visuals & custom print · Custom service guide"))
+    );
+  }
+
+  function sectionHeading(eyebrow, headingNode, extra) {
+    var inner = h("div", { key: "head" },
+      h("p", { className: "eyebrow" }, eyebrow),
+      h("h2", {}, headingNode));
+    var children = extra ? [inner].concat(extra) : [inner];
+    return h("div", { className: "section-heading compact" }, children);
+  }
+
   var ShippingPreview = createClass({
     render: function () {
       var p = this.props;
       return h("div", { className: "site-preview" },
-        announcement("公司信息 · Shipping"),
-        header(),
-        h("main", { className: "container global-settings-preview" },
-          h("p", { className: "eyebrow" }, value(p, "eyebrow", "SHIPPING")),
-          h("h1", {}, value(p, "title", "Shipping page title")),
-          h("p", {}, value(p, "intro", ""))
-        ),
-        footer()
+        enAnnouncement("YINZAOSUO for Australia", "Wide-format media and print supply for the Australian trade"),
+        enHeader("Shipping"),
+        h("main", {},
+          h("section", { className: "page-hero page-hero-photo", style: { backgroundImage: "url('/assets/images/products/ys-outdoor-pvc-rigid-film.webp')" } },
+            h("div", { className: "container" },
+              h("p", { className: "eyebrow" }, value(p, "eyebrow", "SHIPPING & DELIVERY")),
+              h("h1", {}, richEm(value(p, "title", ""), "shipped to print businesses worldwide.")),
+              h("p", {}, value(p, "intro", "")),
+              h("div", { className: "hero-actions" },
+                h("span", { className: "button" }, "Get a quote ↗"),
+                h("span", { className: "button button-ghost" }, "Products")))),
+          h("section", { className: "section page-content" },
+            h("div", { className: "container" },
+              sectionHeading("HOW YOUR ORDER TRAVELS", richEm(value(p, "steps_heading", ""), "to your dock.")),
+              stepCards(listOf(p, "steps"), "num"))),
+          h("section", { className: "section" },
+            h("div", { className: "container" },
+              sectionHeading("TRADE TERMS", richEm(value(p, "trade_terms_heading", ""), "your choice."), [
+                h("p", { className: "heading-description", key: "desc" }, value(p, "trade_terms_intro", ""))
+              ]),
+              stepCards(listOf(p, "trade_terms"), "term"))),
+          h("section", { className: "section section-tint" },
+            h("div", { className: "container" },
+              sectionHeading("TRANSIT TIMES & TERMS", richEm(value(p, "transit_heading", ""), "Your quotation is the promise."), [
+                h("p", { className: "heading-description", key: "desc" }, value(p, "transit_body", "")),
+                h("p", { key: "note" }, richLink(value(p, "australia_note", ""), "See the page for Australian buyers", "australia.html"))
+              ]))),
+          h("section", { className: "section" },
+            h("div", { className: "container" },
+              sectionHeading("PACKED FOR THE JOURNEY", richEm(value(p, "packing_heading", ""), "because it does.")),
+              stepCards(listOf(p, "packing"), "num"),
+              h("p", { style: { marginTop: "38px" } }, h("span", { className: "button button-dark" }, "Get a quote ↗"))))),
+        enFooter()
       );
     }
   });
@@ -249,15 +411,45 @@
   var AboutPreview = createClass({
     render: function () {
       var p = this.props;
+      var email = value(p, "contact_email", "");
       return h("div", { className: "site-preview" },
-        announcement("公司信息 · About"),
-        header(),
-        h("main", { className: "container global-settings-preview" },
-          h("p", { className: "eyebrow" }, value(p, "eyebrow", "ABOUT")),
-          h("h1", {}, value(p, "title", "About page title")),
-          h("p", {}, value(p, "intro", ""))
-        ),
-        footer()
+        enAnnouncement("About YINZAOSUO", "An independent print production studio in China"),
+        enHeader("About"),
+        h("main", {},
+          h("section", { className: "page-hero page-hero-photo", style: { backgroundImage: "url('/assets/images/products/ys-gloss-photo-paper.webp')" } },
+            h("div", { className: "container" },
+              h("p", { className: "eyebrow" }, value(p, "eyebrow", "ABOUT YINZAOSUO")),
+              h("h1", {}, richEm(value(p, "title", ""), "run personally, from enquiry to shipment.")),
+              h("p", {}, value(p, "intro", "")),
+              h("div", { className: "hero-actions" },
+                h("span", { className: "button" }, "Get a quote ↗"),
+                h("span", { className: "button button-ghost" }, "Products")))),
+          h("section", { className: "section page-content" },
+            h("div", { className: "container" },
+              sectionHeading("THE STUDIO", richEm(value(p, "studio_heading", ""), "Direct by design.")),
+              listOf(p, "studio_paragraphs").map(function (paragraph, index) {
+                return h("p", { key: index }, String(paragraph));
+              }))),
+          h("section", { className: "section section-tint" },
+            h("div", { className: "container" },
+              sectionHeading("HOW AN ORDER FLOWS", richEm(value(p, "steps_heading", ""), "step by step.")),
+              stepCards(listOf(p, "steps"), "num"))),
+          h("section", { className: "section" },
+            h("div", { className: "container" },
+              sectionHeading("WHO IT IS FOR", richEm(value(p, "audience_heading", ""), "not the end customer.")),
+              h("p", {}, value(p, "audience_intro", "")),
+              stepCards(listOf(p, "audience"), "dot"),
+              h("p", {}, richLink(value(p, "audience_note", ""), "supply page for the Australian trade", "australia.html", "text-link", true)))),
+          h("section", { className: "section section-tint" },
+            h("div", { className: "container" },
+              sectionHeading("WORK WITH ME", richEm(value(p, "cta_heading", ""), "not a sales pitch."), [
+                h("p", { className: "heading-description", key: "desc" }, value(p, "cta_body", ""))
+              ]),
+              h("p", {},
+                h("span", { className: "button button-dark" }, "Request a quote ↗"),
+                " ",
+                h("span", { className: "button button-outline" }, email ? "Email " + email : "Email"))))),
+        enFooter()
       );
     }
   });
