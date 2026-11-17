@@ -67,7 +67,7 @@
   .hero-fullbleed .eyebrow{color:#fff;margin-bottom:14px}
   .hero-fullbleed h1{color:#fff;font-size:clamp(30px,8.2vw,38px);line-height:1.14}
   .hero-fullbleed h1 em{color:#fff}
-  .hero-fullbleed .hero-text{color:var(--muted);font-size:14px;line-height:1.75;margin-top:66px;max-width:none}
+  .hero-fullbleed .hero-text{color:var(--muted);font-size:14px;line-height:1.75;margin-top:90px;max-width:none}
   .hero-fullbleed .hero-actions{display:flex;flex-wrap:nowrap;gap:12px;margin-top:22px}
   .hero-fullbleed .hero-actions .button{flex:1;border-radius:999px;min-height:50px;padding:13px 10px;font-size:13.5px;letter-spacing:.01em}
   .hero-fullbleed .hero-actions .button span{display:none}
