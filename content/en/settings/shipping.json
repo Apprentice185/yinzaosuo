@@ -1,0 +1,65 @@
+{
+  "eyebrow": "SHIPPING & DELIVERY",
+  "title": "Made in China, shipped to print businesses worldwide.",
+  "intro": "FOB, CIF or DDP — every order is packed for export with obsessive care, photographed before dispatch, and shipped on the terms confirmed in your quotation, whether it is heading to Sydney, Auckland, London or Los Angeles.",
+  "steps_heading": "From confirmed quotation to your dock.",
+  "steps": [
+    {
+      "title": "Confirmed in writing first",
+      "body": "Product, specifications, quantity, packing, freight and delivery terms are confirmed in your quotation and proforma invoice before production starts."
+    },
+    {
+      "title": "Production & checking",
+      "body": "Your order is produced with the partner facility matched to the job, and checked against the confirmed specification."
+    },
+    {
+      "title": "Photos before dispatch",
+      "body": "You receive photos of the finished goods and the export packing for your confirmation before anything leaves — no surprises on arrival."
+    },
+    {
+      "title": "Shipment & documents",
+      "body": "Goods are shipped on the terms in your quotation, with the commercial invoice and packing list provided for your customs clearance and records."
+    }
+  ],
+  "trade_terms_heading": "FOB, CIF or DDP — your choice.",
+  "trade_terms_intro": "We work with the trade terms that suit how you buy. Whichever you choose, the full cost is confirmed in writing in your quotation before production — no surprises added later.",
+  "trade_terms": [
+    {
+      "term": "FOB",
+      "title": "You run the freight",
+      "body": "We deliver your goods to the departure port in China and handle export clearance; your own forwarder arranges the main carriage."
+    },
+    {
+      "term": "CIF",
+      "title": "We ship to your port",
+      "body": "We arrange and pay the freight and insurance to your destination port; you handle import clearance and duties on arrival."
+    },
+    {
+      "term": "DDP",
+      "title": "One landed price, door to door",
+      "body": "We handle everything — freight, customs clearance and import duties — and deliver to your door for one confirmed landed price. Even on DDP terms, our core media typically lands around 40% below local trade prices: the saving survives the freight."
+    }
+  ],
+  "transit_heading": "No generic freight promises. Your quotation is the promise.",
+  "transit_body": "Freight depends on what you order, how much of it, and where it is going — so it is arranged and priced per order rather than read off a rate card. As a reference point, sea freight to main Australian ports typically takes around 40 days in transit; production time is confirmed separately in your quotation. Air freight can be arranged for urgent orders and is quoted separately, as it prices very differently from sea freight.",
+  "australia_note": "Ordering from Australia? See the page for Australian buyers for the media and process most relevant to you.",
+  "packing_heading": "Packed like it matters — because it does.",
+  "packing": [
+    {
+      "title": "Rolls travel as rolls",
+      "body": "Banner, mesh, vinyl, photo paper and films ship in roll form — compact and weight-efficient, the most economical way to move wide-format media by sea."
+    },
+    {
+      "title": "Boards packed flat & protected",
+      "body": "Board products are packed flat, with protection against bending and corner damage for the journey."
+    },
+    {
+      "title": "Waterproof goods, kept that way",
+      "body": "Every media line we export is waterproof and moisture-proof by nature — and packed to stay that way, with moisture protection inside the pack for the sea journey."
+    },
+    {
+      "title": "Checked before it closes",
+      "body": "The packing itself is photographed as part of your pre-dispatch confirmation, so you can see exactly how your goods were packed."
+    }
+  ]
+}

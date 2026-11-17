@@ -187,73 +187,70 @@ collections:
   - name: "en_company"
     label: "海外版 · 公司信息"
     files:
-      - name: "en_company_pages"
-        label: "Shipping & About pages"
-        file: "content/en/settings/company.json"
+      - name: "en_shipping_page"
+        label: "Shipping"
+        file: "content/en/settings/shipping.json"
         fields:
-          - label: "Shipping page"
-            name: "shipping"
-            widget: "object"
+          - { label: "Eyebrow", name: "eyebrow", widget: "string", required: false }
+          - { label: "Title", name: "title", widget: "string" }
+          - { label: "Intro", name: "intro", widget: "text" }
+          - { label: "Steps heading", name: "steps_heading", widget: "string", required: false }
+          - label: "Steps"
+            name: "steps"
+            widget: "list"
             fields:
-              - { label: "Eyebrow", name: "eyebrow", widget: "string", required: false }
-              - { label: "Title", name: "title", widget: "string" }
-              - { label: "Intro", name: "intro", widget: "text" }
-              - { label: "Steps heading", name: "steps_heading", widget: "string", required: false }
-              - label: "Steps"
-                name: "steps"
-                widget: "list"
-                fields:
-                  - { label: "Step title", name: "title", widget: "string" }
-                  - { label: "Step text", name: "body", widget: "text" }
-              - { label: "Trade terms heading", name: "trade_terms_heading", widget: "string", required: false }
-              - { label: "Trade terms intro", name: "trade_terms_intro", widget: "text", required: false }
-              - label: "Trade terms"
-                name: "trade_terms"
-                widget: "list"
-                fields:
-                  - { label: "Term (FOB / CIF / DDP)", name: "term", widget: "string" }
-                  - { label: "Title", name: "title", widget: "string" }
-                  - { label: "Text", name: "body", widget: "text" }
-              - { label: "Transit heading", name: "transit_heading", widget: "string", required: false }
-              - { label: "Transit text", name: "transit_body", widget: "text", required: false }
-              - { label: "Australia note", name: "australia_note", widget: "text", required: false }
-              - { label: "Packing heading", name: "packing_heading", widget: "string", required: false }
-              - label: "Packing points"
-                name: "packing"
-                widget: "list"
-                fields:
-                  - { label: "Title", name: "title", widget: "string" }
-                  - { label: "Text", name: "body", widget: "text" }
-          - label: "About page"
-            name: "about"
-            widget: "object"
+              - { label: "Step title", name: "title", widget: "string" }
+              - { label: "Step text", name: "body", widget: "text" }
+          - { label: "Trade terms heading", name: "trade_terms_heading", widget: "string", required: false }
+          - { label: "Trade terms intro", name: "trade_terms_intro", widget: "text", required: false }
+          - label: "Trade terms"
+            name: "trade_terms"
+            widget: "list"
             fields:
-              - { label: "Eyebrow", name: "eyebrow", widget: "string", required: false }
+              - { label: "Term (FOB / CIF / DDP)", name: "term", widget: "string" }
               - { label: "Title", name: "title", widget: "string" }
-              - { label: "Intro", name: "intro", widget: "text" }
-              - { label: "Studio heading", name: "studio_heading", widget: "string", required: false }
-              - { label: "Studio paragraphs", name: "studio_paragraphs", widget: "list", required: false }
-              - { label: "Steps heading", name: "steps_heading", widget: "string", required: false }
-              - label: "Steps"
-                name: "steps"
-                widget: "list"
-                fields:
-                  - { label: "Step title", name: "title", widget: "string" }
-                  - { label: "Step text", name: "body", widget: "text" }
-              - { label: "Audience heading", name: "audience_heading", widget: "string", required: false }
-              - { label: "Audience intro", name: "audience_intro", widget: "text", required: false }
-              - label: "Audience groups"
-                name: "audience"
-                widget: "list"
-                fields:
-                  - { label: "Title", name: "title", widget: "string" }
-                  - { label: "Text", name: "body", widget: "text" }
-              - { label: "Audience note", name: "audience_note", widget: "text", required: false }
-              - { label: "CTA heading", name: "cta_heading", widget: "string", required: false }
-              - { label: "CTA text", name: "cta_body", widget: "text", required: false }
-              - { label: "Contact email", name: "contact_email", widget: "string", required: false }
+              - { label: "Text", name: "body", widget: "text" }
+          - { label: "Transit heading", name: "transit_heading", widget: "string", required: false }
+          - { label: "Transit text", name: "transit_body", widget: "text", required: false }
+          - { label: "Australia note", name: "australia_note", widget: "text", required: false }
+          - { label: "Packing heading", name: "packing_heading", widget: "string", required: false }
+          - label: "Packing points"
+            name: "packing"
+            widget: "list"
+            fields:
+              - { label: "Title", name: "title", widget: "string" }
+              - { label: "Text", name: "body", widget: "text" }
+      - name: "en_about_page"
+        label: "About"
+        file: "content/en/settings/about.json"
+        fields:
+          - { label: "Eyebrow", name: "eyebrow", widget: "string", required: false }
+          - { label: "Title", name: "title", widget: "string" }
+          - { label: "Intro", name: "intro", widget: "text" }
+          - { label: "Studio heading", name: "studio_heading", widget: "string", required: false }
+          - { label: "Studio paragraphs", name: "studio_paragraphs", widget: "list", required: false }
+          - { label: "Steps heading", name: "steps_heading", widget: "string", required: false }
+          - label: "Steps"
+            name: "steps"
+            widget: "list"
+            fields:
+              - { label: "Step title", name: "title", widget: "string" }
+              - { label: "Step text", name: "body", widget: "text" }
+          - { label: "Audience heading", name: "audience_heading", widget: "string", required: false }
+          - { label: "Audience intro", name: "audience_intro", widget: "text", required: false }
+          - label: "Audience groups"
+            name: "audience"
+            widget: "list"
+            fields:
+              - { label: "Title", name: "title", widget: "string" }
+              - { label: "Text", name: "body", widget: "text" }
+          - { label: "Audience note", name: "audience_note", widget: "text", required: false }
+          - { label: "CTA heading", name: "cta_heading", widget: "string", required: false }
+          - { label: "CTA text", name: "cta_body", widget: "text", required: false }
+          - { label: "Contact email", name: "contact_email", widget: "string", required: false }
 
   # ================= 国内版（中文, yinzaosuo.com/zh） =================
+
   - name: "zh_products"
     label: "国内版 · 产品大全"
     folder: "content/zh/products"

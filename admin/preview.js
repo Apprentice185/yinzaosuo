@@ -230,20 +230,32 @@
     }
   });
 
-  var CompanyPreview = createClass({
+  var ShippingPreview = createClass({
     render: function () {
       var p = this.props;
-      var shipping = value(p, "shipping", {}) || {};
-      var about = value(p, "about", {}) || {};
       return h("div", { className: "site-preview" },
-        announcement("公司信息 · Shipping / About"),
+        announcement("公司信息 · Shipping"),
         header(),
         h("main", { className: "container global-settings-preview" },
-          h("p", { className: "eyebrow" }, shipping.eyebrow || "SHIPPING"),
-          h("h1", {}, shipping.title || "Shipping page title"),
-          h("p", {}, shipping.intro || ""),
-          h("h2", {}, about.title || "About page title"),
-          h("p", {}, about.intro || "")
+          h("p", { className: "eyebrow" }, value(p, "eyebrow", "SHIPPING")),
+          h("h1", {}, value(p, "title", "Shipping page title")),
+          h("p", {}, value(p, "intro", ""))
+        ),
+        footer()
+      );
+    }
+  });
+
+  var AboutPreview = createClass({
+    render: function () {
+      var p = this.props;
+      return h("div", { className: "site-preview" },
+        announcement("公司信息 · About"),
+        header(),
+        h("main", { className: "container global-settings-preview" },
+          h("p", { className: "eyebrow" }, value(p, "eyebrow", "ABOUT")),
+          h("h1", {}, value(p, "title", "About page title")),
+          h("p", {}, value(p, "intro", ""))
         ),
         footer()
       );
@@ -331,6 +343,7 @@
   CMS.registerPreviewTemplate("zh_home_page", HomePreview);
   CMS.registerPreviewTemplate("en_site_global", GlobalPreview);
   CMS.registerPreviewTemplate("zh_site_global", GlobalPreview);
-  CMS.registerPreviewTemplate("en_company_pages", CompanyPreview);
+  CMS.registerPreviewTemplate("en_shipping_page", ShippingPreview);
+  CMS.registerPreviewTemplate("en_about_page", AboutPreview);
   CMS.registerPreviewTemplate("zh_delivery_page", DeliveryPreview);
 })();

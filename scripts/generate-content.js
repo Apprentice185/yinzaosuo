@@ -1087,11 +1087,16 @@ function main() {
       faq_items: Array.isArray(homeSettings.faq_items) ? homeSettings.faq_items : []
     }
   };
-  // Company pages content (EN only: Shipping + About) is edited in the
-  // backend as one file collection and rendered client-side from here.
-  const companySettingsFile = path.join(contentRoot, 'settings', 'company.json');
-  if (fs.existsSync(companySettingsFile)) {
-    siteSettings.company = JSON.parse(fs.readFileSync(companySettingsFile, 'utf8'));
+  // Company pages content (EN only) is edited in the backend as two
+  // separate file entries — Shipping and About — and rendered
+  // client-side from here under the shared "company" settings key.
+  const shippingSettingsFile = path.join(contentRoot, 'settings', 'shipping.json');
+  const aboutSettingsFile = path.join(contentRoot, 'settings', 'about.json');
+  if (fs.existsSync(shippingSettingsFile) || fs.existsSync(aboutSettingsFile)) {
+    siteSettings.company = {
+      shipping: fs.existsSync(shippingSettingsFile) ? JSON.parse(fs.readFileSync(shippingSettingsFile, 'utf8')) : {},
+      about: fs.existsSync(aboutSettingsFile) ? JSON.parse(fs.readFileSync(aboutSettingsFile, 'utf8')) : {}
+    };
   }
   const requiredProductIds = ['YS-SYNTHETIC-PAPER', 'YS-GLOSS-PHOTO-PAPER', 'YS-SATIN-PHOTO-PAPER', 'YS-PVC-MESH', 'YS-PVC-BANNER', 'YS-ADHESIVE-VINYL', 'YS-KT-BOARD', 'YS-OUTDOOR-PVC-RIGID-FILM', 'YS-ROLL-UP', 'YS-X-BANNER', 'YS-DOOR-STAND'];
   const recordsById = new Map(records.map(record => [record.id, record]));

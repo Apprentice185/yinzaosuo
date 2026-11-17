@@ -25,7 +25,7 @@ test("registers shared production styles in the CMS preview iframe", () => {
 
 test("registers a custom preview for every content collection and settings file", () => {
   for (const name of [
-    "en_products", "en_solutions", "en_knowledge", "en_home_page", "en_site_global", "en_company_pages",
+    "en_products", "en_solutions", "en_knowledge", "en_home_page", "en_site_global", "en_shipping_page", "en_about_page",
     "zh_products", "zh_solutions", "zh_knowledge", "zh_materials", "zh_delivery_page", "zh_home_page", "zh_site_global",
   ]) {
     assert.ok(registrations.has(name), "missing preview: " + name);
@@ -53,7 +53,8 @@ test("all preview templates render with partial or empty content", () => {
     zh_home_page: { hero_title_zh: "首页标题", hero_slides: [{ image: "pic/banner.jpg" }] },
     en_site_global: { announcement_en: "Announcement", contact_email: "hello@example.com" },
     zh_site_global: { announcement_zh: "公告", contact_email: "hello@example.com" },
-    en_company_pages: { shipping: { title: "Shipping", intro: "Intro" }, about: { title: "About", intro: "Intro" } },
+    en_shipping_page: { eyebrow: "SHIPPING", title: "Shipping", intro: "Intro" },
+    en_about_page: { eyebrow: "ABOUT", title: "About", intro: "Intro" },
     zh_delivery_page: { title: "配送时效", intro: "导语", timetable: [{ label: "上午确认", condition: "11:00 前", body: "当天下午送达" }] },
   };
 
