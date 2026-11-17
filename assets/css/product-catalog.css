@@ -85,3 +85,6 @@
   font:12px/1.6 'Inter',Arial,sans-serif;
   text-align:center;
 }
+
+/* Homepage archive only: two cards per row on small screens (2026-11-17, owner request; the products page grid is unchanged) */
+@media(max-width:560px){.product-archive-section .product-archive-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
