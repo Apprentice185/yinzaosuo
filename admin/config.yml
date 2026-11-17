@@ -184,6 +184,49 @@ collections:
           - { label: "Footer copyright", name: "footer_copyright_en", widget: "string", required: false }
           - { label: "Footer region note", name: "footer_region_en", widget: "string", required: false }
 
+      - name: "en_showcase_core"
+        label: "Core Wide-Format Media"
+        file: "content/en/settings/showcase-core.json"
+        fields:
+          - label: "Showcase products (display order = selection order)"
+            name: "products"
+            widget: "relation"
+            collection: "en_products"
+            search_fields: ["name", "id"]
+            value_field: "id"
+            display_fields: ["name"]
+            multiple: true
+            required: false
+            hint: "首页 Core Wide-Format Media 橱窗展示的产品，最多 6 个，按选择顺序排列；留空则保持当前默认卡片。"
+      - name: "en_showcase_custom"
+        label: "Custom Print & Display Supply"
+        file: "content/en/settings/showcase-custom.json"
+        fields:
+          - label: "Showcase products (display order = selection order)"
+            name: "products"
+            widget: "relation"
+            collection: "en_products"
+            search_fields: ["name", "id"]
+            value_field: "id"
+            display_fields: ["name"]
+            multiple: true
+            required: false
+            hint: "首页 Custom Print & Display Supply 橱窗展示的产品，最多 6 个，按选择顺序排列。"
+      - name: "en_showcase_knowledge"
+        label: "Know the production details."
+        file: "content/en/settings/showcase-knowledge.json"
+        fields:
+          - label: "Showcase articles (display order = selection order)"
+            name: "articles"
+            widget: "relation"
+            collection: "en_knowledge"
+            search_fields: ["title", "slug"]
+            value_field: "slug"
+            display_fields: ["title"]
+            multiple: true
+            required: false
+            hint: "首页知识区展示的文章，最多 5 条，按选择顺序排列；左侧配图自动使用第一条的封面图。"
+
   - name: "en_company"
     label: "海外版 · 公司信息"
     files:
@@ -490,3 +533,46 @@ collections:
           - { label: "页脚配送说明", name: "footer_delivery_zh", widget: "text", required: false }
           - { label: "版权文字", name: "footer_copyright_zh", widget: "string", required: false }
           - { label: "页脚地区说明", name: "footer_region_zh", widget: "string", required: false }
+      - name: "zh_showcase_core"
+        label: "核心大幅面打印材料"
+        file: "content/zh/settings/showcase-core.json"
+        fields:
+          - label: "橱窗产品（按选择顺序展示）"
+            name: "products"
+            widget: "relation"
+            collection: "zh_products"
+            search_fields: ["title", "id"]
+            value_field: "id"
+            display_fields: ["title"]
+            multiple: true
+            required: false
+            hint: "首页「核心大幅面打印材料」橱窗展示的产品，最多 6 个，按选择顺序排列；留空则保持当前默认卡片。"
+      - name: "zh_showcase_custom"
+        label: "精工材质档案库"
+        file: "content/zh/settings/showcase-custom.json"
+        fields:
+          - label: "橱窗产品（按选择顺序展示）"
+            name: "products"
+            widget: "relation"
+            collection: "zh_products"
+            search_fields: ["title", "id"]
+            value_field: "id"
+            display_fields: ["title"]
+            multiple: true
+            required: false
+            hint: "首页「精工材质档案库」橱窗展示的产品，最多 6 个，按选择顺序排列。"
+      - name: "zh_showcase_knowledge"
+        label: "先了解，再下单。"
+        file: "content/zh/settings/showcase-knowledge.json"
+        fields:
+          - label: "橱窗文章（按选择顺序展示）"
+            name: "articles"
+            widget: "relation"
+            collection: "zh_knowledge"
+            search_fields: ["title", "slug"]
+            value_field: "slug"
+            display_fields: ["title"]
+            multiple: true
+            required: false
+            hint: "首页知识区展示的文章，最多 5 条，按选择顺序排列；左侧配图自动使用第一条的封面图。"
+

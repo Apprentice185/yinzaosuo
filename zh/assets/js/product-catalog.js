@@ -1,4 +1,10 @@
 (function () {
+  // Homepage showcase mode: home-settings.js renders the picked products
+  // into the archive grid, so the tabbed catalog stays off on that page.
+  if (window.CMS_CONTENT?.siteSettings?.showcase?.custom?.length && document.querySelector('.product-archive-section[data-showcase="custom"]')) {
+    window.renderProductCatalog = () => {};
+    return;
+  }
   const catalog = window.CMS_CONTENT?.catalog || window.PRODUCTS_DATA;
   const tabList = document.querySelector('#productCategoryTabs');
   const productGrid = document.querySelector('#productGrid');

@@ -1098,6 +1098,18 @@ function main() {
       about: fs.existsSync(aboutSettingsFile) ? JSON.parse(fs.readFileSync(aboutSettingsFile, 'utf8')) : {}
     };
   }
+  // Homepage showcases: products / articles picked in the backend for
+  // the Core, Custom and Knowledge homepage windows. Missing or empty
+  // files leave the sections on their built-in fallbacks.
+  const showcase = {};
+  const showcaseFiles = { core: 'showcase-core.json', custom: 'showcase-custom.json', knowledge: 'showcase-knowledge.json' };
+  for (const [key, file] of Object.entries(showcaseFiles)) {
+    const showcaseFile = path.join(contentRoot, 'settings', file);
+    if (!fs.existsSync(showcaseFile)) continue;
+    const data = JSON.parse(fs.readFileSync(showcaseFile, 'utf8'));
+    showcase[key] = Array.isArray(data.products) ? data.products : Array.isArray(data.articles) ? data.articles : [];
+  }
+  if (Object.keys(showcase).length) siteSettings.showcase = showcase;
   const requiredProductIds = ['YS-SYNTHETIC-PAPER', 'YS-GLOSS-PHOTO-PAPER', 'YS-SATIN-PHOTO-PAPER', 'YS-PVC-MESH', 'YS-PVC-BANNER', 'YS-ADHESIVE-VINYL', 'YS-KT-BOARD', 'YS-OUTDOOR-PVC-RIGID-FILM', 'YS-ROLL-UP', 'YS-X-BANNER', 'YS-DOOR-STAND'];
   const recordsById = new Map(records.map(record => [record.id, record]));
   const missingProductIds = requiredProductIds.filter(id => !recordsById.has(id));

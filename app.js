@@ -49,7 +49,7 @@ window.addEventListener('pageshow', reloadWhenPublished);
 
 function renderHomeContent() {
   const homeKnowledgeList = document.querySelector('#homeKnowledgeList');
-  if (homeKnowledgeList) {
+  if (homeKnowledgeList && !(window.CMS_CONTENT?.siteSettings?.showcase?.knowledge?.length)) {
     setSanitizedHtml(homeKnowledgeList, (siteData.knowledge || []).slice(0, 3).map((item, index) =>
       `<a href="${escapeContent(articleUrl('knowledge', item))}" class="knowledge-item"><span>${String(index + 1).padStart(2, '0')}</span><strong>${escapeContent(window.contentText('knowledge', item.id, 'title', item.title))}</strong><span>↗</span></a>`
     ).join(''));

@@ -13,3 +13,8 @@
 .rv-init{opacity:0;transform:translateY(20px);transition:opacity .7s ease,transform .7s ease}
 .rv-in{opacity:1;transform:none}
 @media (prefers-reduced-motion:reduce){.rv-init{opacity:1;transform:none;transition:none}}
+
+/* Homepage knowledge heading: main title and subtitle each stay on one line. */
+#knowledge .editorial-copy h2{font-size:clamp(21px,2.8vw,34px);line-height:1.25}
+#knowledge .editorial-copy h2 .title-line{display:block;white-space:nowrap}
+@media(max-width:800px){#knowledge .editorial-copy h2{font-size:clamp(19px,5.6vw,26px)}}

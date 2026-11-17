@@ -25,8 +25,8 @@ test("registers shared production styles in the CMS preview iframe", () => {
 
 test("registers a custom preview for every content collection and settings file", () => {
   for (const name of [
-    "en_products", "en_solutions", "en_knowledge", "en_home_page", "en_site_global", "en_shipping_page", "en_about_page",
-    "zh_products", "zh_solutions", "zh_knowledge", "zh_materials", "zh_delivery_page", "zh_home_page", "zh_site_global",
+    "en_products", "en_solutions", "en_knowledge", "en_home_page", "en_site_global", "en_shipping_page", "en_about_page", "en_showcase_core", "en_showcase_custom", "en_showcase_knowledge",
+    "zh_products", "zh_solutions", "zh_knowledge", "zh_materials", "zh_delivery_page", "zh_home_page", "zh_site_global", "zh_showcase_core", "zh_showcase_custom", "zh_showcase_knowledge",
   ]) {
     assert.ok(registrations.has(name), "missing preview: " + name);
   }
@@ -53,6 +53,12 @@ test("all preview templates render with partial or empty content", () => {
     zh_home_page: { hero_title_zh: "首页标题", hero_slides: [{ image: "pic/banner.jpg" }] },
     en_site_global: { announcement_en: "Announcement", contact_email: "hello@example.com" },
     zh_site_global: { announcement_zh: "公告", contact_email: "hello@example.com" },
+    en_showcase_core: { products: ["YS-GLOSS-PHOTO-PAPER", "YS-PVC-FOAM-BOARD"] },
+    en_showcase_custom: { products: ["YS-KT-BOARD"] },
+    en_showcase_knowledge: { articles: ["three-essential-print-production-concepts"] },
+    zh_showcase_core: { products: [] },
+    zh_showcase_custom: { products: ["YS-GLOSS-PHOTO-PAPER", "YS-PVC-FOAM-BOARD"] },
+    zh_showcase_knowledge: { articles: ["three-essential-print-production-concepts"] },
     en_shipping_page: { eyebrow: "SHIPPING", title: "Shipping", intro: "Intro", steps: [{ title: "Step", body: "Body" }], trade_terms: [{ term: "FOB", title: "Term", body: "Body" }], packing: [{ title: "Pack", body: "Body" }], australia_note: "Note" },
     en_about_page: { eyebrow: "ABOUT", title: "About", intro: "Intro", studio_paragraphs: ["Para"], steps: [{ title: "Step", body: "Body" }], audience: [{ title: "Who", body: "Body" }], contact_email: "hello@example.com" },
     zh_delivery_page: { title: "配送时效", intro: "导语", timetable: [{ label: "上午确认", condition: "11:00 前", body: "当天下午送达" }] },

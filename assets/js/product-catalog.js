@@ -1,4 +1,10 @@
 (function () {
+  // Homepage showcase mode: home-settings.js renders the picked products
+  // into the archive grid, so the tabbed catalog stays off on that page.
+  if (window.CMS_CONTENT?.siteSettings?.showcase?.custom?.length && document.querySelector('.product-archive-section[data-showcase="custom"]')) {
+    window.renderProductCatalog = () => {};
+    return;
+  }
   const managedCatalog = window.CMS_CONTENT?.catalog;
   const staticCatalog = window.PRODUCTS_DATA;
   const catalog = managedCatalog && staticCatalog
