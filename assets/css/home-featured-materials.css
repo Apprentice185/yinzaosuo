@@ -71,3 +71,6 @@
 }
 .home-material-visual-label{display:none !important}
 
+
+/* Mobile: featured cards keep only image, title and subtitle (2026-11-17, owner request; desktop unchanged) */
+@media(max-width:800px){.home-material-kicker,.home-material-copy strong,.home-material-link{display:none}}
