@@ -24,7 +24,7 @@ window.I18N = {
     trust_service_title: '订单协调', trust_service_text: '规格确认 · 生产跟进',
     trust_delivery_title: '贸易物流保障', trust_delivery_text: '海运到澳大利亚主要港口约 40 天 · 发货前发成品与出口包装照片确认',
 
-    home_materials_eyebrow: '核心材料系列', home_materials_title: '五大核心大幅面打印材料', home_materials_intro: '面向印刷贸易商、广告制作商与展示供应商的卷材产品，规格清晰，支持批量询价。',
+    home_materials_eyebrow: '核心材料系列', home_materials_title: '核心大幅面打印材料', home_materials_intro: '面向印刷贸易商、广告制作商与展示供应商的卷材产品，规格清晰，支持批量询价。',
     home_gloss_title: '光面写真相纸', home_gloss_desc: '表面光泽明亮，适用于海报、促销画面与室内展示。', home_gloss_specs: '1520mm · 200gsm · 50米/卷 · USD 18.60/m²',
     home_satin_title: '绸面写真相纸', home_satin_desc: '表面效果柔和，适用于海报、零售画面与展示项目。', home_satin_specs: '1520mm · 200gsm · 50米/卷 · USD 18.60/m²',
     home_synthetic_title: '户外PP合成纸', home_synthetic_desc: '聚丙烯基打印材料，适用于海报与促销画面。', home_synthetic_specs: '1520mm · 180gsm · 50米/卷 · USD 12.60/m²',
@@ -129,7 +129,7 @@ window.I18N = {
     trust_service_title: 'Order coordination', trust_service_text: 'Specification review · production follow-up',
     trust_delivery_title: 'Delivery assurance', trust_delivery_text: 'Sea freight to main Australian ports in around 40 days · Export packing photographed for your confirmation before dispatch',
 
-    home_materials_eyebrow: 'CORE MATERIAL RANGE', home_materials_title: 'Five Core Wide-Format Media', home_materials_intro: 'Roll media for trade printers, sign makers and display suppliers, with clear specifications for trade enquiries.',
+    home_materials_eyebrow: 'CORE MATERIAL RANGE', home_materials_title: 'Core Wide-Format Media', home_materials_intro: 'Roll media for trade printers, sign makers and display suppliers, with clear specifications for trade enquiries.',
     home_gloss_title: 'Gloss Photo Paper', home_gloss_desc: 'A bright, glossy surface for posters, promotions and indoor displays.', home_gloss_specs: '1520mm · 200gsm · 50m/roll · USD 18.60/m²',
     home_satin_title: 'Satin Photo Paper', home_satin_desc: 'A softer surface appearance for posters, retail graphics and displays.', home_satin_specs: '1520mm · 200gsm · 50m/roll · USD 18.60/m²',
     home_synthetic_title: 'Outdoor PP Synthetic Paper', home_synthetic_desc: 'Polypropylene-based print media for posters and promotional graphics.', home_synthetic_specs: '1520mm · 180gsm · 50m/roll · USD 12.60/m²',

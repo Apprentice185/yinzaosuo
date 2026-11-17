@@ -24,7 +24,7 @@ window.I18N = {
     trust_service_title: '专人服务', trust_service_text: '文件检查 · 打样 · 售后',
     trust_delivery_title: '物流配送保障', trust_delivery_text: '同城次日达 · 送货上门',
 
-    home_materials_eyebrow: '核心材料系列', home_materials_title: '五大核心大幅面打印材料', home_materials_intro: '面向印刷贸易商、广告制作商与展示供应商的卷材产品，规格清晰，支持批量询价。',
+    home_materials_eyebrow: '核心材料系列', home_materials_title: '核心大幅面打印材料', home_materials_intro: '面向印刷贸易商、广告制作商与展示供应商的卷材产品，规格清晰，支持批量询价。',
     home_gloss_title: '光面写真相纸', home_gloss_desc: '表面光泽明亮，适用于海报、促销画面与室内展示。', home_gloss_specs: '1520mm · 200gsm · 50米/卷 · USD 18.60/m²',
     home_satin_title: '绸面写真相纸', home_satin_desc: '表面效果柔和，适用于海报、零售画面与展示项目。', home_satin_specs: '1520mm · 200gsm · 50米/卷 · USD 18.60/m²',
     home_synthetic_title: '户外PP合成纸', home_synthetic_desc: '聚丙烯基打印材料，适用于海报与促销画面。', home_synthetic_specs: '1520mm · 180gsm · 50米/卷 · USD 12.60/m²',
