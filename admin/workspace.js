@@ -1,14 +1,19 @@
 (function () {
   "use strict";
 
-  // Admin workspace helpers. This file intentionally does NOT touch the
-  // entry editor's own toolbar: saving, publishing and deleting run
-  // through Decap's native controls. (The pre-redesign build injected a
-  // custom action bar with a translation button and a proxy Save button
-  // that scraped the DOM for the native one; when Decap's markup moved
-  // on, the proxy Save silently stopped working, so the whole layer was
-  // removed on 2026-11-17.) What remains: row actions on collection
-  // lists (删除 / 复制 / 排序) and the sidebar regrouping below.
+  // Admin workspace helpers:
+  //   - collection-list row actions (删除 / 复制 / 排序)
+  //   - the sidebar regrouping into 海外版 / 国内版 cards (below)
+  //   - the entry editor's single 保存 button (owner requirement,
+  //     2026-11-17): the editor shows ONLY this button — grey and
+  //     disabled while there are no unsaved changes, teal and clickable
+  //     once there are, back to grey after Decap confirms the save.
+  //     Decap's native publish dropdown and 删除内容 button stay in
+  //     the DOM (this button and the row actions drive them in code)
+  //     but are visually hidden. Two guards keep this from silently
+  //     breaking the way the pre-redesign proxy Save did: the Decap
+  //     build is pinned to an exact version in admin/index.html, and
+  //     a failed save surfaces an alert instead of failing quietly.
 
   var root = document.getElementById("nc-root");
   var pendingAction = null;
@@ -211,6 +216,183 @@
     });
   }
 
+  // --- Entry editor: a single 保存 button -------------------------------
+  // Dirty state is read from Decap itself: the publish toggle reads
+  // 发布 while the entry has unsaved changes (or is new) and 已发布
+  // once everything is saved; the toolbar status line shows
+  // 含未保存的修改 while dirty. Saving runs Decap's own 立即发布 menu
+  // action in code, so what lands in the repo is exactly what the
+  // native control would have committed.
+  var saveButton = null;
+  var saveInFlight = false;
+  var saveFlightTimer = null;
+
+  function inEntryEditor() {
+    return window.location.hash.indexOf("/collections/") !== -1 &&
+      window.location.hash.indexOf("/entries/") !== -1;
+  }
+
+  function findPublishToggle() {
+    var nodes = root.querySelectorAll("button,[role='button']");
+    for (var i = 0; i < nodes.length; i++) {
+      var label = text(nodes[i]);
+      if (label === "发布" || label === "已发布" || label === "Publish" || label === "Published") return nodes[i];
+    }
+    return null;
+  }
+
+  function findDeleteButton(scope) {
+    var nodes = scope.querySelectorAll("button,[role='button']");
+    for (var i = 0; i < nodes.length; i++) {
+      var label = text(nodes[i]);
+      if (label === "删除内容" || label === "Delete entry") return nodes[i];
+    }
+    return null;
+  }
+
+  function scopeHasUnsaved(scope) {
+    var nodes = scope.querySelectorAll("span,div,p,small");
+    for (var i = 0; i < nodes.length; i++) {
+      if (nodes[i].childElementCount === 0 && text(nodes[i]) === "含未保存的修改") return true;
+    }
+    return false;
+  }
+
+  function hasUnsavedChanges(toggle) {
+    var scope = toggle;
+    for (var up = 0; up < 6 && scope.parentElement; up++) {
+      scope = scope.parentElement;
+      if (scopeHasUnsaved(scope)) return true;
+      if (scope === root) break;
+    }
+    return false;
+  }
+
+  function setSaveState(state) {
+    if (!saveButton) return;
+    // Write only on change: mount() runs from a MutationObserver, so an
+    // unconditional textContent assignment would mutate the DOM on every
+    // pass and retrigger itself forever.
+    var label = state === "saving" ? "保存中…" : "保存";
+    var disabled = state !== "dirty";
+    if (saveButton.dataset.state !== state) saveButton.dataset.state = state;
+    if (saveButton.disabled !== disabled) saveButton.disabled = disabled;
+    if (saveButton.textContent !== label) saveButton.textContent = label;
+  }
+
+  function syncSaveButton() {
+    if (!saveButton) return;
+    var toggle = findPublishToggle();
+    if (saveInFlight) {
+      if (toggle && text(toggle) === "已发布" && !hasUnsavedChanges(toggle)) {
+        saveInFlight = false;
+        if (saveFlightTimer) { window.clearTimeout(saveFlightTimer); saveFlightTimer = null; }
+      } else {
+        setSaveState("saving");
+        return;
+      }
+    }
+    if (!toggle) { setSaveState("clean"); return; }
+    var label = text(toggle);
+    var dirty = label === "发布" || label === "Publish" || hasUnsavedChanges(toggle);
+    setSaveState(dirty ? "dirty" : "clean");
+  }
+
+  function findPublishNowItem() {
+    var nodes = root.querySelectorAll("button,[role='menuitem'],a");
+    for (var i = 0; i < nodes.length; i++) {
+      var label = text(nodes[i]);
+      if (label === "立即发布" || label === "Publish now") return nodes[i];
+    }
+    return null;
+  }
+
+  function saveFailed(message) {
+    saveInFlight = false;
+    if (saveFlightTimer) { window.clearTimeout(saveFlightTimer); saveFlightTimer = null; }
+    syncSaveButton();
+    window.alert(message);
+  }
+
+  function beginSaveFlight() {
+    saveInFlight = true;
+    setSaveState("saving");
+    if (saveFlightTimer) window.clearTimeout(saveFlightTimer);
+    saveFlightTimer = window.setTimeout(function () {
+      saveFlightTimer = null;
+      saveInFlight = false;
+      var toggle = findPublishToggle();
+      if (toggle && (text(toggle) === "发布" || hasUnsavedChanges(toggle))) {
+        saveFailed("保存似乎没有成功，请再点一次「保存」。");
+      } else {
+        syncSaveButton();
+      }
+    }, 25000);
+  }
+
+  function pollForPublishItem(attempt) {
+    var item = findPublishNowItem();
+    if (item) { item.click(); return; }
+    if (attempt >= 30) {
+      saveFailed("保存未完成：没有找到发布菜单，请刷新页面后重试。");
+      return;
+    }
+    window.setTimeout(function () { pollForPublishItem(attempt + 1); }, 100);
+  }
+
+  function onSaveClick() {
+    if (saveInFlight || !saveButton || saveButton.disabled) return;
+    var item = findPublishNowItem();
+    if (item) { beginSaveFlight(); item.click(); return; }
+    var toggle = findPublishToggle();
+    if (!toggle) {
+      window.alert("保存未完成：没有找到发布按钮，请刷新页面后重试。");
+      return;
+    }
+    beginSaveFlight();
+    toggle.click();
+    pollForPublishItem(0);
+  }
+
+  function enhanceEditor() {
+    if (!inEntryEditor()) { saveButton = null; return; }
+    var toggle = findPublishToggle();
+    if (!toggle) { saveButton = null; return; }
+    if (!toggle.classList.contains("yz-native-hidden")) toggle.classList.add("yz-native-hidden");
+    var scope = toggle;
+    for (var up = 0; up < 5 && scope.parentElement; up++) {
+      scope = scope.parentElement;
+      var remove = findDeleteButton(scope);
+      if (remove) {
+        if (!remove.classList.contains("yz-native-hidden")) remove.classList.add("yz-native-hidden");
+        break;
+      }
+      if (scope === root) break;
+    }
+    var existing = root.querySelector(".yz-save-button");
+    if (existing && existing.__yzWired) {
+      saveButton = existing;
+    } else {
+      // A same-class element without our wiring (e.g. a cloned node) is
+      // useless — clicking it would do nothing. Replace it.
+      if (existing) existing.remove();
+      saveButton = document.createElement("button");
+      saveButton.type = "button";
+      saveButton.className = "yz-save-button";
+      saveButton.textContent = "保存";
+      saveButton.disabled = true;
+      saveButton.dataset.state = "clean";
+      saveButton.__yzWired = true;
+      saveButton.addEventListener("click", onSaveClick);
+      var anchor = toggle;
+      var wrap = toggle.parentElement;
+      if (wrap && wrap !== root && wrap.children.length <= 2) anchor = wrap;
+      if (anchor.parentElement) anchor.parentElement.insertBefore(saveButton, anchor);
+      else toggle.parentElement.insertBefore(saveButton, toggle);
+    }
+    syncSaveButton();
+  }
+
   // --- Collections sidebar: regroup Decap's flat list into two visual
   // --- cards (海外版 / 国内版). No Decap-managed node is moved or removed:
   // --- we only retitle the native heading, strip the label prefixes,
@@ -320,6 +502,7 @@
     addRowActions();
     layoutSidebar();
     shortenNewEntryLink();
+    enhanceEditor();
     if (pendingAction) schedulePendingAction();
   }
 

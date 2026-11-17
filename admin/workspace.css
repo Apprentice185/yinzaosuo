@@ -18,9 +18,43 @@
   max-width: 920px;
 }
 
-/* Collection-list row actions (删除 / 复制 / 排序), injected by
-   workspace.js. The entry editor itself uses Decap's native toolbar —
-   no custom editor action bar is styled here anymore. */
+/* Entry editor: a single 保存 button (injected by workspace.js).
+   Decap's native publish dropdown and 删除内容 button remain in the
+   DOM — the save button and the list row actions drive them in code —
+   but are never shown. */
+#nc-root .yz-native-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+#nc-root .yz-save-button {
+  min-height: 36px;
+  padding: 0 22px;
+  border: none;
+  border-radius: 6px;
+  background: #00a8b5;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#nc-root .yz-save-button:disabled {
+  background: #d6d6d6;
+  cursor: not-allowed;
+}
+
+#nc-root .yz-save-button[data-state="saving"]:disabled {
+  background: #8fcdd2;
+}
+
+#nc-root .yz-save-button[data-state="dirty"]:hover {
+  background: #0093a0;
+}
 #nc-root .yinzaosuo-entry-actions {
   display: flex;
   align-items: center;
