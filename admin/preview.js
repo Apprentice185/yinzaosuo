@@ -51,50 +51,8 @@
     return assetUrl(props, value(props, key, ""));
   }
 
-  function header() {
-    return h("header", { className: "site-header" },
-      h("div", { className: "container nav-wrap" },
-        h("a", { className: "brand", href: "#" },
-          h("span", { className: "brand-mark" }, "印"),
-          h("span", {}, "YINZAOSUO", h("small", {}, "PRINT PRODUCTION & DISPLAY SUPPLY"))
-        ),
-        h("nav", { className: "main-nav" },
-          h("a", { href: "#" }, "产品中心"),
-          h("a", { href: "#" }, "场景方案"),
-          h("a", { href: "#" }, "印刷知识"),
-          h("a", { href: "#" }, "品牌资讯"),
-          h("a", { href: "#" }, "模板素材")
-        ),
-        h("div", { className: "nav-actions" },
-          h("span", { className: "language-switch" }, "CN / EN"),
-          h("span", { className: "quote-btn" }, "获取报价 ↗")
-        )
-      )
-    );
-  }
-
   function announcement(text) {
     return h("div", { className: "announcement" }, text || "印造所 · 印刷生产与展示物料");
-  }
-
-  function footer() {
-    return h("footer", { className: "site-footer" },
-      h("div", { className: "container footer-top" },
-        h("div", { className: "footer-brand" },
-          h("a", { className: "brand brand-light", href: "#" },
-            h("span", { className: "brand-mark" }, "印"),
-            h("span", {}, "YINZAOSUO", h("small", {}, "PRINT PRODUCTION & DISPLAY SUPPLY"))
-          ),
-          h("p", {}, "专业印刷生产与展示物料供应")
-        ),
-        h("div", { className: "footer-links" },
-          h("div", {}, h("strong", {}, "产品中心"), h("a", { href: "#" }, "全部产品")),
-          h("div", {}, h("strong", {}, "内容中心"), h("a", { href: "#" }, "印刷知识")),
-          h("div", {}, h("strong", {}, "联系我们"), h("a", { href: "#" }, "获取报价"))
-        )
-      ),
-      h("div", { className: "container footer-bottom" }, "© 2026 YINZAOSUO")
-    );
   }
 
   function bulletList(items) {
@@ -104,24 +62,30 @@
     }));
   }
 
-  function articlePreview() {
+  function makeArticlePreview(lang) {
+    var copy = lang === "en"
+      ? { announcement: ["YINZAOSUO Editorial", "Thoughtful writing and thoughtful print"], back: "← Back to content", asideTitle: "YINZAOSUO Editorial", asideBody: "We regularly publish guidance on paper, print finishes, branded materials, and real-world projects.", asideCtaTitle: "Need print produced?", asideCtaBody: "Share the article title or template details with us to make your enquiry easier." }
+      : { announcement: ["印造所内容中心 · 认真写每一篇文章，也认真做好每一件印品"], back: "← 返回内容列表", asideTitle: "印造所内容中心", asideBody: "关于纸张、工艺、品牌物料和实际案例，我们持续更新。", asideCtaTitle: "需要制作印品？", asideCtaBody: "欢迎提交项目需求，获取定制报价。" };
     return createClass({
       render: function () {
         var p = this.props;
-        var title = first(p, ["title"], "文章标题");
-        var category = first(p, ["category"], "内容分类");
+        var title = first(p, ["title"], lang === "en" ? "Article title" : "文章标题");
+        var category = first(p, ["category"], lang === "en" ? "Category" : "内容分类");
         var summary = first(p, ["summary"], "");
         var cover = imageUrl(p, "cover");
-        var body = p.widgetFor("body") || h("p", {}, "正文内容将在这里显示");
+        var body = p.widgetFor("body") || h("p", {}, lang === "en" ? "Article body will appear here." : "正文内容将在这里显示");
+        var announcementNode = copy.announcement.length > 1
+          ? h("div", { className: "announcement" }, h("span", {}, copy.announcement[0]), " · " + copy.announcement[1])
+          : h("div", { className: "announcement" }, copy.announcement[0]);
         return h("div", { className: "site-preview" },
-          announcement("印造所内容中心 · 内容详情"),
-          header(),
+          announcementNode,
+          previewHeader(lang, HOME_COPY[lang]),
           h("main", { className: "article-detail" },
             h("div", { className: "container article-detail-head" },
-              h("a", { className: "back-link", href: "#" }, "← 返回内容列表"),
+              h("a", { className: "back-link", href: "#" }, copy.back),
               h("p", { className: "eyebrow" }, category),
               h("h1", {}, title),
-              h("p", { className: "article-date" }, value(p, "date", "发布日期")),
+              h("p", { className: "article-date" }, value(p, "date", lang === "en" ? "Publish date" : "发布日期")),
               summary ? h("p", { className: "preview-summary" }, summary) : null,
               cover ? h("img", { className: "article-cover", src: cover, alt: title }) : null
             ),
@@ -129,83 +93,214 @@
               h("div", { className: "article-detail-body" }, body),
               h("aside", {},
                 h("div", { className: "aside-box" },
-                  h("strong", {}, "印造所内容中心"),
-                  h("p", {}, "关于纸张、工艺、品牌物料和实际案例，我们持续更新。")
+                  h("strong", {}, copy.asideTitle),
+                  h("p", {}, copy.asideBody)
                 ),
                 h("div", { className: "aside-box" },
-                  h("strong", {}, "需要制作印品？"),
-                  h("p", {}, "欢迎提交项目需求，获取定制报价。")
+                  h("strong", {}, copy.asideCtaTitle),
+                  h("p", {}, copy.asideCtaBody)
                 )
               )
             )
           ),
-          footer()
+          previewFooter(lang, HOME_COPY[lang])
         );
       }
     });
   }
 
-  // Merged product record (redesign phase 1): one preview covers both the
-  // list layer (title/image/desc) and the detail layer (name/detail_*).
-  var ProductPreview = createClass({
-    render: function () {
-      var p = this.props;
-      var title = first(p, ["name", "title"], "产品名称");
-      var intro = first(p, ["detail_desc", "desc", "intro"], "");
-      var image = imageUrl(p, "detail_image") || imageUrl(p, "image");
-      var detail = value(p, "detail", {}) || {};
-      var materials = value(p, "materials", []);
-      var crafts = value(p, "crafts", []);
-      return h("div", { className: "site-preview" },
-        announcement("产品中心 · 产品详情"),
-        header(),
-        h("main", {},
-          h("section", { className: "product-detail-page" },
-            h("div", { className: "container product-detail-layout" },
-              h("div", {
-                className: "product-detail-image",
-                style: image ? { backgroundImage: "url('" + image + "')" } : {}
-              }, !image ? h("strong", {}, "产品主图") : null),
-              h("div", { className: "product-detail-copy" },
-                h("p", { className: "eyebrow" }, first(p, ["category_label", "category_title", "category"], "PRODUCT")),
-                h("h1", {}, title),
-                h("p", { className: "product-detail-intro" }, intro || "产品介绍将在这里显示。"),
-                h("div", { className: "preview-tags" },
-                  (Array.isArray(materials) ? materials : []).concat(Array.isArray(crafts) ? crafts : []).map(function (tag, index) {
-                    return h("span", { key: index }, String(tag));
+  // Product detail page (mirrors product.html as filled in by
+  // scripts/generate-content.js renderStaticProduct): left gallery with
+  // thumbnails when there is more than one image, right copy with the
+  // quote price line, the four detail panels, the artwork/brief notes
+  // and — for the seven related-media ids — the related media section.
+  // The gallery now reads detail_gallery (first image doubles as the
+  // list image); detail_image / image are only a legacy fallback.
+  // Header/footer come from the shared lang-aware previewHeader /
+  // previewFooter, not the old pre-split Chinese nav.
+  var PRODUCT_COPY = {
+    en: {
+      announcement: ["Custom print production", "Tell us about your project requirements"],
+      quote: "Ask about this configuration ↗",
+      tip: "Sizes, materials, and finishes can be combined. Final pricing is confirmed for each project.",
+      price: "Request a quote",
+      categoryDefault: "Print Media",
+      categoryWide: "Photo & Wide-Format Print Media",
+      infoEyebrow: "PRODUCT DETAILS",
+      infoTitle: "Product specifications & ordering",
+      panels: ["PRODUCTION OPTIONS", "TYPICAL APPLICATIONS", "FINISHING & PROCESSING", "DELIVERY FORMATS"],
+      artworkTitle: "Artwork support",
+      briefTitle: "What to include in your enquiry",
+      infoCta: "Discuss your project ↗",
+      relatedEyebrow: "RELATED MEDIA",
+      relatedTitle: "Related media",
+      imagePlaceholder: "Product image"
+    },
+    zh: {
+      announcement: ["产品中心 · 选择规格，提交你的印刷计划"],
+      quote: "带着选项去咨询 ↗",
+      tip: "规格、材料、尺寸可以自由组合，最终价格以项目确认报价为准。",
+      price: "欢迎询价",
+      categoryDefault: "印刷材料",
+      categoryWide: "写真与大幅面印刷材料",
+      infoEyebrow: "PRODUCT DETAILS",
+      infoTitle: "产品详情与采购信息",
+      panels: ["生产规格与选项", "适用场景", "加工与覆膜", "包装与交付"],
+      artworkTitle: "设计文件支持",
+      briefTitle: "询价时请提供",
+      infoCta: "",
+      relatedEyebrow: "相关材料",
+      relatedTitle: "相关产品材料",
+      imagePlaceholder: "产品主图"
+    }
+  };
+
+  var RELATED_MEDIA_IDS = [
+    "YS-GLOSS-PHOTO-PAPER",
+    "YS-SATIN-PHOTO-PAPER",
+    "YS-SYNTHETIC-PAPER",
+    "YS-ADHESIVE-VINYL",
+    "YS-OUTDOOR-PVC-RIGID-FILM",
+    "YS-PVC-BANNER",
+    "YS-PVC-MESH"
+  ];
+
+  var RELATED_MEDIA_FALLBACK = {
+    "YS-GLOSS-PHOTO-PAPER": { name_en: "Gloss Photo Paper", name_zh: "光面写真相纸" },
+    "YS-SATIN-PHOTO-PAPER": { name_en: "Satin Photo Paper", name_zh: "绸面写真相纸" },
+    "YS-SYNTHETIC-PAPER": { name_en: "Outdoor PP Synthetic Paper", name_zh: "户外PP合成纸" },
+    "YS-ADHESIVE-VINYL": { name_en: "Self-Adhesive Vinyl", name_zh: "自粘背胶" },
+    "YS-OUTDOOR-PVC-RIGID-FILM": { name_en: "Outdoor PVC Printing Film", name_zh: "户外PVC喷绘膜" },
+    "YS-PVC-BANNER": { name_en: "Printed PVC Banners", name_zh: "PVC 横幅喷绘" },
+    "YS-PVC-MESH": { name_en: "Printed PVC Mesh Banners", name_zh: "PVC 网格布喷绘" }
+  };
+
+  function makeProductPreview(lang) {
+    var copy = PRODUCT_COPY[lang];
+    return createClass({
+      getInitialState: function () { return { remote: null }; },
+      componentDidMount: function () {
+        var self = this;
+        if (typeof fetch !== "function") return;
+        fetch(lang === "zh" ? "/zh/assets/js/content-index.js" : "/assets/js/content-index.js")
+          .then(function (r) { return r.text(); })
+          .then(function (text) {
+            var w = {};
+            new Function("window", text)(w);
+            if (w.CMS_CONTENT) self.setState({ remote: w.CMS_CONTENT });
+          })
+          .catch(function () { /* entry-only preview still renders */ });
+      },
+      render: function () {
+        var p = this.props;
+        var remote = (this.state && this.state.remote) || {};
+        var title = first(p, ["name", "title"], lang === "en" ? "Product name" : "产品名称");
+        var intro = first(p, ["detail_desc", "desc", "intro"], "");
+        var galleryEntries = value(p, "detail_gallery", []);
+        var gallery = (Array.isArray(galleryEntries) ? galleryEntries : []).map(function (entry) {
+          var path = typeof entry === "string" ? entry : (entry && entry.image) || "";
+          return path ? assetUrl(p, path) : "";
+        }).filter(Boolean);
+        if (!gallery.length) {
+          var legacy = imageUrl(p, "detail_image") || imageUrl(p, "image");
+          if (legacy) gallery = [legacy];
+        }
+        var image = gallery[0] || "";
+        var category = first(p, ["category_label"], "");
+        if (!category) {
+          var cat = value(p, "category", "");
+          category = cat === "wideformat" ? copy.categoryWide : (cat || copy.categoryDefault);
+        }
+        var rawPrice = value(p, "price", "");
+        var price = rawPrice && (lang === "zh" || /^USD\s/i.test(rawPrice)) ? rawPrice : copy.price;
+        var detail = value(p, "detail", {}) || {};
+        var materials = value(p, "materials", []);
+        var crafts = value(p, "crafts", []);
+        var id = String(value(p, "id", "") || "");
+        var products = Array.isArray(remote.products) ? remote.products : [];
+        var byId = {};
+        products.forEach(function (item) { byId[item.id] = item; });
+        var related = null;
+        if (RELATED_MEDIA_IDS.indexOf(id) !== -1) {
+          var cards = RELATED_MEDIA_IDS.filter(function (otherId) { return otherId !== id; }).map(function (otherId) {
+            var found = byId[otherId];
+            var fallback = RELATED_MEDIA_FALLBACK[otherId] || {};
+            var name = (found && (found.name || found.title)) || fallback["name_" + lang] || otherId;
+            var desc = (found && (found.detail_desc || found.desc)) || "";
+            var img = found ? (found.image ? absSitePath(lang, found.image) : "") : "";
+            return h("a", { className: "archive-card", key: otherId, href: "#" },
+              h("div", { className: "archive-visual" },
+                img ? h("img", { src: img, alt: name, loading: "lazy", decoding: "async" }) : null),
+              h("div", { className: "archive-card-content" },
+                h("h3", {}, name),
+                h("p", { className: "archive-card-summary" }, desc)));
+          });
+          related = h("section", { className: "section product-related-media" },
+            h("div", { className: "container" },
+              h("p", { className: "eyebrow" }, copy.relatedEyebrow),
+              h("h2", {}, copy.relatedTitle),
+              h("div", { className: "product-archive-grid" }, cards)));
+        }
+        var announcementNode = copy.announcement.length > 1
+          ? h("div", { className: "announcement" }, h("span", {}, copy.announcement[0]), " · " + copy.announcement[1])
+          : h("div", { className: "announcement" }, copy.announcement[0]);
+        return h("div", { className: "site-preview" },
+          announcementNode,
+          previewHeader(lang, HOME_COPY[lang]),
+          h("main", {},
+            h("section", { className: "product-detail-page" },
+              h("div", { className: "container product-detail-layout" },
+                h("div", { className: "product-detail-image" },
+                  image ? h("img", { src: image, alt: title, decoding: "async" }) : h("strong", {}, copy.imagePlaceholder),
+                  gallery.length > 1 ? h("div", { className: "product-thumbs" }, gallery.map(function (src, index) {
+                    return h("button", { type: "button", className: "product-thumb" + (index === 0 ? " is-active" : ""), key: index },
+                      h("img", { src: src, alt: "" }));
+                  })) : null),
+                h("div", { className: "product-detail-copy" },
+                  h("p", { className: "eyebrow" }, category),
+                  h("h1", {}, title),
+                  h("p", { className: "product-detail-intro" }, intro || (lang === "en" ? "Product introduction will appear here." : "产品介绍将在这里显示。")),
+                  h("strong", { className: "product-detail-price" }, price),
+                  h("div", { className: "preview-tags" },
+                    (Array.isArray(materials) ? materials : []).concat(Array.isArray(crafts) ? crafts : []).map(function (tag, index) {
+                      return h("span", { key: index }, String(tag));
+                    })
+                  ),
+                  h("button", { className: "button button-dark", type: "button" }, copy.quote),
+                  h("p", { className: "detail-tip" }, copy.tip)
+                )
+              )
+            ),
+            h("section", { className: "product-information" },
+              h("div", { className: "container" },
+                h("div", { className: "product-information-heading" },
+                  h("p", { className: "eyebrow" }, copy.infoEyebrow),
+                  h("h2", {}, copy.infoTitle),
+                  h("p", {}, detail.lead || (lang === "en" ? "Product details introduction" : "产品详情导语"))
+                ),
+                h("div", { className: "product-information-grid" },
+                  [[copy.panels[0], detail.highlights], [copy.panels[1], detail.applications], [copy.panels[2], detail.finishing], [copy.panels[3], detail.delivery]].map(function (section, index) {
+                    return h("article", { className: "product-info-panel", key: index },
+                      h("p", { className: "product-info-label" }, section[0]),
+                      bulletList(section[1])
+                    );
                   })
                 ),
-                h("span", { className: "button button-dark" }, "获取报价 ↗")
+                h("div", { className: "product-information-notes" },
+                  h("article", {}, h("h3", {}, copy.artworkTitle), h("p", {}, detail.artwork || "")),
+                  h("article", {}, h("h3", {}, copy.briefTitle), h("p", {}, detail.brief || ""))
+                ),
+                h("p", { className: "product-information-caveat" }, detail.caveat || ""),
+                copy.infoCta ? h("span", { className: "button button-dark product-information-cta" }, copy.infoCta) : null
               )
-            )
+            ),
+            related
           ),
-          h("section", { className: "product-information" },
-            h("div", { className: "container" },
-              h("div", { className: "product-information-heading" },
-                h("p", { className: "eyebrow" }, "PRODUCT DETAILS"),
-                h("h2", {}, title),
-                h("p", {}, detail.lead || "产品详情导语")
-              ),
-              h("div", { className: "product-information-grid" },
-                [["生产与定制能力", detail.highlights], ["适用场景", detail.applications], ["加工与后道处理", detail.finishing], ["交付形式", detail.delivery]].map(function (section, index) {
-                  return h("article", { className: "product-info-panel", key: index },
-                    h("p", { className: "product-info-label" }, section[0]),
-                    bulletList(section[1])
-                  );
-                })
-              ),
-              h("div", { className: "product-information-notes" },
-                h("article", {}, h("h3", {}, "设计文件支持"), h("p", {}, detail.artwork || "")),
-                h("article", {}, h("h3", {}, "询价时建议提供的信息"), h("p", {}, detail.brief || ""))
-              ),
-              h("p", { className: "product-information-caveat" }, detail.caveat || "")
-            )
-          )
-        ),
-        footer()
-      );
-    }
-  });
+          previewFooter(lang, HOME_COPY[lang])
+        );
+      }
+    });
+  }
 
   // Domestic materials centre (phase 2 front-end): switchable gallery on
   // the left, title + introduction + enquiry button on the right.
@@ -218,7 +313,7 @@
       var image = firstImage ? assetUrl(p, firstImage) : "";
       return h("div", { className: "site-preview" },
         announcement("素材中心 · 画面素材展示"),
-        header(),
+        previewHeader("zh", HOME_COPY.zh),
         h("main", { className: "template-detail container" },
           h("p", { className: "eyebrow" }, "素材中心"),
           h("div", { className: "detail-gallery" },
@@ -228,7 +323,7 @@
           h("p", {}, value(p, "description", "素材介绍将在这里显示")),
           h("span", { className: "button button-dark" }, "用这款素材制作画面 ↗")
         ),
-        footer()
+        previewFooter("zh", HOME_COPY.zh)
       );
     }
   });
@@ -463,7 +558,7 @@
       var timetable = value(p, "timetable", []);
       return h("div", { className: "site-preview" },
         announcement("配送时效 · 西安专车整板配送"),
-        header(),
+        previewHeader("zh", HOME_COPY.zh),
         h("main", { className: "container global-settings-preview" },
           h("h1", {}, value(p, "title", "配送时效")),
           h("p", {}, value(p, "intro", "")),
@@ -473,7 +568,7 @@
           }),
           h("p", {}, value(p, "coverage", ""))
         ),
-        footer()
+        previewFooter("zh", HOME_COPY.zh)
       );
     }
   });
@@ -835,12 +930,12 @@
     });
   }
 
-  CMS.registerPreviewTemplate("en_products", ProductPreview);
-  CMS.registerPreviewTemplate("zh_products", ProductPreview);
-  CMS.registerPreviewTemplate("en_solutions", articlePreview());
-  CMS.registerPreviewTemplate("zh_solutions", articlePreview());
-  CMS.registerPreviewTemplate("en_knowledge", articlePreview());
-  CMS.registerPreviewTemplate("zh_knowledge", articlePreview());
+  CMS.registerPreviewTemplate("en_products", makeProductPreview("en"));
+  CMS.registerPreviewTemplate("zh_products", makeProductPreview("zh"));
+  CMS.registerPreviewTemplate("en_solutions", makeArticlePreview("en"));
+  CMS.registerPreviewTemplate("zh_solutions", makeArticlePreview("zh"));
+  CMS.registerPreviewTemplate("en_knowledge", makeArticlePreview("en"));
+  CMS.registerPreviewTemplate("zh_knowledge", makeArticlePreview("zh"));
   CMS.registerPreviewTemplate("zh_materials", MaterialPreview);
   CMS.registerPreviewTemplate("en_home_page", makeHomepagePreview("en", "home"));
   CMS.registerPreviewTemplate("zh_home_page", makeHomepagePreview("zh", "home"));

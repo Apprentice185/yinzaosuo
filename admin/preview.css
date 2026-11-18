@@ -7,6 +7,12 @@ body { margin: 0; padding: 0; }
 .site-preview .preview-tags span { padding: 6px 10px; border: 1px solid #d9ded9; color: #59645d; font-size: 12px; }
 .site-preview .preview-empty { color: #888; font-size: 13px; }
 .site-preview .product-detail-image { background-color: #dbe5dd; background-position: center; background-size: cover; }
+.site-preview .product-detail-image img { width: 100%; height: 100%; object-fit: cover; display: block; position: relative; z-index: 1; }
+/* Thumbnails mirror the live product page (generator-injected styles). */
+.site-preview .product-thumbs { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.site-preview .product-thumbs .product-thumb { width: 72px; height: 72px; padding: 0; border: 2px solid #e2e2e2; border-radius: 8px; overflow: hidden; background: #fff; cursor: pointer; }
+.site-preview .product-thumbs .product-thumb.is-active { border-color: #17221e; }
+.site-preview .product-thumbs .product-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .site-preview .template-detail { padding-top: 64px; padding-bottom: 80px; }
 .site-preview .template-detail h1, .site-preview .global-settings-preview h1 { font-size: clamp(32px, 4vw, 52px); margin: 0 0 30px; }
 .site-preview .global-settings-preview { padding-top: 72px; padding-bottom: 90px; }
