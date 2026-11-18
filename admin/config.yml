@@ -417,8 +417,9 @@ collections:
         min: 3
         max: 5
         summary: "{{fields.image}}"
+        hint: "图片直接上传到网站仓库，免费、没有流量费。建议先压缩再传：长边不超过 1600px，JPG 或 WebP 格式，单张尽量控制在 500KB 以内。"
         fields:
-          - { label: "图片", name: "image", widget: "image", choose_url: true }
+          - { label: "图片", name: "image", widget: "image", choose_url: false }
       - { label: "文字介绍", name: "description", widget: "text", required: false }
       - { label: "展示顺序（数字越小越靠前）", name: "sort_order", widget: "number", default: 10, value_type: "int", required: false }
 
