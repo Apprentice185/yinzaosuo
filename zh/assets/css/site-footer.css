@@ -262,3 +262,16 @@
 
 /* Mobile: hide the footer link columns to shorten the footer (2026-11-17, owner request; desktop keeps them) */
 @media (max-width:800px){.site-footer .footer-links{display:none}}
+
+/* Mobile footer compaction: drop slogan and secondary notes, tighten spacing to about half a screen (2026-11-25, owner request) */
+@media (max-width:800px){
+.site-footer{padding-top:32px}
+.site-footer .footer-brand p{display:none}
+.site-footer .footer-top{gap:18px;padding-bottom:20px}
+.site-footer .footer-contact-details{gap:9px}
+.site-footer .footer-contact-item>small{display:none}
+.site-footer .footer-wechat>small{display:none}
+.site-footer .footer-wechat .qr-code{width:96px;height:96px}
+.site-footer .footer-bottom{min-height:0;padding:12px 0 10px}
+.site-footer .footer-bottom span+span{display:none}
+}

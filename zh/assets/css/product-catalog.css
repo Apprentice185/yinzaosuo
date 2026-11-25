@@ -91,3 +91,6 @@
 
 /* Mobile, homepage archive only: cards keep only image, title and summary (2026-11-17, owner request; products page unchanged) */
 @media(max-width:800px){.product-archive-section .archive-tag-group{display:none}}
+
+/* Mobile: card summaries clamp to 2 lines so grid rows stay even (2026-11-25, owner request) */
+@media (max-width:800px){.archive-card-summary{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:0;margin-bottom:10px}}
