@@ -49,6 +49,13 @@ const categoryDefaults = {
     desc: '面向活动、零售与空间展示的广告物料和制作服务',
     desc_en: 'Display graphics and production for events, retail, and branded spaces.'
   },
+  signage: {
+    num: '04',
+    zh: '标识与视觉传播',
+    en: 'Signage & Visual Communication',
+    desc: '面向设施、工业园区与贸易买家的定制停车标识、安全标识与导视系统。',
+    desc_en: 'Custom parking, safety and wayfinding signage systems for facilities, industrial parks and trade buyers.'
+  },
 };
 
 function filesIn(folder, extension) {
@@ -1004,6 +1011,18 @@ function renderStaticProduct(record, template, records) {
     html = html.replace(/<p id="productArtwork"><\/p>/, `<p id="productArtwork">${escapeHtml(detail.artwork || '')}</p>`);
     html = html.replace(/<p id="productBrief"><\/p>/, `<p id="productBrief">${escapeHtml(detail.brief || '')}</p>`);
     html = html.replace(/<p class="product-information-caveat" id="productCaveat"><\/p>/, `<p class="product-information-caveat" id="productCaveat">${escapeHtml(detail.caveat || '')}</p>`);
+    if (Array.isArray(detail.faq) && detail.faq.length) {
+      const faqItems = detail.faq.filter(entry => entry && entry.q && entry.a);
+      if (faqItems.length) {
+        const faqHtml = faqItems.map(entry => `<div class="product-faq-item"><h3>${escapeHtml(entry.q)}</h3><p>${escapeHtml(entry.a)}</p></div>`).join('');
+        const guideHtml = detail.guide && detail.guide.path
+          ? `<p class="product-guide-link">${escapeHtml(isEnglish ? 'Read the guide: ' : '延伸阅读：')}<a href="${escapeHtml(detail.guide.path)}">${escapeHtml(detail.guide.title || detail.guide.path)}</a></p>`
+          : '';
+        html = html.replace('</main>', `<section class="product-faq">${guideHtml}<h2>${escapeHtml(isEnglish ? 'Frequently Asked Questions' : '常见问题')}</h2>${faqHtml}</section></main>`);
+        const faqLd = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqItems.map(entry => ({ '@type': 'Question', name: entry.q, acceptedAnswer: { '@type': 'Answer', text: entry.a } })) };
+        html = html.replace('</head>', `<script type="application/ld+json">${JSON.stringify(faqLd).replace(/<\//g, '<\\/')}</script><style>.product-faq{max-width:900px;margin:0 auto;padding:8px 20px 40px}.product-faq h2{font-size:24px;margin:24px 0 8px}.product-faq-item{border-top:1px solid #e2e2e2;padding:14px 0}.product-faq-item h3{font-size:16px;margin:0 0 6px}.product-faq-item p{margin:0;line-height:1.65;color:#444}.product-guide-link{margin:0 0 8px;font-size:15px}</style></head>`);
+      }
+    }
   } else {
     html = html.replace(/<section class="product-information" id="productInformation"[^>]*>/, '<section class="product-information" id="productInformation" hidden>');
   }
