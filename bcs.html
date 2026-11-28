@@ -1,0 +1,2822 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>批量图文排版 · 300 PPI 批量引擎</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- JSZip & jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- OpenType.js (用于将任意中文/英文字体直接解析为真矢量贝塞尔轮廓路径写入 PDF) -->
+  <script src="https://cdn.jsdelivr.net/npm/opentype.js@1.3.4/dist/opentype.min.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Fonts: Inter & Noto Sans SC & Noto Serif SC -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Noto+Sans+SC:wght@400;500;700;900&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'Noto Sans SC', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+          },
+          colors: {
+            apple: {
+              bg: '#F5F5F7',
+              card: '#FFFFFF',
+              border: '#E5E5EA',
+              text: '#1D1D1F',
+              subtext: '#86868B',
+              blue: '#0071E3',
+              blueHover: '#0077ED',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #F5F5F7;
+      color: #1D1D1F;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #D1D1D6;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #AEAEB2;
+    }
+
+    /* 瑞士网格背景 */
+    .canvas-workspace-bg {
+      background-color: #EAEAEF;
+      background-image: 
+        linear-gradient(to right, rgba(0,0,0,0.035) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0,0,0,0.035) 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+
+    input[type="color"] {
+      -webkit-appearance: none;
+      border: none;
+      padding: 0;
+    }
+    input[type="color"]::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+    input[type="color"]::-webkit-color-swatch {
+      border: 1px solid rgba(0,0,0,0.15);
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden select-none">
+
+  <!-- 顶部导航栏 -->
+  <header class="h-14 bg-white/90 backdrop-blur-md border-b border-apple-border px-3 lg:px-5 flex items-center justify-between shrink-0 z-30 gap-2">
+    <!-- 左侧：中文工作台名称 -->
+    <div class="flex items-center gap-2.5 shrink-0">
+      <div class="w-8 h-8 rounded-lg bg-[#1D1D1F] text-white flex items-center justify-center shadow-sm">
+        <i data-lucide="layers" class="w-4 h-4"></i>
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-sm font-bold tracking-tight text-apple-text">批量图文排版</h1>
+          <span class="text-[11px] font-medium px-2 py-0.5 rounded-full bg-apple-bg text-apple-subtext border border-apple-border hidden sm:inline-block">300 PPI 批量引擎</span>
+        </div>
+        <p class="text-[11px] text-apple-subtext hidden md:block">左上角原点 (0,0) · 画布实时拖拽缩放 · 离线高清输出</p>
+      </div>
+    </div>
+
+    <!-- 最右侧：模板导入导出 + 三个图像/PDF导出按钮 -->
+    <div class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto py-1">
+      <!-- 模板操作区 -->
+      <label class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-gray-100/80 hover:bg-gray-200/70 text-apple-text border border-apple-border transition active:scale-[0.98] cursor-pointer shrink-0" title="从 JSON 文件恢复全部排版设定">
+        <i data-lucide="folder-up" class="w-3.5 h-3.5 text-indigo-600"></i>
+        <span>导入模板</span>
+        <input type="file" id="importTemplateInput" accept=".json,application/json" class="hidden" onchange="importTemplate(this)" />
+      </label>
+
+      <button type="button" onclick="exportTemplate()" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-gray-100/80 hover:bg-gray-200/70 text-apple-text border border-apple-border transition active:scale-[0.98] cursor-pointer shrink-0" title="将当前所有设定与变量数据保存为 JSON 模板">
+        <i data-lucide="save" class="w-3.5 h-3.5 text-indigo-600"></i>
+        <span>导出模板</span>
+      </button>
+
+      <div class="h-4 w-px bg-apple-border mx-0.5 shrink-0"></div>
+
+      <!-- 批量输出区 -->
+      <button type="button" onclick="exportBatch('jpg')" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-white hover:bg-gray-50 text-apple-text border border-apple-border shadow-2xs transition active:scale-[0.98] cursor-pointer shrink-0">
+        <i data-lucide="file-image" class="w-3.5 h-3.5 text-amber-600"></i>
+        <span>导出 JPG</span>
+      </button>
+      <button type="button" onclick="exportBatch('png')" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-white hover:bg-gray-50 text-apple-text border border-apple-border shadow-2xs transition active:scale-[0.98] cursor-pointer shrink-0">
+        <i data-lucide="image" class="w-3.5 h-3.5 text-emerald-600"></i>
+        <span>导出 PNG</span>
+      </button>
+      <button type="button" onclick="exportBatch('pdf')" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-apple-blue hover:bg-apple-blueHover text-white shadow-xs transition active:scale-[0.98] cursor-pointer shrink-0">
+        <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+        <span>导出 PDF</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 主界面双栏结构 -->
+  <main class="flex-1 flex flex-col lg:flex-row overflow-hidden">
+    
+    <!-- 左侧编辑面板 -->
+    <aside class="w-full lg:w-[450px] xl:w-[490px] bg-apple-bg border-b lg:border-b-0 lg:border-r border-apple-border flex flex-col h-[52vh] lg:h-full shrink-0">
+      <div class="flex-1 overflow-y-auto p-3.5 space-y-3.5 select-text" id="editorScrollArea">
+        
+        <!-- 卡片 1：基础画布设置 -->
+        <section class="bg-apple-card rounded-2xl border border-apple-border p-4 shadow-2xs space-y-3.5">
+          <div class="flex items-center justify-between border-b border-gray-100 pb-2">
+            <div class="flex items-center gap-2">
+              <i data-lucide="sliders-horizontal" class="w-4 h-4 text-apple-blue"></i>
+              <h2 class="text-xs font-semibold uppercase tracking-wider text-apple-text">基础画布设置</h2>
+            </div>
+            <span id="pixelResolutionBadge" class="text-[11px] font-mono bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md">1772 × 1181 px</span>
+          </div>
+
+          <!-- 项目名称 -->
+          <div>
+            <label class="block text-xs font-medium text-apple-subtext mb-1">项目名称（导出文件名、ZIP 及模板命名）</label>
+            <input type="text" id="projectNameInput" value="未命名项目" placeholder="请输入项目名称..."
+              oninput="updateProjectName(this.value)"
+              class="w-full px-3 py-1.5 text-sm bg-gray-50/70 border border-apple-border rounded-lg focus:outline-none focus:ring-2 focus:ring-apple-blue/20 focus:border-apple-blue transition" />
+          </div>
+
+          <!-- 计量单位与画布尺寸 -->
+          <div class="grid grid-cols-12 gap-2.5 items-end">
+            <div class="col-span-4">
+              <label class="block text-xs font-medium text-apple-subtext mb-1">全局单位</label>
+              <div class="grid grid-cols-2 bg-gray-100 p-0.5 rounded-lg border border-apple-border">
+                <button type="button" id="unitBtnMm" onclick="switchUnit('mm')" class="py-1 text-xs font-semibold rounded-md bg-white text-apple-text shadow-2xs transition cursor-pointer">mm</button>
+                <button type="button" id="unitBtnPt" onclick="switchUnit('pt')" class="py-1 text-xs font-medium rounded-md text-apple-subtext hover:text-apple-text transition cursor-pointer">pt</button>
+              </div>
+            </div>
+
+            <div class="col-span-4">
+              <label class="block text-xs font-medium text-apple-subtext mb-1">宽度 (<span class="unit-label">mm</span>)</label>
+              <input type="number" step="any" id="canvasWidthInput" value="150"
+                onchange="updateCanvasSize('width', this.value)"
+                class="w-full px-2.5 py-1.5 text-sm font-mono bg-gray-50/70 border border-apple-border rounded-lg focus:outline-none focus:ring-2 focus:ring-apple-blue/20 focus:border-apple-blue" />
+            </div>
+
+            <div class="col-span-4">
+              <label class="block text-xs font-medium text-apple-subtext mb-1">高度 (<span class="unit-label">mm</span>)</label>
+              <input type="number" step="any" id="canvasHeightInput" value="100"
+                onchange="updateCanvasSize('height', this.value)"
+                class="w-full px-2.5 py-1.5 text-sm font-mono bg-gray-50/70 border border-apple-border rounded-lg focus:outline-none focus:ring-2 focus:ring-apple-blue/20 focus:border-apple-blue" />
+            </div>
+          </div>
+
+          <!-- 画布背景色（单行可折叠色板） -->
+          <div class="pt-2 border-t border-gray-100" id="canvasBgPaletteContainer"></div>
+
+          <!-- 参考背景图（辅助对齐） -->
+          <div class="pt-2 border-t border-gray-100 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5">
+                <i data-lucide="image-down" class="w-3.5 h-3.5 text-apple-subtext"></i>
+                <span class="text-xs font-medium text-apple-text">参考背景图（辅助对齐）</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <label class="px-2.5 py-1 bg-gray-100 hover:bg-gray-200/80 text-apple-text border border-apple-border rounded-lg text-[11px] font-medium cursor-pointer transition">
+                  <span id="refBgUploadBtnText">上传参考图</span>
+                  <input type="file" accept="image/*" class="hidden" onchange="handleRefBgUpload(this)" />
+                </label>
+                <button type="button" id="clearRefBgBtn" onclick="clearRefBgImage()" class="hidden px-2 py-1 text-[11px] text-red-600 hover:bg-red-50 rounded-lg border border-red-200 transition cursor-pointer">清除</button>
+              </div>
+            </div>
+
+            <!-- 参考图参数控制面板（仅当已上传参考图时展开） -->
+            <div id="refBgControlsPanel" class="hidden p-2.5 bg-gray-50/90 rounded-xl border border-apple-border space-y-2.5">
+              <div class="flex items-center gap-2.5">
+                <img id="refBgThumb" src="" class="w-10 h-10 object-cover rounded-lg border border-gray-200 bg-white shrink-0" />
+                <div class="flex-1 min-w-0">
+                  <p id="refBgFileName" class="text-xs font-medium text-apple-text truncate">reference.png</p>
+                  <div class="flex items-center gap-2 mt-1">
+                    <span class="text-[11px] text-apple-subtext shrink-0">透明度</span>
+                    <input type="range" id="refBgOpacityRange" min="0" max="100" value="40"
+                      oninput="updateRefBgOpacity(this.value)"
+                      class="flex-1 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-apple-blue" />
+                    <span id="refBgOpacityLabel" class="text-[11px] font-mono font-medium text-apple-text w-9 text-right">40%</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between pt-1 border-t border-gray-200/70">
+                <label class="inline-flex items-center gap-1.5 text-[11px] font-medium text-apple-text cursor-pointer">
+                  <input type="checkbox" id="refBgHideOnExportCheck" checked onchange="updateRefBgHideOnExport(this.checked)"
+                    class="rounded border-gray-300 text-apple-blue focus:ring-apple-blue" />
+                  <span>导出时隐藏参考背景图</span>
+                </label>
+                <select id="refBgFitModeSelect" onchange="updateRefBgFitMode(this.value)"
+                  class="text-[11px] bg-white border border-apple-border rounded-md px-1.5 py-0.5 text-apple-text focus:outline-none">
+                  <option value="stretch">铺满画布</option>
+                  <option value="contain">等比居中</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 卡片 2：内容元素（图层列表与添加按钮栏） -->
+        <section class="space-y-3">
+          <div class="bg-apple-card rounded-2xl border border-apple-border p-3 shadow-2xs space-y-2.5">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5">
+                <i data-lucide="layers-2" class="w-4 h-4 text-apple-text"></i>
+                <h2 class="text-xs font-semibold uppercase tracking-wider text-apple-text">添加内容元素</h2>
+              </div>
+              <span id="layerCountBadge" class="text-[11px] font-mono text-apple-subtext">0 个图层</span>
+            </div>
+
+            <!-- 5 种元素快捷添加按钮组 -->
+            <div class="grid grid-cols-5 gap-1.5">
+              <button type="button" onclick="addTextLayer()" class="flex flex-col items-center justify-center gap-1 py-2 px-1 rounded-xl text-[11px] font-medium bg-gray-50 hover:bg-blue-50/70 hover:text-apple-blue hover:border-blue-200 text-apple-text border border-apple-border transition active:scale-95 cursor-pointer">
+                <i data-lucide="type" class="w-4 h-4 text-apple-blue"></i>
+                <span>+ 文字</span>
+              </button>
+              <button type="button" onclick="addImageLayer()" class="flex flex-col items-center justify-center gap-1 py-2 px-1 rounded-xl text-[11px] font-medium bg-gray-50 hover:bg-emerald-50/70 hover:text-emerald-700 hover:border-emerald-200 text-apple-text border border-apple-border transition active:scale-95 cursor-pointer">
+                <i data-lucide="image-plus" class="w-4 h-4 text-emerald-600"></i>
+                <span>+ 图片</span>
+              </button>
+              <button type="button" onclick="addShapeLayer('rect')" class="flex flex-col items-center justify-center gap-1 py-2 px-1 rounded-xl text-[11px] font-medium bg-gray-50 hover:bg-amber-50/70 hover:text-amber-700 hover:border-amber-200 text-apple-text border border-apple-border transition active:scale-95 cursor-pointer">
+                <i data-lucide="square" class="w-4 h-4 text-amber-600"></i>
+                <span>+ 矩形</span>
+              </button>
+              <button type="button" onclick="addShapeLayer('ellipse')" class="flex flex-col items-center justify-center gap-1 py-2 px-1 rounded-xl text-[11px] font-medium bg-gray-50 hover:bg-purple-50/70 hover:text-purple-700 hover:border-purple-200 text-apple-text border border-apple-border transition active:scale-95 cursor-pointer">
+                <i data-lucide="circle" class="w-4 h-4 text-purple-600"></i>
+                <span>+ 椭圆形</span>
+              </button>
+              <button type="button" onclick="addShapeLayer('line')" class="flex flex-col items-center justify-center gap-1 py-2 px-1 rounded-xl text-[11px] font-medium bg-gray-50 hover:bg-rose-50/70 hover:text-rose-700 hover:border-rose-200 text-apple-text border border-apple-border transition active:scale-95 cursor-pointer">
+                <i data-lucide="minus" class="w-4 h-4 text-rose-600"></i>
+                <span>+ 直线</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 图层列表容器 -->
+          <div id="layersContainer" class="space-y-3 pb-8"></div>
+        </section>
+
+      </div>
+    </aside>
+
+    <!-- 右侧实时预览界面 -->
+    <section class="flex-1 flex flex-col h-[48vh] lg:h-full canvas-workspace-bg relative overflow-hidden">
+      
+      <!-- 预览顶部浮动工具条 -->
+      <div class="px-4 py-2 flex items-center justify-between bg-white/80 backdrop-blur-md border-b border-apple-border/80 z-10 gap-2">
+        <div class="flex items-center gap-2.5 text-xs text-apple-subtext truncate">
+          <span class="inline-flex items-center gap-1.5 font-medium text-apple-text shrink-0">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            实时预览画布
+          </span>
+          <span class="hidden sm:inline text-gray-300">|</span>
+          <span class="hidden sm:inline truncate">点击选中对象，拖拽移动或拉动蓝色控制点缩放（按住 Shift 等比）</span>
+        </div>
+
+        <div class="flex items-center gap-3 shrink-0">
+          <label class="inline-flex items-center gap-1.5 text-xs text-apple-text cursor-pointer">
+            <input type="checkbox" id="showRulerCheck" checked onchange="renderPreview()" class="rounded border-gray-300 text-apple-blue focus:ring-apple-blue" />
+            <span>坐标网格与辅助框</span>
+          </label>
+          <span id="zoomScaleBadge" class="text-[11px] font-mono px-2 py-0.5 rounded bg-white border border-apple-border text-apple-subtext">100%</span>
+        </div>
+      </div>
+
+      <!-- 画布居中展示区 -->
+      <div id="canvasViewport" class="flex-1 flex items-center justify-center p-6 overflow-hidden relative">
+        <div id="canvasWrapper" class="relative shadow-[0_12px_40px_rgba(0,0,0,0.12)] bg-white transition-shadow">
+          <canvas id="previewCanvas" class="block"></canvas>
+        </div>
+      </div>
+
+      <!-- 底部翻页控制器 -->
+      <div class="h-14 bg-white/90 backdrop-blur-md border-t border-apple-border px-4 flex items-center justify-between shrink-0 z-10">
+        <div class="text-xs text-apple-subtext flex items-center gap-2 truncate">
+          <i data-lucide="database" class="w-3.5 h-3.5 text-apple-blue shrink-0"></i>
+          <span id="variableSummaryText" class="truncate">当前无批量变量（共 1 页静态预览）</span>
+        </div>
+
+        <!-- 翻页按钮组 -->
+        <div class="flex items-center gap-2 shrink-0">
+          <button type="button" id="prevPageBtn" onclick="changePage(-1)" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-white hover:bg-gray-50 disabled:opacity-40 disabled:pointer-events-none text-apple-text border border-apple-border shadow-2xs transition cursor-pointer">
+            <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+            <span>上一页</span>
+          </button>
+
+          <div class="flex items-center gap-1.5 bg-gray-100 px-2.5 py-1 rounded-lg border border-apple-border text-xs font-mono">
+            <span>第</span>
+            <input type="number" id="currentPageInput" value="1" min="1" onchange="jumpToPage(this.value)"
+              class="w-10 text-center bg-white border border-gray-300 rounded px-1 py-0.5 text-xs font-semibold text-apple-text focus:outline-none focus:border-apple-blue" />
+            <span>/ <span id="totalPagesLabel">1</span> 页</span>
+          </div>
+
+          <button type="button" id="nextPageBtn" onclick="changePage(1)" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-white hover:bg-gray-50 disabled:opacity-40 disabled:pointer-events-none text-apple-text border border-apple-border shadow-2xs transition cursor-pointer">
+            <span>下一页</span>
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 导出进度遮罩模态框 -->
+  <div id="exportModal" class="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl border border-apple-border shadow-2xl max-w-md w-full p-6 space-y-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-blue-50 text-apple-blue flex items-center justify-center shrink-0">
+          <i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i>
+        </div>
+        <div>
+          <h3 id="exportModalTitle" class="text-sm font-semibold text-apple-text">正在生成 300 PPI 高清批量文件...</h3>
+          <p id="exportModalDesc" class="text-xs text-apple-subtext mt-0.5">请勿关闭页面，正在渲染第 1 / 1 张</p>
+        </div>
+      </div>
+
+      <div class="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden border border-gray-200">
+        <div id="exportProgressBar" class="bg-apple-blue h-full rounded-full transition-all duration-150" style="width: 0%"></div>
+      </div>
+
+      <div class="flex justify-between text-[11px] font-mono text-apple-subtext">
+        <span id="exportProgressPercent">0%</span>
+        <span id="exportResolutionInfo">300 PPI · 物理精确尺寸</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 轻量级提示 Toast -->
+  <div id="toastContainer" class="fixed bottom-16 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <script>
+    /**
+     * ============================================================================
+     * 1. 核心常量与物理单位换算工具 (300 PPI 标准)
+     * ============================================================================
+     */
+    const PPI = 300;
+    const MM_PER_INCH = 25.4;
+    const PT_PER_INCH = 72;
+
+    // 24种常用印刷与设计推荐色（前8个作为单行默认精简推荐色）
+    const PRESET_COLORS = [
+      '#FFFFFF', '#000000', '#1D1D1F', '#8E8E93', '#FF3B30', '#007AFF', '#34C759', '#FF9500',
+      '#F5F5F7', '#E5E5EA', '#3A3A3C', '#FFCC00', '#00C7BE', '#30B0C7', '#5856D6', '#AF52DE',
+      '#FF2D55', '#A2845E', '#FFF8E7', '#E8F4FD', '#EAFBF0', '#FDF2F2', '#1B365D', '#8B0000'
+    ];
+
+    const FONT_OPTIONS = [
+      { label: '思源黑体 / Noto Sans SC', value: '"Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif' },
+      { label: '思源宋体 / Noto Serif SC', value: '"Noto Serif SC", "Songti SC", "SimSun", serif' },
+      { label: '苹方 / PingFang SC', value: '"PingFang SC", "Noto Sans SC", sans-serif' },
+      { label: '微软雅黑 / Microsoft YaHei', value: '"Microsoft YaHei", "Noto Sans SC", sans-serif' },
+      { label: '黑体 / SimHei', value: '"SimHei", "Noto Sans SC", sans-serif' },
+      { label: '楷体 / KaiTi', value: '"KaiTi", "STKaiti", serif' },
+      { label: 'Inter (现代无衬线)', value: '"Inter", "Helvetica Neue", Arial, sans-serif' },
+      { label: 'Helvetica / Arial', value: 'Helvetica, Arial, sans-serif' },
+      { label: 'Times New Roman', value: '"Times New Roman", Times, serif' },
+      { label: 'Courier New (等宽)', value: '"Courier New", Courier, monospace' }
+    ];
+
+    function mmToPx(mm) {
+      return (mm / MM_PER_INCH) * PPI;
+    }
+
+    function pxToMm(px) {
+      return (px / PPI) * MM_PER_INCH;
+    }
+
+    function mmToUnit(mm, unit) {
+      return unit === 'pt' ? (mm / MM_PER_INCH) * PT_PER_INCH : mm;
+    }
+
+    function unitToMm(val, unit) {
+      const num = parseFloat(val);
+      if (isNaN(num)) return 0;
+      return unit === 'pt' ? (num / PT_PER_INCH) * MM_PER_INCH : num;
+    }
+
+    function formatDisplayNum(mmVal, unit) {
+      const converted = mmToUnit(mmVal, unit);
+      return Number(converted.toFixed(2));
+    }
+
+    /**
+     * ============================================================================
+     * 2. 全局状态定义
+     * ============================================================================
+     */
+    const state = {
+      projectName: '未命名项目',
+      unit: 'mm', // 'mm' | 'pt'
+      canvasWidthMm: 150,
+      canvasHeightMm: 100,
+      canvasBgColor: '#FFFFFF',
+      // 参考背景图配置
+      refBgImage: null, // { name, src, imgObj, naturalWidth, naturalHeight }
+      refBgOpacity: 0.4,
+      refBgHideOnExport: true,
+      refBgFitMode: 'stretch', // 'stretch' | 'contain'
+
+      currentPage: 1,
+      selectedLayerId: null,
+      layers: []
+    };
+
+    // 记录各色板的展开/收起状态（默认全部折叠为单行）
+    const paletteExpandedMap = {};
+
+    // 画布交互（移动 + 8向手柄缩放）状态
+    const interactState = {
+      mode: 'none', // 'none' | 'move' | 'resize'
+      handle: null, // 'nw' | 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w'
+      layerId: null,
+      startMouseXMm: 0,
+      startMouseYMm: 0,
+      origXMm: 0,
+      origYMm: 0,
+      origWMm: 0,
+      origHMm: 0,
+      origFontSizeMm: 0,
+      previewScale: 1
+    };
+
+    // 缓存当前页各图层的实时计算包围盒（用于精确点击命中与渲染缩放手柄）
+    const computedBoundsMap = {};
+
+    let layerIdCounter = 1;
+
+    /**
+     * ============================================================================
+     * 3. 单行可折叠色板全局组件 (保证所有位置默认严格单行显示)
+     * ============================================================================
+     */
+    function renderCompactColorPalette({ paletteId, label, currentColor, onChangeExpr, allowTransparent = false, isTransparent = false, onToggleTransparentExpr = '' }) {
+      const isExpanded = !!paletteExpandedMap[paletteId];
+      const topRowColors = PRESET_COLORS.slice(0, 8);
+
+      return `
+        <div class="space-y-1.5">
+          <!-- 单行核心区：标签 + 当前色指示 + 8个高频色块 + 展开按钮 -->
+          <div class="flex items-center justify-between gap-1.5">
+            <div class="flex items-center gap-1.5 shrink-0">
+              <span class="text-[11px] font-medium text-apple-subtext">${label}</span>
+              ${allowTransparent ? `
+                <label class="inline-flex items-center gap-1 text-[10px] text-apple-subtext cursor-pointer bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200">
+                  <input type="checkbox" ${isTransparent ? 'checked' : ''} onchange="${onToggleTransparentExpr}" class="rounded text-apple-blue w-3 h-3" />
+                  <span>无填充</span>
+                </label>
+              ` : ''}
+            </div>
+
+            <div class="flex items-center gap-1 ${isTransparent ? 'opacity-40 pointer-events-none' : ''}">
+              <!-- 当前颜色预览小圆点 -->
+              <span class="w-4 h-4 rounded-full border border-black/20 shrink-0 mr-0.5 shadow-2xs" style="background-color: ${currentColor};" title="当前颜色: ${currentColor}"></span>
+              
+              <!-- 单行 8 个高频色块 -->
+              <div class="flex items-center gap-1">
+                ${topRowColors.map(hex => `
+                  <button type="button" onclick="${onChangeExpr.replace('__COLOR__', hex)}"
+                    style="background-color: ${hex};"
+                    title="${hex}"
+                    class="w-4 h-4 rounded-[4px] border ${currentColor.toUpperCase() === hex ? 'border-apple-blue ring-1 ring-apple-blue scale-110' : 'border-black/15'} hover:scale-110 transition-transform cursor-pointer shrink-0"></button>
+                `).join('')}
+              </div>
+
+              <!-- 展开/收起按钮 -->
+              <button type="button" onclick="toggleColorPalette('${paletteId}')"
+                title="${isExpanded ? '收起完整色板' : '展开完整色板与色环'}"
+                class="ml-0.5 px-1.5 h-5 rounded bg-gray-100 hover:bg-gray-200/80 border border-apple-border text-[10px] text-apple-subtext hover:text-apple-text flex items-center justify-center transition cursor-pointer shrink-0">
+                <span>${isExpanded ? '▲' : '▼'}</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 展开面板：完整 24 色 + 原生色环 + HEX 输入 -->
+          ${isExpanded && !isTransparent ? `
+            <div class="p-2.5 bg-gray-50/90 rounded-xl border border-apple-border space-y-2 transition-all">
+              <div class="grid grid-cols-12 gap-1">
+                ${PRESET_COLORS.map(hex => `
+                  <button type="button" onclick="${onChangeExpr.replace('__COLOR__', hex)}"
+                    style="background-color: ${hex};"
+                    title="${hex}"
+                    class="w-full aspect-square rounded-[4px] border ${currentColor.toUpperCase() === hex ? 'border-apple-blue ring-1 ring-apple-blue' : 'border-black/15'} hover:scale-110 transition-transform cursor-pointer"></button>
+                `).join('')}
+              </div>
+              <div class="flex items-center justify-between pt-1.5 border-t border-gray-200/70">
+                <span class="text-[11px] text-apple-subtext">自定义色环 / 色值：</span>
+                <div class="flex items-center gap-1.5">
+                  <input type="color" value="${currentColor}"
+                    oninput="${onChangeExpr.replace('__COLOR__', "' + this.value.toUpperCase() + '")}"
+                    class="w-6 h-5 rounded cursor-pointer" title="打开系统色环" />
+                  <input type="text" value="${currentColor}" maxlength="7"
+                    onchange="${onChangeExpr.replace('__COLOR__', "' + this.value.toUpperCase() + '")}"
+                    class="w-20 px-2 py-0.5 text-[11px] font-mono uppercase bg-white border border-apple-border rounded focus:outline-none focus:border-apple-blue" />
+                </div>
+              </div>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    function toggleColorPalette(paletteId) {
+      paletteExpandedMap[paletteId] = !paletteExpandedMap[paletteId];
+      renderCanvasBgPaletteUI();
+      renderLayersUI();
+    }
+
+    function renderCanvasBgPaletteUI() {
+      const container = document.getElementById('canvasBgPaletteContainer');
+      if (!container) return;
+      container.innerHTML = renderCompactColorPalette({
+        paletteId: 'canvas_bg',
+        label: '画布背景色',
+        currentColor: state.canvasBgColor,
+        onChangeExpr: `updateCanvasBgColor('__COLOR__')`
+      });
+    }
+
+    /**
+     * ============================================================================
+     * 4. 初始化与默认示例数据
+     * ============================================================================
+     */
+    function measureTextDimensionsMm(text, fontSizeMm, letterSpacingMm, lineHeightRatio, fontWeight, fontFamily) {
+      const tempCanvas = document.createElement('canvas');
+      const ctx = tempCanvas.getContext('2d');
+      const fontSizePx = mmToPx(fontSizeMm);
+      const letterSpacingPx = mmToPx(letterSpacingMm);
+      const lineHeightPx = fontSizePx * (lineHeightRatio || 1.2);
+
+      ctx.font = `${fontWeight} ${fontSizePx}px ${fontFamily}`;
+      const lines = (text || '').split('\n');
+      let maxWidthPx = 0;
+
+      lines.forEach(line => {
+        const chars = Array.from(line);
+        let lineW = 0;
+        chars.forEach((ch, idx) => {
+          lineW += ctx.measureText(ch).width + (idx < chars.length - 1 ? letterSpacingPx : 0);
+        });
+        maxWidthPx = Math.max(maxWidthPx, lineW);
+      });
+
+      const totalHeightPx = Math.max(fontSizePx, lines.length * lineHeightPx);
+      return {
+        widthMm: pxToMm(maxWidthPx),
+        heightMm: pxToMm(totalHeightPx)
+      };
+    }
+
+    function initApp() {
+      renderCanvasBgPaletteUI();
+
+      // 计算主标题与副标题在 150×100mm 画布上的居中坐标
+      const mainTitleText = '名称';
+      const mainTitleFontSizeMm = 14; // 约 40pt，醒目主标题字号
+      const mainTitleLetterSpacingMm = 1.5;
+      const mainTitleFont = FONT_OPTIONS[0].value;
+      const mainDims = measureTextDimensionsMm(
+        mainTitleText,
+        mainTitleFontSizeMm,
+        mainTitleLetterSpacingMm,
+        1.2,
+        '700',
+        mainTitleFont
+      );
+
+      const subTitleText = '编号123456789';
+      const subTitleFontSizeMm = 6.5; // 约 18.5pt，清晰副标题字号
+      const subTitleLetterSpacingMm = 0.5;
+      const subTitleFont = FONT_OPTIONS[0].value;
+      const subDims = measureTextDimensionsMm(
+        subTitleText,
+        subTitleFontSizeMm,
+        subTitleLetterSpacingMm,
+        1.2,
+        '500',
+        subTitleFont
+      );
+
+      // 垂直组合整体居中（主副标题间距 5mm）
+      const verticalGapMm = 5;
+      const totalGroupHeightMm = mainDims.heightMm + verticalGapMm + subDims.heightMm;
+      const groupStartYMm = (state.canvasHeightMm - totalGroupHeightMm) / 2;
+
+      const mainTitleLayer = {
+        id: 'layer_' + (layerIdCounter++),
+        type: 'text',
+        name: '主标题',
+        collapsed: false,
+        styleCollapsed: true,
+        text: mainTitleText,
+        useVariable: false,
+        variables: [''],
+        fontFamily: mainTitleFont,
+        customFont: '',
+        fontWeight: '700',
+        fontSizeMm: mainTitleFontSizeMm,
+        letterSpacingMm: mainTitleLetterSpacingMm,
+        lineHeightRatio: 1.2,
+        color: '#1D1D1F',
+        anchor: 'center', // 'left' | 'center' | 'right'
+        xMm: Number((state.canvasWidthMm / 2).toFixed(2)),
+        yMm: Number(groupStartYMm.toFixed(2)),
+        constrainBox: false,
+        boxWidthMm: 90,
+        boxHeightMm: 22
+      };
+
+      const subTitleLayer = {
+        id: 'layer_' + (layerIdCounter++),
+        type: 'text',
+        name: '副标题',
+        collapsed: false,
+        styleCollapsed: true,
+        text: subTitleText,
+        useVariable: false,
+        variables: [''],
+        fontFamily: subTitleFont,
+        customFont: '',
+        fontWeight: '500',
+        fontSizeMm: subTitleFontSizeMm,
+        letterSpacingMm: subTitleLetterSpacingMm,
+        lineHeightRatio: 1.2,
+        color: '#515154',
+        anchor: 'center', // 'left' | 'center' | 'right'
+        xMm: Number((state.canvasWidthMm / 2).toFixed(2)),
+        yMm: Number((groupStartYMm + mainDims.heightMm + verticalGapMm).toFixed(2)),
+        constrainBox: false,
+        boxWidthMm: 90,
+        boxHeightMm: 14
+      };
+
+      state.layers = [mainTitleLayer, subTitleLayer];
+      state.selectedLayerId = mainTitleLayer.id;
+
+      syncCanvasInputs();
+      syncRefBgUI();
+      renderLayersUI();
+      updatePaginationState();
+      setupCanvasInteractions();
+      renderPreview();
+
+      window.addEventListener('resize', renderPreview);
+    }
+
+    /**
+     * ============================================================================
+     * 5. 画布基础设置、参考背景图及 Toast 提示逻辑
+     * ============================================================================
+     */
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+      const toast = document.createElement('div');
+      const colorMap = {
+        success: 'bg-[#1D1D1F] text-white border-emerald-500/40',
+        error: 'bg-red-600 text-white border-red-400',
+        info: 'bg-[#1D1D1F] text-white border-gray-700'
+      };
+      toast.className = `px-3.5 py-2.5 rounded-xl text-xs font-medium shadow-lg border backdrop-blur-md transition-all duration-200 ${colorMap[type] || colorMap.info}`;
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(6px)';
+        setTimeout(() => toast.remove(), 220);
+      }, 2800);
+    }
+
+    function updateProjectName(val) {
+      state.projectName = val;
+    }
+
+    function switchUnit(newUnit) {
+      if (state.unit === newUnit) return;
+      state.unit = newUnit;
+      const btnMm = document.getElementById('unitBtnMm');
+      const btnPt = document.getElementById('unitBtnPt');
+      if (newUnit === 'mm') {
+        btnMm.className = 'py-1 text-xs font-semibold rounded-md bg-white text-apple-text shadow-2xs transition cursor-pointer';
+        btnPt.className = 'py-1 text-xs font-medium rounded-md text-apple-subtext hover:text-apple-text transition cursor-pointer';
+      } else {
+        btnPt.className = 'py-1 text-xs font-semibold rounded-md bg-white text-apple-text shadow-2xs transition cursor-pointer';
+        btnMm.className = 'py-1 text-xs font-medium rounded-md text-apple-subtext hover:text-apple-text transition cursor-pointer';
+      }
+      document.querySelectorAll('.unit-label').forEach(el => el.textContent = newUnit);
+      syncCanvasInputs();
+      renderLayersUI();
+    }
+
+    function syncCanvasInputs() {
+      const wInput = document.getElementById('canvasWidthInput');
+      const hInput = document.getElementById('canvasHeightInput');
+      if (wInput) wInput.value = formatDisplayNum(state.canvasWidthMm, state.unit);
+      if (hInput) hInput.value = formatDisplayNum(state.canvasHeightMm, state.unit);
+
+      const physW = Math.max(1, Math.round(mmToPx(state.canvasWidthMm)));
+      const physH = Math.max(1, Math.round(mmToPx(state.canvasHeightMm)));
+      const badge = document.getElementById('pixelResolutionBadge');
+      if (badge) badge.textContent = `${physW} × ${physH} px`;
+    }
+
+    function updateCanvasSize(dim, val) {
+      const mmVal = Math.max(1, unitToMm(val, state.unit));
+      if (dim === 'width') state.canvasWidthMm = Number(mmVal.toFixed(2));
+      else state.canvasHeightMm = Number(mmVal.toFixed(2));
+      syncCanvasInputs();
+      renderPreview();
+    }
+
+    function updateCanvasBgColor(hex) {
+      if (!/^#[0-9A-Fa-f]{6}$/.test(hex)) return;
+      state.canvasBgColor = hex.toUpperCase();
+      renderCanvasBgPaletteUI();
+      renderPreview();
+    }
+
+    function loadImageFromDataUrl(src, name) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          resolve({
+            name: name || 'image.png',
+            src,
+            imgObj: img,
+            naturalWidth: img.naturalWidth,
+            naturalHeight: img.naturalHeight
+          });
+        };
+        img.onerror = () => resolve(null);
+        img.src = src;
+      });
+    }
+
+    function readFileAsDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function handleRefBgUpload(input) {
+      const file = input.files && input.files[0];
+      if (!file) return;
+      try {
+        const dataUrl = await readFileAsDataUrl(file);
+        const loaded = await loadImageFromDataUrl(dataUrl, file.name);
+        if (loaded) {
+          state.refBgImage = loaded;
+          syncRefBgUI();
+          renderPreview();
+          showToast(`已载入参考背景图：${file.name}`, 'success');
+        }
+      } catch (e) {
+        showToast('参考背景图读取失败', 'error');
+      } finally {
+        input.value = '';
+      }
+    }
+
+    function clearRefBgImage() {
+      state.refBgImage = null;
+      syncRefBgUI();
+      renderPreview();
+    }
+
+    function updateRefBgOpacity(val) {
+      state.refBgOpacity = Math.min(1, Math.max(0, Number(val) / 100));
+      const label = document.getElementById('refBgOpacityLabel');
+      if (label) label.textContent = `${Math.round(state.refBgOpacity * 100)}%`;
+      renderPreview();
+    }
+
+    function updateRefBgHideOnExport(checked) {
+      state.refBgHideOnExport = !!checked;
+    }
+
+    function updateRefBgFitMode(mode) {
+      state.refBgFitMode = mode;
+      renderPreview();
+    }
+
+    function syncRefBgUI() {
+      const panel = document.getElementById('refBgControlsPanel');
+      const clearBtn = document.getElementById('clearRefBgBtn');
+      const uploadBtnText = document.getElementById('refBgUploadBtnText');
+      if (!panel) return;
+
+      if (state.refBgImage) {
+        panel.classList.remove('hidden');
+        clearBtn.classList.remove('hidden');
+        uploadBtnText.textContent = '更换参考图';
+        document.getElementById('refBgThumb').src = state.refBgImage.src;
+        document.getElementById('refBgFileName').textContent = state.refBgImage.name;
+        const pct = Math.round(state.refBgOpacity * 100);
+        document.getElementById('refBgOpacityRange').value = pct;
+        document.getElementById('refBgOpacityLabel').textContent = `${pct}%`;
+        document.getElementById('refBgHideOnExportCheck').checked = state.refBgHideOnExport;
+        document.getElementById('refBgFitModeSelect').value = state.refBgFitMode;
+      } else {
+        panel.classList.add('hidden');
+        clearBtn.classList.add('hidden');
+        uploadBtnText.textContent = '上传参考图';
+      }
+    }
+
+    /**
+     * ============================================================================
+     * 6. 图层增删改查与变量数据处理
+     * ============================================================================
+     */
+    function addTextLayer() {
+      const count = state.layers.filter(l => l.type === 'text').length + 1;
+      const newLayer = {
+        id: 'layer_' + (layerIdCounter++),
+        type: 'text',
+        name: `文字图层 ${count}`,
+        collapsed: false,
+        styleCollapsed: true,
+        text: '双击或在此输入文字',
+        useVariable: false,
+        variables: [''],
+        fontFamily: FONT_OPTIONS[0].value,
+        customFont: '',
+        fontWeight: '400',
+        fontSizeMm: 8,
+        letterSpacingMm: 0,
+        lineHeightRatio: 1.2,
+        color: '#1D1D1F',
+        anchor: 'left',
+        xMm: 15,
+        yMm: 15 + (count - 1) * 8,
+        constrainBox: false,
+        boxWidthMm: 60,
+        boxHeightMm: 15
+      };
+      state.layers.push(newLayer);
+      state.selectedLayerId = newLayer.id;
+      renderLayersUI();
+      updatePaginationState();
+      renderPreview();
+    }
+
+    function addImageLayer() {
+      const count = state.layers.filter(l => l.type === 'image').length + 1;
+      const newLayer = {
+        id: 'layer_' + (layerIdCounter++),
+        type: 'image',
+        name: `图片图层 ${count}`,
+        collapsed: false,
+        useVariable: false,
+        singleImage: null,
+        variableImages: [],
+        widthMm: 40,
+        heightMm: 40,
+        lockAspectRatio: true,
+        xMm: 20,
+        yMm: 20
+      };
+      state.layers.push(newLayer);
+      state.selectedLayerId = newLayer.id;
+      renderLayersUI();
+      updatePaginationState();
+      renderPreview();
+    }
+
+    function addShapeLayer(shapeType) {
+      const labelMap = { rect: '矩形', ellipse: '椭圆形', line: '直线' };
+      const count = state.layers.filter(l => l.type === shapeType).length + 1;
+      const newLayer = {
+        id: 'layer_' + (layerIdCounter++),
+        type: shapeType,
+        name: `${labelMap[shapeType]} ${count}`,
+        collapsed: false,
+        xMm: 25,
+        yMm: 25,
+        widthMm: shapeType === 'line' ? 60 : 45,
+        heightMm: shapeType === 'line' ? 0 : 30,
+        lineDirection: 'tl-br',
+        fillColor: '#E8F4FD',
+        fillTransparent: shapeType === 'line',
+        strokeColor: '#1D1D1F',
+        strokeWidthMm: 0.5,
+        strokeDashed: false,
+        dashLengthMm: 2,
+        dashGapMm: 1.5
+      };
+      state.layers.push(newLayer);
+      state.selectedLayerId = newLayer.id;
+      renderLayersUI();
+      renderPreview();
+    }
+
+    function toggleLayerCollapse(id) {
+      const layer = state.layers.find(l => l.id === id);
+      if (layer) {
+        layer.collapsed = !layer.collapsed;
+        renderLayersUI();
+      }
+    }
+
+    function toggleTextStyleCollapse(id) {
+      const layer = state.layers.find(l => l.id === id);
+      if (layer) {
+        layer.styleCollapsed = layer.styleCollapsed === false ? true : false;
+        renderLayersUI();
+      }
+    }
+
+    function selectLayer(id) {
+      if (state.selectedLayerId !== id) {
+        state.selectedLayerId = id;
+        renderLayersUI();
+        renderPreview();
+      }
+    }
+
+    function moveLayer(id, direction) {
+      const idx = state.layers.findIndex(l => l.id === id);
+      if (idx === -1) return;
+      const targetIdx = idx + direction;
+      if (targetIdx < 0 || targetIdx >= state.layers.length) return;
+      const [item] = state.layers.splice(idx, 1);
+      state.layers.splice(targetIdx, 0, item);
+      renderLayersUI();
+      renderPreview();
+    }
+
+    function duplicateLayer(id) {
+      const layer = state.layers.find(l => l.id === id);
+      if (!layer) return;
+      const copy = JSON.parse(JSON.stringify(layer));
+      copy.id = 'layer_' + (layerIdCounter++);
+      copy.name = layer.name + ' 副本';
+      copy.xMm = Number((layer.xMm + 5).toFixed(2));
+      copy.yMm = Number((layer.yMm + 5).toFixed(2));
+      if (layer.type === 'image') {
+        copy.singleImage = layer.singleImage ? { ...layer.singleImage } : null;
+        copy.variableImages = (layer.variableImages || []).map(v => ({ ...v }));
+      }
+      state.layers.push(copy);
+      state.selectedLayerId = copy.id;
+      renderLayersUI();
+      updatePaginationState();
+      renderPreview();
+    }
+
+    function deleteLayer(id) {
+      state.layers = state.layers.filter(l => l.id !== id);
+      if (state.selectedLayerId === id) {
+        state.selectedLayerId = state.layers.length ? state.layers[state.layers.length - 1].id : null;
+      }
+      renderLayersUI();
+      updatePaginationState();
+      renderPreview();
+    }
+
+    function setLinePresetOrientation(id, orientation) {
+      const layer = state.layers.find(l => l.id === id);
+      if (!layer || layer.type !== 'line') return;
+      if (orientation === 'horizontal') {
+        if (layer.widthMm < 5) layer.widthMm = Math.max(20, layer.heightMm || 50);
+        layer.heightMm = 0;
+      } else if (orientation === 'vertical') {
+        if (layer.heightMm < 5) layer.heightMm = Math.max(20, layer.widthMm || 40);
+        layer.widthMm = 0;
+      }
+      renderLayersUI();
+      renderPreview();
+    }
+
+    function setTextAnchor(id, newAnchor) {
+      const layer = state.layers.find(l => l.id === id);
+      if (!layer || layer.type !== 'text') return;
+      const oldAnchor = layer.anchor || 'left';
+      if (oldAnchor === newAnchor) return;
+
+      const b = computedBoundsMap[layer.id];
+      if (b && typeof b.wMm === 'number') {
+        const leftEdge = b.xMm;
+        const w = b.wMm;
+        let nextX = leftEdge;
+        if (newAnchor === 'center') nextX = leftEdge + w / 2;
+        else if (newAnchor === 'right') nextX = leftEdge + w;
+        layer.xMm = Number(nextX.toFixed(2));
+      }
+
+      layer.anchor = newAnchor;
+      renderLayersUI();
+      renderPreview();
+    }
+
+    function updateLayerProp(id, prop, value, convertFromUnit = false, forceRerender = false) {
+      const layer = state.layers.find(l => l.id === id);
+      if (!layer) return;
+
+      let parsedVal = value;
+      if (convertFromUnit) {
+        parsedVal = Number(unitToMm(value, state.unit).toFixed(3));
+        if (['fontSizeMm', 'widthMm', 'heightMm', 'boxWidthMm', 'boxHeightMm'].includes(prop)) {
+          const minAllowed = layer.type === 'line' ? 0 : 0.5;
+          parsedVal = Math.max(minAllowed, parsedVal);
+        }
+        if (prop === 'strokeWidthMm') parsedVal = Math.max(0, parsedVal);
+      }
+
+      if (layer.type === 'image' && layer.lockAspectRatio && (prop === 'widthMm' || prop === 'heightMm')) {
+        const activeImg = getActiveImageForLayer(layer, state.currentPage);
+        const ratio = activeImg && activeImg.naturalHeight > 0
+          ? activeImg.naturalWidth / activeImg.naturalHeight
+          : (layer.heightMm > 0 ? layer.widthMm / layer.heightMm : 1);
+
+        if (prop === 'widthMm' && parsedVal > 0) {
+          layer.widthMm = parsedVal;
+          layer.heightMm = Number((parsedVal / ratio).toFixed(2));
+          forceRerender = true;
+        } else if (prop === 'heightMm' && parsedVal > 0) {
+          layer.heightMm = parsedVal;
+          layer.widthMm = Number((parsedVal * ratio).toFixed(2));
+          forceRerender = true;
+        }
+      } else {
+        layer[prop] = parsedVal;
+      }
+
+      let rerenderUI = forceRerender;
+      if (prop === 'useVariable') {
+        if (value === true && layer.type === 'text') {
+          const hasMeaningfulVars = Array.isArray(layer.variables) && layer.variables.some(v => v && v.trim() !== '');
+          if (!hasMeaningfulVars) {
+            layer.variables = [''];
+          }
+        }
+        updatePaginationState();
+        rerenderUI = true;
+      }
+      if (rerenderUI) {
+        renderLayersUI();
+      }
+      renderPreview();
+    }
+
+    // 变量文本表格操作
+    function addVariableRow(layerId) {
+      const layer = state.layers.find(l => l.id === layerId);
+      if (!layer) return;
+      layer.variables.push('');
+      renderLayersUI();
+      updatePaginationState();
+      renderPreview();
+    }
+
+    function removeVariableRow(layerId, index) {
+      const layer = state.layers.find(l => l.id === layerId);
+      if (!layer) return;
+      layer.variables.splice(index, 1);
+      if (layer.variables.length === 0) layer.variables.push('');
+      renderLayersUI();
+      updatePaginationState();
+      renderPreview();
+    }
+
+    function clearVariableRows(layerId) {
+      const layer = state.layers.find(l => l.id === layerId);
+      if (!layer) return;
+      layer.variables = [''];
+      renderLayersUI();
+      updatePaginationState();
+      renderPreview();
+    }
+
+    function updateVariableRow(layerId, index, val) {
+      const layer = state.layers.find(l => l.id === layerId);
+      if (!layer) return;
+      layer.variables[index] = val;
+      renderPreview();
+    }
+
+    function handleVariablePaste(event, layerId, startIndex) {
+      const pasteText = (event.clipboardData || window.clipboardData).getData('text');
+      if (!pasteText || (!pasteText.includes('\n') && !pasteText.includes('\r'))) {
+        return; // 单行普通粘贴交由默认输入框处理
+      }
+      event.preventDefault();
+      const layer = state.layers.find(l => l.id === layerId);
+      if (!layer) return;
+
+      const rows = pasteText.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+      if (rows.length > 1 && rows[rows.length - 1] === '') {
+        rows.pop();
+      }
+      if (rows.length === 0) return;
+
+      rows.forEach((cellVal, offset) => {
+        const cleanCell = cellVal.split('\t')[0];
+        layer.variables[startIndex + offset] = cleanCell;
+      });
+
+      renderLayersUI();
+      updatePaginationState();
+      renderPreview();
+      showToast(`已从剪贴板导入 ${rows.length} 条变量数据`, 'success');
+    }
+
+    // 图片上传与变量图库操作
+    async function handleSingleImageUpload(input, layerId) {
+      const file = input.files && input.files[0];
+      const layer = state.layers.find(l => l.id === layerId);
+      if (!file || !layer) return;
+
+      try {
+        const dataUrl = await readFileAsDataUrl(file);
+        const loaded = await loadImageFromDataUrl(dataUrl, file.name);
+        if (loaded) {
+          layer.singleImage = loaded;
+          if (loaded.naturalWidth > 0 && loaded.naturalHeight > 0) {
+            const aspect = loaded.naturalWidth / loaded.naturalHeight;
+            layer.heightMm = Number((layer.widthMm / aspect).toFixed(2));
+          }
+          renderLayersUI();
+          renderPreview();
+        }
+      } finally {
+        input.value = '';
+      }
+    }
+
+    async function handleBatchImagesUpload(input, layerId) {
+      const files = Array.from(input.files || []).filter(f => f.type.startsWith('image/'));
+      const layer = state.layers.find(l => l.id === layerId);
+      if (!layer || files.length === 0) {
+        input.value = '';
+        return;
+      }
+
+      files.sort((a, b) => a.name.localeCompare(b.name, 'zh-CN', { numeric: true }));
+
+      const loadedList = [];
+      for (const file of files) {
+        const dataUrl = await readFileAsDataUrl(file);
+        const loaded = await loadImageFromDataUrl(dataUrl, file.name);
+        if (loaded) loadedList.push(loaded);
+      }
+
+      if (loadedList.length > 0) {
+        layer.variableImages = loadedList;
+        const first = loadedList[0];
+        if (first.naturalWidth > 0 && first.naturalHeight > 0 && layer.lockAspectRatio) {
+          const aspect = first.naturalWidth / first.naturalHeight;
+          layer.heightMm = Number((layer.widthMm / aspect).toFixed(2));
+        }
+        renderLayersUI();
+        updatePaginationState();
+        renderPreview();
+        showToast(`已批量导入 ${loadedList.length} 张变量图片`, 'success');
+      }
+      input.value = '';
+    }
+
+    function removeVariableImage(layerId, idx) {
+      const layer = state.layers.find(l => l.id === layerId);
+      if (!layer) return;
+      layer.variableImages.splice(idx, 1);
+      renderLayersUI();
+      updatePaginationState();
+      renderPreview();
+    }
+
+    /**
+     * ============================================================================
+     * 7. 左侧图层面板 UI 渲染器
+     * ============================================================================
+     */
+    function renderLayersUI() {
+      const container = document.getElementById('layersContainer');
+      const countBadge = document.getElementById('layerCountBadge');
+      if (!container) return;
+
+      if (countBadge) countBadge.textContent = `${state.layers.length} 个图层`;
+
+      if (state.layers.length === 0) {
+        container.innerHTML = `
+          <div class="bg-apple-card rounded-2xl border border-dashed border-apple-border p-6 text-center text-xs text-apple-subtext">
+            暂无内容元素，请点击上方按钮添加文字、图片或图形
+          </div>
+        `;
+        return;
+      }
+
+      const u = state.unit;
+
+      container.innerHTML = state.layers.map((layer, index) => {
+        const isSelected = state.selectedLayerId === layer.id;
+        const borderClass = isSelected ? 'border-apple-blue ring-1 ring-apple-blue/25' : 'border-apple-border';
+
+        const renderHeader = (iconName, iconBg, iconColor, extraBadge = '') => `
+          <div class="px-3.5 py-2.5 bg-gray-50/70 border-b ${layer.collapsed ? 'border-transparent' : 'border-gray-100'} flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2 min-w-0 flex-1">
+              <button type="button" onclick="event.stopPropagation(); toggleLayerCollapse('${layer.id}')"
+                class="p-1 text-gray-400 hover:text-apple-text rounded cursor-pointer shrink-0">
+                <i data-lucide="${layer.collapsed ? 'chevron-right' : 'chevron-down'}" class="w-3.5 h-3.5"></i>
+              </button>
+              <span class="w-6 h-6 rounded-lg ${iconBg} ${iconColor} flex items-center justify-center shrink-0">
+                <i data-lucide="${iconName}" class="w-3.5 h-3.5"></i>
+              </span>
+              <input type="text" value="${escapeHtml(layer.name)}"
+                onclick="event.stopPropagation()"
+                onchange="updateLayerProp('${layer.id}', 'name', this.value)"
+                class="text-xs font-semibold text-apple-text bg-transparent hover:bg-white focus:bg-white px-1.5 py-0.5 rounded border border-transparent focus:border-apple-border focus:outline-none min-w-0 flex-1 truncate" />
+              ${extraBadge}
+            </div>
+            <div class="flex items-center gap-0.5 shrink-0" onclick="event.stopPropagation()">
+              <button type="button" onclick="moveLayer('${layer.id}', -1)" ${index === 0 ? 'disabled' : ''} title="上移一层"
+                class="p-1 text-gray-400 hover:text-apple-text disabled:opacity-30 rounded cursor-pointer">
+                <i data-lucide="arrow-up" class="w-3.5 h-3.5"></i>
+              </button>
+              <button type="button" onclick="moveLayer('${layer.id}', 1)" ${index === state.layers.length - 1 ? 'disabled' : ''} title="下移一层"
+                class="p-1 text-gray-400 hover:text-apple-text disabled:opacity-30 rounded cursor-pointer">
+                <i data-lucide="arrow-down" class="w-3.5 h-3.5"></i>
+              </button>
+              <button type="button" onclick="duplicateLayer('${layer.id}')" title="复制图层"
+                class="p-1 text-gray-400 hover:text-apple-blue rounded cursor-pointer">
+                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+              </button>
+              <button type="button" onclick="deleteLayer('${layer.id}')" title="删除图层"
+                class="p-1 text-gray-400 hover:text-red-500 rounded cursor-pointer">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+        `;
+
+        // 1. 文字图层
+        if (layer.type === 'text') {
+          const tag = layer.useVariable ? `<span class="text-[10px] font-medium px-1.5 py-0.5 rounded bg-blue-100/80 text-apple-blue shrink-0">变量 (${layer.variables.length})</span>` : '';
+          const isStyleCollapsed = layer.styleCollapsed !== false;
+          const fontMatch = FONT_OPTIONS.find(f => f.value === layer.fontFamily);
+          const fontShortLabel = (layer.customFont && layer.customFont.trim())
+            ? layer.customFont.trim()
+            : (fontMatch ? fontMatch.label.split(' / ')[0] : '默认字体');
+          const styleSummary = `${fontShortLabel} · ${formatDisplayNum(layer.fontSizeMm, u)}${u} · (${formatDisplayNum(layer.xMm, u)}, ${formatDisplayNum(layer.yMm, u)})`;
+
+          return `
+            <div onclick="selectLayer('${layer.id}')" class="bg-apple-card rounded-2xl border ${borderClass} shadow-2xs transition-all overflow-hidden">
+              ${renderHeader('type', 'bg-blue-50', 'text-apple-blue', tag)}
+              <div class="${layer.collapsed ? 'hidden' : 'p-3.5 space-y-3'}">
+                <div>
+                  <div class="flex items-center justify-between mb-1">
+                    <label class="text-[11px] font-medium text-apple-subtext">文本内容</label>
+                    <label class="inline-flex items-center gap-1.5 text-[11px] font-medium text-apple-blue cursor-pointer">
+                      <input type="checkbox" ${layer.useVariable ? 'checked' : ''}
+                        onchange="updateLayerProp('${layer.id}', 'useVariable', this.checked)"
+                        class="rounded border-gray-300 text-apple-blue focus:ring-apple-blue" />
+                      <span>启用变量（批量数据）</span>
+                    </label>
+                  </div>
+
+                  ${!layer.useVariable ? `
+                    <textarea rows="2" placeholder="输入文本内容（支持回车换行）..."
+                      oninput="updateLayerProp('${layer.id}', 'text', this.value)"
+                      class="w-full px-2.5 py-1.5 text-xs bg-gray-50/70 border border-apple-border rounded-lg focus:outline-none focus:border-apple-blue resize-y">${escapeHtml(layer.text)}</textarea>
+                  ` : `
+                    <div class="border border-apple-border rounded-xl overflow-hidden bg-gray-50/50">
+                      <div class="px-2.5 py-1.5 bg-blue-50/60 border-b border-apple-border flex items-center justify-between">
+                        <span class="text-[11px] text-apple-blue font-medium">在下方任意行粘贴 Excel 一竖列即可自动创建</span>
+                        <div class="flex items-center gap-1">
+                          <button type="button" onclick="addVariableRow('${layer.id}')" class="text-[11px] px-1.5 py-0.5 bg-white border border-apple-border rounded hover:bg-gray-50 text-apple-text cursor-pointer">+ 加一行</button>
+                          <button type="button" onclick="clearVariableRows('${layer.id}')" class="text-[11px] px-1.5 py-0.5 bg-white border border-apple-border rounded hover:text-red-600 text-gray-500 cursor-pointer">清空</button>
+                        </div>
+                      </div>
+                      <div class="max-h-36 overflow-y-auto divide-y divide-gray-200/70">
+                        ${layer.variables.map((val, rIdx) => `
+                          <div class="flex items-center bg-white hover:bg-gray-50/80">
+                            <span class="w-9 text-center text-[11px] font-mono text-gray-400 border-r border-gray-100 py-1 shrink-0">${rIdx + 1}</span>
+                            <input type="text" value="${escapeHtml(val)}" placeholder="粘贴 Excel 竖列或输入内容..."
+                              onpaste="handleVariablePaste(event, '${layer.id}', ${rIdx})"
+                              oninput="updateVariableRow('${layer.id}', ${rIdx}, this.value)"
+                              class="flex-1 px-2 py-1 text-xs bg-transparent focus:outline-none focus:bg-blue-50/30" />
+                            <button type="button" onclick="removeVariableRow('${layer.id}', ${rIdx})" class="px-2 py-1 text-gray-300 hover:text-red-500 cursor-pointer">×</button>
+                          </div>
+                        `).join('')}
+                      </div>
+                    </div>
+                  `}
+                </div>
+
+                <!-- 可折叠子面板：字体、字号、间距与坐标参数（默认折叠） -->
+                <div class="border border-apple-border rounded-xl bg-gray-50/50 overflow-hidden">
+                  <button type="button" onclick="toggleTextStyleCollapse('${layer.id}')"
+                    class="w-full px-2.5 py-2 flex items-center justify-between gap-2 text-left hover:bg-gray-100/70 transition cursor-pointer">
+                    <div class="flex items-center gap-1.5 shrink-0">
+                      <i data-lucide="${isStyleCollapsed ? 'chevron-right' : 'chevron-down'}" class="w-3.5 h-3.5 text-apple-subtext"></i>
+                      <span class="text-[11px] font-medium text-apple-text">字体与位置参数</span>
+                    </div>
+                    <span class="text-[11px] font-mono text-apple-subtext truncate">${escapeHtml(styleSummary)}</span>
+                  </button>
+
+                  <div class="${isStyleCollapsed ? 'hidden' : 'p-2.5 pt-2 border-t border-apple-border/80 bg-white space-y-2.5'}">
+                    <!-- 字体与字重 -->
+                    <div class="grid grid-cols-12 gap-2">
+                      <div class="col-span-7">
+                        <label class="block text-[11px] text-apple-subtext mb-1">字体选择</label>
+                        <select onchange="updateLayerProp('${layer.id}', 'fontFamily', this.value)"
+                          class="w-full px-2 py-1.5 text-xs bg-gray-50/70 border border-apple-border rounded-lg focus:outline-none focus:border-apple-blue">
+                          ${FONT_OPTIONS.map(f => `<option value='${f.value}' ${layer.fontFamily === f.value ? 'selected' : ''}>${f.label}</option>`).join('')}
+                        </select>
+                      </div>
+                      <div class="col-span-5">
+                        <label class="block text-[11px] text-apple-subtext mb-1">字重</label>
+                        <select onchange="updateLayerProp('${layer.id}', 'fontWeight', this.value)"
+                          class="w-full px-2 py-1.5 text-xs bg-gray-50/70 border border-apple-border rounded-lg focus:outline-none focus:border-apple-blue">
+                          <option value="400" ${layer.fontWeight === '400' ? 'selected' : ''}>Regular (400)</option>
+                          <option value="500" ${layer.fontWeight === '500' ? 'selected' : ''}>Medium (500)</option>
+                          <option value="700" ${layer.fontWeight === '700' ? 'selected' : ''}>Bold (700)</option>
+                          <option value="900" ${layer.fontWeight === '900' ? 'selected' : ''}>Heavy (900)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <input type="text" value="${escapeHtml(layer.customFont)}" placeholder="可选：输入本机系统字体精确名称"
+                      onchange="updateLayerProp('${layer.id}', 'customFont', this.value)"
+                      class="w-full px-2.5 py-1 text-[11px] bg-gray-50/50 border border-apple-border rounded-lg focus:outline-none focus:border-apple-blue" />
+
+                    <!-- 字号、字间距、行间距 -->
+                    <div class="grid grid-cols-3 gap-2">
+                      <div>
+                        <label class="block text-[11px] text-apple-subtext mb-1">字号 (${u})</label>
+                        <input type="number" step="any" id="input_fontsize_${layer.id}" value="${formatDisplayNum(layer.fontSizeMm, u)}"
+                          onchange="updateLayerProp('${layer.id}', 'fontSizeMm', this.value, true)"
+                          class="w-full px-2 py-1 text-xs font-mono bg-gray-50/70 border border-apple-border rounded-lg focus:outline-none focus:border-apple-blue" />
+                      </div>
+                      <div>
+                        <label class="block text-[11px] text-apple-subtext mb-1">字间距 (${u})</label>
+                        <input type="number" step="any" value="${formatDisplayNum(layer.letterSpacingMm, u)}"
+                          onchange="updateLayerProp('${layer.id}', 'letterSpacingMm', this.value, true)"
+                          class="w-full px-2 py-1 text-xs font-mono bg-gray-50/70 border border-apple-border rounded-lg focus:outline-none focus:border-apple-blue" />
+                      </div>
+                      <div>
+                        <label class="block text-[11px] text-apple-subtext mb-1">行间距 (倍)</label>
+                        <input type="number" step="0.05" value="${layer.lineHeightRatio}"
+                          onchange="updateLayerProp('${layer.id}', 'lineHeightRatio', parseFloat(this.value) || 1.2)"
+                          class="w-full px-2 py-1 text-xs font-mono bg-gray-50/70 border border-apple-border rounded-lg focus:outline-none focus:border-apple-blue" />
+                      </div>
+                    </div>
+
+                    <!-- 坐标 X, Y -->
+                    <div class="grid grid-cols-2 gap-2">
+                      <div>
+                        <label class="block text-[11px] text-apple-subtext mb-1">X 坐标 (${u})</label>
+                        <input type="number" step="any" id="input_x_${layer.id}" value="${formatDisplayNum(layer.xMm, u)}"
+                          onchange="updateLayerProp('${layer.id}', 'xMm', this.value, true)"
+                          class="w-full px-2 py-1 text-xs font-mono bg-gray-50/70 border border-apple-border rounded-lg focus:outline-none focus:border-apple-blue" />
+                      </div>
+                      <div>
+                        <label class="block text-[11px] text-apple-subtext mb-1">Y 坐标 (${u})</label>
+                        <input type="number" step="any" id="input_y_${layer.id}" value="${formatDisplayNum(layer.yMm, u)}"
+                          onchange="updateLayerProp('${layer.id}', 'yMm', this.value, true)"
+                          class="w-full px-2 py-1 text-xs font-mono bg-gray-50/70 border border-apple-border rounded-lg focus:outline-none focus:border-apple-blue" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 基准点（左 / 中 / 右）显性分段控制器 -->
+                <div class="bg-gray-50/90 p-2 rounded-xl border border-apple-border space-y-1.5">
+                  <div class="flex items-center justify-between">
+                    <span class="text-[11px] font-medium text-apple-text">基准点（对齐方式）</span>
+                    <span class="text-[10px] text-apple-subtext">${(layer.anchor || 'left') === 'center' ? '向两侧均匀延伸' : (layer.anchor === 'right' ? '向左侧延伸' : '向右侧延伸')}</span>
+                  </div>
+                  <div class="grid grid-cols-3 gap-1 bg-gray-200/70 p-0.5 rounded-lg">
+                    <button type="button" onclick="setTextAnchor('${layer.id}', 'left')"
+                      class="flex items-center justify-center gap-1 py-1 text-xs font-medium rounded-md transition cursor-pointer ${(layer.anchor || 'left') === 'left' ? 'bg-apple-blue text-white shadow-2xs' : 'text-apple-text hover:bg-white/70'}">
+                      <i data-lucide="align-left" class="w-3.5 h-3.5"></i>
+                      <span>左</span>
+                    </button>
+                    <button type="button" onclick="setTextAnchor('${layer.id}', 'center')"
+                      class="flex items-center justify-center gap-1 py-1 text-xs font-medium rounded-md transition cursor-pointer ${layer.anchor === 'center' ? 'bg-apple-blue text-white shadow-2xs' : 'text-apple-text hover:bg-white/70'}">
+                      <i data-lucide="align-center" class="w-3.5 h-3.5"></i>
+                      <span>中</span>
+                    </button>
+                    <button type="button" onclick="setTextAnchor('${layer.id}', 'right')"
+                      class="flex items-center justify-center gap-1 py-1 text-xs font-medium rounded-md transition cursor-pointer ${layer.anchor === 'right' ? 'bg-apple-blue text-white shadow-2xs' : 'text-apple-text hover:bg-white/70'}">
+                      <i data-lucide="align-right" class="w-3.5 h-3.5"></i>
+                      <span>右</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- 限制文字宽高 -->
+                <div class="pt-1 border-t border-gray-100">
+                  <label class="inline-flex items-center gap-1.5 text-xs font-medium text-apple-text cursor-pointer">
+                    <input type="checkbox" ${layer.constrainBox ? 'checked' : ''}
+                      onchange="updateLayerProp('${layer.id}', 'constrainBox', this.checked, false, true)"
+                      class="rounded border-gray-300 text-apple-blue focus:ring-apple-blue" />
+                    <span>限制文字对象宽高（自动拉伸适应尺寸）</span>
+                  </label>
+
+                  ${layer.constrainBox ? `
+                    <div class="grid grid-cols-2 gap-2 mt-2 pl-5">
+                      <div>
+                        <label class="block text-[11px] text-apple-subtext mb-1">限定宽度 (${u})</label>
+                        <input type="number" step="any" id="input_boxw_${layer.id}" value="${formatDisplayNum(layer.boxWidthMm, u)}"
+                          onchange="updateLayerProp('${layer.id}', 'boxWidthMm', this.value, true)"
+                          class="w-full px-2 py-1 text-xs font-mono bg-blue-50/30 border border-apple-border rounded-lg focus:outline-none focus:border-apple-blue" />
+                      </div>
+                      <div>
+                        <label class="block text-[11px] text-apple-subtext mb-1">限定高度 (${u})</label>
+                        <input type="number" step="any" id="input_boxh_${layer.id}" value="${formatDisplayNum(layer.boxHeightMm, u)}"
+                          onchange="updateLayerProp('${layer.id}', 'boxHeightMm', this.value, true)"
+                          class="w-full px-2 py-1 text-xs font-mono bg-blue-50/30 border border-apple-border rounded-lg focus:outline-none focus:border-apple-blue" />
+                      </div>
+                    </div>
+                  ` : ''}
+                </div>
+
+                <!-- 文字颜色（单行可折叠色板） -->
+                <div class="pt-1.5 border-t border-gray-100">
+                  ${renderCompactColorPalette({
+                    paletteId: `text_color_${layer.id}`,
+                    label: '文字颜色',
+                    currentColor: layer.color,
+                    onChangeExpr: `updateLayerProp('${layer.id}', 'color', '__COLOR__', false, true)`
+                  })}
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
+        // 2. 图片图层
+        if (layer.type === 'image') {
+          const tag = layer.useVariable ? `<span class="text-[10px] font-medium px-1.5 py-0.5 rounded bg-emerald-100/80 text-emerald-700 shrink-0">图库 (${layer.variableImages.length})</span>` : '';
+          return `
+            <div onclick="selectLayer('${layer.id}')" class="bg-apple-card rounded-2xl border ${borderClass} shadow-2xs transition-all overflow-hidden">
+              ${renderHeader('image', 'bg-emerald-50', 'text-emerald-600', tag)}
+              <div class="${layer.collapsed ? 'hidden' : 'p-3.5 space-y-3'}">
+                <div class="flex items-center justify-between">
+                  <span class="text-[11px] font-medium text-apple-subtext">图片来源模式</span>
+                  <label class="inline-flex items-center gap-1.5 text-[11px] font-medium text-emerald-700 cursor-pointer">
+                    <input type="checkbox" ${layer.useVariable ? 'checked' : ''}
+                      onchange="updateLayerProp('${layer.id}', 'useVariable', this.checked)"
+                      class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500" />
+                    <span>启用变量（批量图片/文件夹）</span>
+                  </label>
+                </div>
+
+                ${!layer.useVariable ? `
+                  <div class="flex items-center gap-3 p-2.5 bg-gray-50/80 border border-dashed border-gray-300 rounded-xl">
+                    ${layer.singleImage ? `
+                      <img src="${layer.singleImage.src}" class="w-11 h-11 object-contain rounded-lg bg-white border border-gray-200 shrink-0" />
+                      <div class="min-w-0 flex-1">
+                        <p class="text-xs font-medium text-apple-text truncate">${escapeHtml(layer.singleImage.name)}</p>
+                        <p class="text-[10px] font-mono text-apple-subtext">${layer.singleImage.naturalWidth} × ${layer.singleImage.naturalHeight} px</p>
+                      </div>
+                    ` : `
+                      <div class="w-11 h-11 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-gray-400 shrink-0">
+                        <i data-lucide="image" class="w-5 h-5"></i>
+                      </div>
+                      <div class="flex-1 text-xs text-apple-subtext">请选择一张固定图片</div>
+                    `}
+                    <label class="px-2.5 py-1.5 bg-white hover:bg-gray-50 border border-apple-border rounded-lg text-xs font-medium text-apple-text shadow-2xs cursor-pointer shrink-0">
+                      <span>上传图片</span>
+                      <input type="file" accept="image/*" class="hidden" onchange="handleSingleImageUpload(this, '${layer.id}')" />
+                    </label>
+                  </div>
+                ` : `
+                  <div class="space-y-2">
+                    <div class="grid grid-cols-2 gap-2">
+                      <label class="flex items-center justify-center gap-1.5 px-2.5 py-2 bg-emerald-50/70 hover:bg-emerald-50 border border-emerald-200 rounded-xl text-xs font-medium text-emerald-800 cursor-pointer transition">
+                        <i data-lucide="images" class="w-3.5 h-3.5"></i>
+                        <span>选择多张图片</span>
+                        <input type="file" accept="image/*" multiple class="hidden" onchange="handleBatchImagesUpload(this, '${layer.id}')" />
+                      </label>
+                      <label class="flex items-center justify-center gap-1.5 px-2.5 py-2 bg-emerald-50/70 hover:bg-emerald-50 border border-emerald-200 rounded-xl text-xs font-medium text-emerald-800 cursor-pointer transition">
+                        <i data-lucide="folder-open" class="w-3.5 h-3.5"></i>
+                        <span>选择整个文件夹</span>
+                        <input type="file" webkitdirectory directory multiple class="hidden" onchange="handleBatchImagesUpload(this, '${layer.id}')" />
+                      </label>
+                    </div>
+
+                    <div class="border border-apple-border rounded-xl overflow-hidden bg-gray-50/50">
+                      <div class="px-2.5 py-1.5 bg-gray-100/80 border-b border-apple-border flex items-center justify-between text-[11px] text-apple-subtext">
+                        <span>自动按文件名创建变量表 (${layer.variableImages.length} 张)</span>
+                        ${layer.variableImages.length > 0 ? `<button type="button" onclick="state.layers.find(l=>l.id==='${layer.id}').variableImages=[]; renderLayersUI(); updatePaginationState(); renderPreview();" class="text-red-500 hover:underline cursor-pointer">清空</button>` : ''}
+                      </div>
+                      <div class="max-h-32 overflow-y-auto divide-y divide-gray-200/70">
+                        ${layer.variableImages.length === 0 ? `
+                          <div class="p-3 text-center text-[11px] text-gray-400">尚未选择批量图片或文件夹</div>
+                        ` : layer.variableImages.map((imgItem, idx) => `
+                          <div class="flex items-center gap-2 px-2 py-1 bg-white">
+                            <span class="w-6 text-center text-[11px] font-mono text-gray-400 shrink-0">${idx + 1}</span>
+                            <img src="${imgItem.src}" class="w-6 h-6 object-cover rounded border border-gray-200 shrink-0" />
+                            <span class="flex-1 text-xs truncate text-apple-text">${escapeHtml(imgItem.name)}</span>
+                            <button type="button" onclick="removeVariableImage('${layer.id}', ${idx})" class="text-gray-300 hover:text-red-500 px-1 cursor-pointer">×</button>
+                          </div>
+                        `).join('')}
+                      </div>
+                    </div>
+                  </div>
+                `}
+
+                <!-- 图片尺寸 W, H 与等比锁定 -->
+                <div class="grid grid-cols-12 gap-2 items-end">
+                  <div class="col-span-5">
+                    <label class="block text-[11px] text-apple-subtext mb-1">宽度 W (${u})</label>
+                    <input type="number" step="any" id="input_w_${layer.id}" value="${formatDisplayNum(layer.widthMm, u)}"
+                      onchange="updateLayerProp('${layer.id}', 'widthMm', this.value, true)"
+                      class="w-full px-2 py-1 text-xs font-mono bg-gray-50/70 border border-apple-border rounded-lg focus:outline-none focus:border-apple-blue" />
+                  </div>
+                  <div class="col-span-2 flex justify-center pb-1">
+                    <button type="button" onclick="updateLayerProp('${layer.id}', 'lockAspectRatio', ${!layer.lockAspectRatio}, false, true)"
+                      title="${layer.lockAspectRatio ? '已锁定宽高比' : '已解锁宽高比'}"
+                      class="p-1.5 rounded-lg border ${layer.lockAspectRatio ? 'bg-blue-50 border-blue-200 text-apple-blue' : 'bg-gray-50 border-apple-border text-gray-400'} cursor-pointer">
+                      <i data-lucide="${layer.lockAspectRatio ? 'link' : 'unlink'}" class="w-3.5 h-3.5"></i>
+                    </button>
+                  </div>
+                  <div class="col-span-5">
+                    <label class="block text-[11px] text-apple-subtext mb-1">高度 H (${u})</label>
+                    <input type="number" step="any" id="input_h_${layer.id}" value="${formatDisplayNum(layer.heightMm, u)}"
+                      onchange="updateLayerProp('${layer.id}', 'heightMm', this.value, true)"
+                      class="w-full px-2 py-1 text-xs font-mono bg-gray-50/70 border border-apple-border rounded-lg focus:outline-none focus:border-apple-blue" />
+                  </div>
+                </div>
+
+                <!-- 坐标 X, Y -->
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label class="block text-[11px] text-apple-subtext mb-1">X 坐标 (${u})</label>
+                    <input type="number" step="any" id="input_x_${layer.id}" value="${formatDisplayNum(layer.xMm, u)}"
+                      onchange="updateLayerProp('${layer.id}', 'xMm', this.value, true)"
+                      class="w-full px-2 py-1 text-xs font-mono bg-gray-50/70 border border-apple-border rounded-lg focus:outline-none focus:border-apple-blue" />
+                  </div>
+                  <div>
+                    <label class="block text-[11px] text-apple-subtext mb-1">Y 坐标 (${u})</label>
+                    <input type="number" step="any" id="input_y_${layer.id}" value="${formatDisplayNum(layer.yMm, u)}"
+                      onchange="updateLayerProp('${layer.id}', 'yMm', this.value, true)"
+                      class="w-full px-2 py-1 text-xs font-mono bg-gray-50/70 border border-apple-border rounded-lg focus:outline-none focus:border-apple-blue" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
+        // 3. 几何形状图层（矩形 rect / 椭圆形 ellipse / 直线 line）
+        const shapeMeta = {
+          rect: { icon: 'square', bg: 'bg-amber-50', color: 'text-amber-600' },
+          ellipse: { icon: 'circle', bg: 'bg-purple-50', color: 'text-purple-600' },
+          line: { icon: 'minus', bg: 'bg-rose-50', color: 'text-rose-600' }
+        }[layer.type];
+
+        return `
+          <div onclick="selectLayer('${layer.id}')" class="bg-apple-card rounded-2xl border ${borderClass} shadow-2xs transition-all overflow-hidden">
+            ${renderHeader(shapeMeta.icon, shapeMeta.bg, shapeMeta.color)}
+            <div class="${layer.collapsed ? 'hidden' : 'p-3.5 space-y-3'}">
+              
+              <!-- 位置 X, Y -->
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[11px] text-apple-subtext mb-1">X 坐标 (${u})</label>
+                  <input type="number" step="any" id="input_x_${layer.id}" value="${formatDisplayNum(layer.xMm, u)}"
+                    onchange="updateLayerProp('${layer.id}', 'xMm', this.value, true)"
+                    class="w-full px-2 py-1 text-xs font-mono bg-gray-50/70 border border-apple-border rounded-lg focus:outline-none focus:border-apple-blue" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-apple-subtext mb-1">Y 坐标 (${u})</label>
+                  <input type="number" step="any" id="input_y_${layer.id}" value="${formatDisplayNum(layer.yMm, u)}"
+                    onchange="updateLayerProp('${layer.id}', 'yMm', this.value, true)"
+                    class="w-full px-2 py-1 text-xs font-mono bg-gray-50/70 border border-apple-border rounded-lg focus:outline-none focus:border-apple-blue" />
+                </div>
+              </div>
+
+              <!-- 尺寸 W, H -->
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[11px] text-apple-subtext mb-1">${layer.type === 'line' ? `水平跨度 W (${u})` : `宽度 W (${u})`}</label>
+                  <input type="number" step="any" id="input_w_${layer.id}" value="${formatDisplayNum(layer.widthMm, u)}"
+                    onchange="updateLayerProp('${layer.id}', 'widthMm', this.value, true)"
+                    class="w-full px-2 py-1 text-xs font-mono bg-gray-50/70 border border-apple-border rounded-lg focus:outline-none focus:border-apple-blue" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-apple-subtext mb-1">${layer.type === 'line' ? `垂直跨度 H (${u})` : `高度 H (${u})`}</label>
+                  <input type="number" step="any" id="input_h_${layer.id}" value="${formatDisplayNum(layer.heightMm, u)}"
+                    onchange="updateLayerProp('${layer.id}', 'heightMm', this.value, true)"
+                    class="w-full px-2 py-1 text-xs font-mono bg-gray-50/70 border border-apple-border rounded-lg focus:outline-none focus:border-apple-blue" />
+                </div>
+              </div>
+
+              ${layer.type === 'line' ? `
+                <!-- 直线专属方向快捷控制 -->
+                <div class="flex items-center justify-between gap-2 bg-gray-50/80 px-2.5 py-1.5 rounded-lg border border-apple-border">
+                  <span class="text-[11px] text-apple-subtext">方向快捷：</span>
+                  <div class="flex items-center gap-1">
+                    <button type="button" onclick="setLinePresetOrientation('${layer.id}', 'horizontal')" class="px-2 py-0.5 text-[11px] bg-white border border-apple-border rounded hover:bg-gray-100 cursor-pointer">水平线</button>
+                    <button type="button" onclick="setLinePresetOrientation('${layer.id}', 'vertical')" class="px-2 py-0.5 text-[11px] bg-white border border-apple-border rounded hover:bg-gray-100 cursor-pointer">垂直线</button>
+                    <button type="button" onclick="updateLayerProp('${layer.id}', 'lineDirection', '${layer.lineDirection === 'tl-br' ? 'bl-tr' : 'tl-br'}', false, true)"
+                      class="px-2 py-0.5 text-[11px] bg-white border border-apple-border rounded hover:bg-gray-100 cursor-pointer" title="切换对角方向">
+                      ${layer.lineDirection === 'tl-br' ? '斜向 ↘' : '斜向 ↗'}
+                    </button>
+                  </div>
+                </div>
+              ` : `
+                <!-- 矩形 & 椭圆形 填充颜色（单行可折叠色板 + 无填充开关） -->
+                <div class="pt-1 border-t border-gray-100">
+                  ${renderCompactColorPalette({
+                    paletteId: `fill_color_${layer.id}`,
+                    label: '填充颜色',
+                    currentColor: layer.fillColor,
+                    onChangeExpr: `updateLayerProp('${layer.id}', 'fillColor', '__COLOR__', false, true)`,
+                    allowTransparent: true,
+                    isTransparent: layer.fillTransparent,
+                    onToggleTransparentExpr: `updateLayerProp('${layer.id}', 'fillTransparent', this.checked, false, true)`
+                  })}
+                </div>
+              `}
+
+              <!-- 描边设置：粗细 + 虚线开关 + 虚线间隙 -->
+              <div class="pt-1.5 border-t border-gray-100 space-y-2.5">
+                <div class="grid grid-cols-12 gap-2 items-end">
+                  <div class="col-span-6">
+                    <label class="block text-[11px] text-apple-subtext mb-1">描边大小 (${u})</label>
+                    <input type="number" step="any" value="${formatDisplayNum(layer.strokeWidthMm, u)}"
+                      onchange="updateLayerProp('${layer.id}', 'strokeWidthMm', this.value, true)"
+                      class="w-full px-2 py-1 text-xs font-mono bg-gray-50/70 border border-apple-border rounded-lg focus:outline-none focus:border-apple-blue" />
+                  </div>
+                  <div class="col-span-6 pb-1">
+                    <label class="inline-flex items-center gap-1.5 text-xs font-medium text-apple-text cursor-pointer">
+                      <input type="checkbox" ${layer.strokeDashed ? 'checked' : ''}
+                        onchange="updateLayerProp('${layer.id}', 'strokeDashed', this.checked, false, true)"
+                        class="rounded border-gray-300 text-apple-blue focus:ring-apple-blue" />
+                      <span>启用描边虚线</span>
+                    </label>
+                  </div>
+                </div>
+
+                ${layer.strokeDashed ? `
+                  <div class="grid grid-cols-2 gap-2 p-2 bg-gray-50/80 rounded-xl border border-apple-border">
+                    <div>
+                      <label class="block text-[11px] text-apple-subtext mb-1">实线段长 (${u})</label>
+                      <input type="number" step="any" value="${formatDisplayNum(layer.dashLengthMm, u)}"
+                        onchange="updateLayerProp('${layer.id}', 'dashLengthMm', this.value, true)"
+                        class="w-full px-2 py-1 text-xs font-mono bg-white border border-apple-border rounded-lg focus:outline-none focus:border-apple-blue" />
+                    </div>
+                    <div>
+                      <label class="block text-[11px] text-apple-subtext mb-1">虚线间隙 (${u})</label>
+                      <input type="number" step="any" value="${formatDisplayNum(layer.dashGapMm, u)}"
+                        onchange="updateLayerProp('${layer.id}', 'dashGapMm', this.value, true)"
+                        class="w-full px-2 py-1 text-xs font-mono bg-white border border-apple-border rounded-lg focus:outline-none focus:border-apple-blue" />
+                    </div>
+                  </div>
+                ` : ''}
+
+                <!-- 描边颜色（单行可折叠色板） -->
+                ${renderCompactColorPalette({
+                  paletteId: `stroke_color_${layer.id}`,
+                  label: '描边颜色',
+                  currentColor: layer.strokeColor,
+                  onChangeExpr: `updateLayerProp('${layer.id}', 'strokeColor', '__COLOR__', false, true)`
+                })}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    /**
+     * ============================================================================
+     * 8. 变量分页计算与翻页控制
+     * ============================================================================
+     */
+    function getTotalVariablePages() {
+      let maxPages = 1;
+      for (const layer of state.layers) {
+        if (layer.type === 'text' && layer.useVariable && layer.variables.length > 0) {
+          maxPages = Math.max(maxPages, layer.variables.length);
+        } else if (layer.type === 'image' && layer.useVariable && layer.variableImages.length > 0) {
+          maxPages = Math.max(maxPages, layer.variableImages.length);
+        }
+      }
+      return maxPages;
+    }
+
+    function updatePaginationState() {
+      const total = getTotalVariablePages();
+      if (state.currentPage > total) state.currentPage = total;
+      if (state.currentPage < 1) state.currentPage = 1;
+
+      document.getElementById('totalPagesLabel').textContent = total;
+      const pageInput = document.getElementById('currentPageInput');
+      pageInput.value = state.currentPage;
+      pageInput.max = total;
+
+      document.getElementById('prevPageBtn').disabled = state.currentPage <= 1;
+      document.getElementById('nextPageBtn').disabled = state.currentPage >= total;
+
+      const hasVar = state.layers.some(l => (l.type === 'text' && l.useVariable) || (l.type === 'image' && l.useVariable));
+      document.getElementById('variableSummaryText').textContent = hasVar
+        ? `批量变量已激活 · 共 ${total} 组序列化页面（翻页实时预览切换）`
+        : `当前无批量变量（共 1 页静态预览）`;
+    }
+
+    function changePage(delta) {
+      const total = getTotalVariablePages();
+      const next = Math.min(total, Math.max(1, state.currentPage + delta));
+      if (next !== state.currentPage) {
+        state.currentPage = next;
+        updatePaginationState();
+        renderPreview();
+      }
+    }
+
+    function jumpToPage(val) {
+      const total = getTotalVariablePages();
+      const num = parseInt(val, 10);
+      if (isNaN(num)) {
+        updatePaginationState();
+        return;
+      }
+      state.currentPage = Math.min(total, Math.max(1, num));
+      updatePaginationState();
+      renderPreview();
+    }
+
+    function getActiveTextForLayer(layer, pageIndex1Based) {
+      if (!layer.useVariable || layer.variables.length === 0) return layer.text || '';
+      const idx = (pageIndex1Based - 1) % layer.variables.length;
+      return layer.variables[idx] ?? '';
+    }
+
+    function getActiveImageForLayer(layer, pageIndex1Based) {
+      if (!layer.useVariable) return layer.singleImage;
+      if (layer.variableImages.length === 0) return null;
+      const idx = (pageIndex1Based - 1) % layer.variableImages.length;
+      return layer.variableImages[idx];
+    }
+
+    /**
+     * ============================================================================
+     * 9. 核心渲染引擎（支持参考背景图、全图层矢量/位图、交互定界框与控制手柄）
+     * ============================================================================
+     */
+    function renderDocumentToContext(ctx, pixelWidth, pixelHeight, pageIndex, isPreview = false) {
+      // 开启最高品质图像平滑插值
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+
+      // 1. 画布纯色背景
+      ctx.save();
+      ctx.fillStyle = state.canvasBgColor;
+      ctx.fillRect(0, 0, pixelWidth, pixelHeight);
+      ctx.restore();
+
+      const scaleX = pixelWidth / mmToPx(state.canvasWidthMm);
+      const scaleY = pixelHeight / mmToPx(state.canvasHeightMm);
+
+      // 2. 参考背景图（仅当预览模式，或导出未开启隐藏时渲染）
+      if (state.refBgImage && state.refBgImage.imgObj && (isPreview || !state.refBgHideOnExport)) {
+        ctx.save();
+        ctx.globalAlpha = state.refBgOpacity;
+        const img = state.refBgImage.imgObj;
+        let drawX = 0, drawY = 0, drawW = pixelWidth, drawH = pixelHeight;
+        if (state.refBgFitMode === 'contain') {
+          const imgRatio = img.naturalWidth / img.naturalHeight;
+          const canvasRatio = pixelWidth / pixelHeight;
+          if (imgRatio > canvasRatio) {
+            drawH = pixelWidth / imgRatio;
+            drawY = (pixelHeight - drawH) / 2;
+          } else {
+            drawW = pixelHeight * imgRatio;
+            drawX = (pixelWidth - drawW) / 2;
+          }
+        }
+        ctx.drawImage(img, drawX, drawY, drawW, drawH);
+        ctx.restore();
+      }
+
+      // 3. 预览坐标参考网格
+      if (isPreview && document.getElementById('showRulerCheck')?.checked) {
+        ctx.save();
+        ctx.strokeStyle = 'rgba(0, 113, 227, 0.08)';
+        ctx.lineWidth = 1;
+        const stepPx = mmToPx(10) * scaleX;
+        if (stepPx >= 6) {
+          for (let x = stepPx; x < pixelWidth; x += stepPx) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, pixelHeight);
+            ctx.stroke();
+          }
+          for (let y = stepPx; y < pixelHeight; y += stepPx) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(pixelWidth, y);
+            ctx.stroke();
+          }
+        }
+        ctx.restore();
+      }
+
+      if (isPreview) {
+        for (const k in computedBoundsMap) delete computedBoundsMap[k];
+      }
+
+      // 4. 逐层渲染内容元素
+      for (const layer of state.layers) {
+        ctx.save();
+        let boundsMm = { xMm: layer.xMm, yMm: layer.yMm, wMm: 10, hMm: 10 };
+
+        if (layer.type === 'image') {
+          const x = mmToPx(layer.xMm) * scaleX;
+          const y = mmToPx(layer.yMm) * scaleY;
+          const w = mmToPx(layer.widthMm) * scaleX;
+          const h = mmToPx(layer.heightMm) * scaleY;
+          boundsMm = { xMm: layer.xMm, yMm: layer.yMm, wMm: layer.widthMm, hMm: layer.heightMm };
+
+          const imgData = getActiveImageForLayer(layer, pageIndex);
+          if (imgData && imgData.imgObj) {
+            ctx.drawImage(imgData.imgObj, x, y, w, h);
+          } else if (isPreview) {
+            ctx.fillStyle = 'rgba(16, 185, 129, 0.08)';
+            ctx.fillRect(x, y, w, h);
+            ctx.strokeStyle = 'rgba(16, 185, 129, 0.5)';
+            ctx.setLineDash([4, 4]);
+            ctx.strokeRect(x, y, w, h);
+            ctx.fillStyle = '#059669';
+            ctx.font = `${Math.max(11, 12 * scaleX)}px sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('待上传图片', x + w / 2, y + h / 2);
+          }
+        } else if (layer.type === 'rect' || layer.type === 'ellipse' || layer.type === 'line') {
+          const x = mmToPx(layer.xMm) * scaleX;
+          const y = mmToPx(layer.yMm) * scaleY;
+          const w = mmToPx(layer.widthMm) * scaleX;
+          const h = mmToPx(layer.heightMm) * scaleY;
+          boundsMm = { xMm: layer.xMm, yMm: layer.yMm, wMm: layer.widthMm, hMm: layer.heightMm };
+
+          const hasFill = layer.type !== 'line' && !layer.fillTransparent;
+          const hasStroke = (layer.strokeWidthMm || 0) > 0;
+
+          if (hasFill) ctx.fillStyle = layer.fillColor;
+          if (hasStroke) {
+            ctx.strokeStyle = layer.strokeColor;
+            ctx.lineWidth = Math.max(0.5, mmToPx(layer.strokeWidthMm) * scaleX);
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            if (layer.strokeDashed) {
+              ctx.setLineDash([
+                Math.max(1, mmToPx(layer.dashLengthMm) * scaleX),
+                Math.max(1, mmToPx(layer.dashGapMm) * scaleX)
+              ]);
+            }
+          }
+
+          ctx.beginPath();
+          if (layer.type === 'rect') {
+            ctx.rect(x, y, w, h);
+          } else if (layer.type === 'ellipse') {
+            ctx.ellipse(x + w / 2, y + h / 2, Math.max(0.5, w / 2), Math.max(0.5, h / 2), 0, 0, Math.PI * 2);
+          } else if (layer.type === 'line') {
+            if (layer.lineDirection === 'bl-tr') {
+              ctx.moveTo(x, y + h);
+              ctx.lineTo(x + w, y);
+            } else {
+              ctx.moveTo(x, y);
+              ctx.lineTo(x + w, y + h);
+            }
+          }
+
+          if (hasFill) ctx.fill();
+          if (hasStroke) ctx.stroke();
+        } else if (layer.type === 'text') {
+          const content = getActiveTextForLayer(layer, pageIndex);
+          const fontSizePx = mmToPx(layer.fontSizeMm) * scaleY;
+          const letterSpacingPx = mmToPx(layer.letterSpacingMm || 0) * scaleX;
+          const lineHeightPx = fontSizePx * (layer.lineHeightRatio || 1.2);
+          const anchor = layer.anchor || 'left';
+          const fontStack = layer.customFont && layer.customFont.trim()
+            ? `"${layer.customFont.trim()}", ${layer.fontFamily}`
+            : layer.fontFamily;
+
+          ctx.font = `${layer.fontWeight} ${fontSizePx}px ${fontStack}`;
+          ctx.fillStyle = layer.color;
+          ctx.textBaseline = 'top';
+
+          const lines = (content || '').split('\n');
+          let naturalWidthPx = 0;
+          const measuredLines = lines.map(line => {
+            const chars = Array.from(line);
+            let lineW = 0;
+            chars.forEach((ch, idx) => {
+              lineW += ctx.measureText(ch).width + (idx < chars.length - 1 ? letterSpacingPx : 0);
+            });
+            naturalWidthPx = Math.max(naturalWidthPx, lineW);
+            return { chars, width: lineW };
+          });
+          const naturalHeightPx = Math.max(fontSizePx, lines.length * lineHeightPx);
+
+          const naturalWidthMm = pxToMm(naturalWidthPx / scaleX);
+          const naturalHeightMm = pxToMm(naturalHeightPx / scaleY);
+          const targetWMm = layer.constrainBox ? layer.boxWidthMm : naturalWidthMm;
+          const targetHMm = layer.constrainBox ? layer.boxHeightMm : naturalHeightMm;
+
+          let boxLeftMm = layer.xMm;
+          if (anchor === 'center') boxLeftMm = layer.xMm - targetWMm / 2;
+          else if (anchor === 'right') boxLeftMm = layer.xMm - targetWMm;
+
+          boundsMm = { xMm: boxLeftMm, yMm: layer.yMm, wMm: targetWMm, hMm: targetHMm };
+
+          const boxLeftPx = mmToPx(boxLeftMm) * scaleX;
+          const boxTopPx = mmToPx(layer.yMm) * scaleY;
+          const stretchX = naturalWidthPx > 0 ? (mmToPx(targetWMm) * scaleX) / naturalWidthPx : 1;
+          const stretchY = naturalHeightPx > 0 ? (mmToPx(targetHMm) * scaleY) / naturalHeightPx : 1;
+
+          ctx.translate(boxLeftPx, boxTopPx);
+          if (layer.constrainBox) {
+            ctx.scale(stretchX, stretchY);
+          }
+
+          measuredLines.forEach((lineObj, lineIdx) => {
+            let cursorX = 0;
+            if (anchor === 'center') cursorX = (naturalWidthPx - lineObj.width) / 2;
+            else if (anchor === 'right') cursorX = naturalWidthPx - lineObj.width;
+            const cursorY = lineIdx * lineHeightPx;
+
+            lineObj.chars.forEach(ch => {
+              ctx.fillText(ch, cursorX, cursorY);
+              cursorX += ctx.measureText(ch).width + letterSpacingPx;
+            });
+          });
+        }
+
+        ctx.restore();
+
+        if (isPreview) {
+          computedBoundsMap[layer.id] = boundsMm;
+        }
+      }
+
+      // 5. 预览选中高亮框、基准参考线与 8 向控制手柄
+      if (isPreview && state.selectedLayerId && computedBoundsMap[state.selectedLayerId]) {
+        const selLayer = state.layers.find(l => l.id === state.selectedLayerId);
+        const b = computedBoundsMap[state.selectedLayerId];
+        const bx = mmToPx(b.xMm) * scaleX;
+        const by = mmToPx(b.yMm) * scaleY;
+        const bw = mmToPx(b.wMm) * scaleX;
+        const bh = mmToPx(b.hMm) * scaleY;
+
+        ctx.save();
+        ctx.strokeStyle = '#0071E3';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(bx, by, bw, bh);
+
+        // 文字锚点基准垂直指示线
+        if (selLayer && selLayer.type === 'text') {
+          const anchorX = mmToPx(selLayer.xMm) * scaleX;
+          ctx.save();
+          ctx.strokeStyle = '#0071E3';
+          ctx.lineWidth = 1;
+          ctx.setLineDash([3, 3]);
+          ctx.beginPath();
+          ctx.moveTo(anchorX, Math.max(0, by - 14));
+          ctx.lineTo(anchorX, Math.min(pixelHeight, by + bh + 14));
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.fillStyle = '#0071E3';
+          ctx.beginPath();
+          ctx.arc(anchorX, by - 6, 3, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+
+        // 绘制 8 个控制手柄
+        const handles = getHandlePositionsPx(bx, by, bw, bh);
+        handles.forEach(h => {
+          ctx.fillStyle = '#FFFFFF';
+          ctx.strokeStyle = '#0071E3';
+          ctx.lineWidth = 1.5;
+          ctx.fillRect(h.x - 4, h.y - 4, 8, 8);
+          ctx.strokeRect(h.x - 4, h.y - 4, 8, 8);
+        });
+        ctx.restore();
+      }
+    }
+
+    function getHandlePositionsPx(bx, by, bw, bh) {
+      return [
+        { id: 'nw', x: bx, y: by, cursor: 'nwse-resize' },
+        { id: 'n', x: bx + bw / 2, y: by, cursor: 'ns-resize' },
+        { id: 'ne', x: bx + bw, y: by, cursor: 'nesw-resize' },
+        { id: 'e', x: bx + bw, y: by + bh / 2, cursor: 'ew-resize' },
+        { id: 'se', x: bx + bw, y: by + bh, cursor: 'nwse-resize' },
+        { id: 's', x: bx + bw / 2, y: by + bh, cursor: 'ns-resize' },
+        { id: 'sw', x: bx, y: by + bh, cursor: 'nesw-resize' },
+        { id: 'w', x: bx, y: by + bh / 2, cursor: 'ew-resize' }
+      ];
+    }
+
+    function renderPreview() {
+      const viewport = document.getElementById('canvasViewport');
+      const canvas = document.getElementById('previewCanvas');
+      if (!viewport || !canvas) return;
+
+      const availW = Math.max(120, viewport.clientWidth - 48);
+      const availH = Math.max(120, viewport.clientHeight - 48);
+
+      const physW = mmToPx(state.canvasWidthMm);
+      const physH = mmToPx(state.canvasHeightMm);
+      const fitScale = Math.min(availW / physW, availH / physH, 1.5);
+      interactState.previewScale = fitScale;
+
+      const cssW = Math.max(40, Math.round(physW * fitScale));
+      const cssH = Math.max(40, Math.round(physH * fitScale));
+      const dpr = window.devicePixelRatio || 1;
+
+      canvas.style.width = `${cssW}px`;
+      canvas.style.height = `${cssH}px`;
+      canvas.width = Math.round(cssW * dpr);
+      canvas.height = Math.round(cssH * dpr);
+
+      const zoomBadge = document.getElementById('zoomScaleBadge');
+      if (zoomBadge) zoomBadge.textContent = `${Math.round(fitScale * 100)}%`;
+
+      const ctx = canvas.getContext('2d');
+      renderDocumentToContext(ctx, canvas.width, canvas.height, state.currentPage, true);
+    }
+
+    /**
+     * ============================================================================
+     * 10. 画布鼠标拖拽移动与 8 向控制手柄缩放交互
+     * ============================================================================
+     */
+    function setupCanvasInteractions() {
+      const canvas = document.getElementById('previewCanvas');
+      if (!canvas) return;
+
+      function getMousePosMmAndPx(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        const pxX = clientX - rect.left;
+        const pxY = clientY - rect.top;
+        const xMm = (pxX / rect.width) * state.canvasWidthMm;
+        const yMm = (pxY / rect.height) * state.canvasHeightMm;
+        return { pxX, pxY, xMm, yMm, rectW: rect.width, rectH: rect.height };
+      }
+
+      canvas.addEventListener('mousedown', (e) => {
+        const { pxX, pxY, xMm, yMm, rectW, rectH } = getMousePosMmAndPx(e);
+        const scaleX = rectW / state.canvasWidthMm;
+        const scaleY = rectH / state.canvasHeightMm;
+
+        // 1. 优先检测当前选中图层的 8 个缩放手柄
+        if (state.selectedLayerId && computedBoundsMap[state.selectedLayerId]) {
+          const b = computedBoundsMap[state.selectedLayerId];
+          const handles = getHandlePositionsPx(b.xMm * scaleX, b.yMm * scaleY, b.wMm * scaleX, b.hMm * scaleY);
+          const hitHandle = handles.find(h => Math.abs(pxX - h.x) <= 7 && Math.abs(pxY - h.y) <= 7);
+          if (hitHandle) {
+            const layer = state.layers.find(l => l.id === state.selectedLayerId);
+            if (layer) {
+              interactState.mode = 'resize';
+              interactState.handle = hitHandle.id;
+              interactState.layerId = layer.id;
+              interactState.startMouseXMm = xMm;
+              interactState.startMouseYMm = yMm;
+              interactState.origXMm = b.xMm;
+              interactState.origYMm = b.yMm;
+              interactState.origWMm = b.wMm;
+              interactState.origHMm = b.hMm;
+              interactState.origFontSizeMm = layer.fontSizeMm || 8;
+              return;
+            }
+          }
+        }
+
+        // 2. 自顶向下命中测试选择图层
+        let hitLayerId = null;
+        for (let i = state.layers.length - 1; i >= 0; i--) {
+          const l = state.layers[i];
+          const b = computedBoundsMap[l.id];
+          if (!b) continue;
+          const padMm = 1.5;
+          if (xMm >= b.xMm - padMm && xMm <= b.xMm + b.wMm + padMm &&
+              yMm >= b.yMm - padMm && yMm <= b.yMm + b.hMm + padMm) {
+            hitLayerId = l.id;
+            break;
+          }
+        }
+
+        if (hitLayerId) {
+          selectLayer(hitLayerId);
+          const layer = state.layers.find(l => l.id === hitLayerId);
+          interactState.mode = 'move';
+          interactState.layerId = layer.id;
+          interactState.startMouseXMm = xMm;
+          interactState.startMouseYMm = yMm;
+          interactState.origXMm = layer.xMm;
+          interactState.origYMm = layer.yMm;
+        } else {
+          state.selectedLayerId = null;
+          renderLayersUI();
+          renderPreview();
+        }
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (interactState.mode === 'none') {
+          if (e.target === canvas && state.selectedLayerId && computedBoundsMap[state.selectedLayerId]) {
+            const { pxX, pxY, rectW, rectH } = getMousePosMmAndPx(e);
+            const b = computedBoundsMap[state.selectedLayerId];
+            const handles = getHandlePositionsPx(
+              b.xMm * (rectW / state.canvasWidthMm),
+              b.yMm * (rectH / state.canvasHeightMm),
+              b.wMm * (rectW / state.canvasWidthMm),
+              b.hMm * (rectH / state.canvasHeightMm)
+            );
+            const hit = handles.find(h => Math.abs(pxX - h.x) <= 7 && Math.abs(pxY - h.y) <= 7);
+            canvas.style.cursor = hit ? hit.cursor : 'move';
+          }
+          return;
+        }
+
+        const layer = state.layers.find(l => l.id === interactState.layerId);
+        if (!layer) return;
+
+        const { xMm, yMm } = getMousePosMmAndPx(e);
+        const dx = xMm - interactState.startMouseXMm;
+        const dy = yMm - interactState.startMouseYMm;
+
+        if (interactState.mode === 'move') {
+          layer.xMm = Number((interactState.origXMm + dx).toFixed(2));
+          layer.yMm = Number((interactState.origYMm + dy).toFixed(2));
+          syncLayerNumericInputs(layer);
+          renderPreview();
+        } else if (interactState.mode === 'resize') {
+          const h = interactState.handle;
+          let newLeft = interactState.origXMm;
+          let newTop = interactState.origYMm;
+          let newW = interactState.origWMm;
+          let newH = interactState.origHMm;
+
+          if (h.includes('e')) newW = Math.max(0.5, interactState.origWMm + dx);
+          if (h.includes('s')) newH = Math.max(layer.type === 'line' ? 0 : 0.5, interactState.origHMm + dy);
+          if (h.includes('w')) {
+            const maxShift = interactState.origWMm - 0.5;
+            const shift = Math.min(maxShift, dx);
+            newLeft = interactState.origXMm + shift;
+            newW = interactState.origWMm - shift;
+          }
+          if (h.includes('n')) {
+            const maxShift = interactState.origHMm - (layer.type === 'line' ? 0 : 0.5);
+            const shift = Math.min(maxShift, dy);
+            newTop = interactState.origYMm + shift;
+            newH = interactState.origHMm - shift;
+          }
+
+          // 按住 Shift 键或图片锁定比例时保持等比缩放
+          if ((e.shiftKey || (layer.type === 'image' && layer.lockAspectRatio)) && interactState.origHMm > 0) {
+            const aspect = interactState.origWMm / interactState.origHMm;
+            if (h === 'n' || h === 's') {
+              newW = newH * aspect;
+            } else {
+              newH = newW / aspect;
+            }
+          }
+
+          if (layer.type === 'text') {
+            if (layer.constrainBox) {
+              layer.boxWidthMm = Number(newW.toFixed(2));
+              layer.boxHeightMm = Number(newH.toFixed(2));
+            } else if (interactState.origHMm > 0) {
+              const scaleRatio = newH / interactState.origHMm;
+              layer.fontSizeMm = Number(Math.max(1, interactState.origFontSizeMm * scaleRatio).toFixed(2));
+            }
+            const anchor = layer.anchor || 'left';
+            if (anchor === 'center') layer.xMm = Number((newLeft + newW / 2).toFixed(2));
+            else if (anchor === 'right') layer.xMm = Number((newLeft + newW).toFixed(2));
+            else layer.xMm = Number(newLeft.toFixed(2));
+            layer.yMm = Number(newTop.toFixed(2));
+          } else {
+            layer.xMm = Number(newLeft.toFixed(2));
+            layer.yMm = Number(newTop.toFixed(2));
+            layer.widthMm = Number(newW.toFixed(2));
+            layer.heightMm = Number(newH.toFixed(2));
+          }
+
+          syncLayerNumericInputs(layer);
+          renderPreview();
+        }
+      });
+
+      window.addEventListener('mouseup', () => {
+        if (interactState.mode !== 'none') {
+          interactState.mode = 'none';
+          interactState.handle = null;
+          renderLayersUI();
+        }
+      });
+    }
+
+    function syncLayerNumericInputs(layer) {
+      const u = state.unit;
+      const xEl = document.getElementById(`input_x_${layer.id}`);
+      const yEl = document.getElementById(`input_y_${layer.id}`);
+      if (xEl) xEl.value = formatDisplayNum(layer.xMm, u);
+      if (yEl) yEl.value = formatDisplayNum(layer.yMm, u);
+
+      if (layer.type === 'text') {
+        const fsEl = document.getElementById(`input_fontsize_${layer.id}`);
+        const bwEl = document.getElementById(`input_boxw_${layer.id}`);
+        const bhEl = document.getElementById(`input_boxh_${layer.id}`);
+        if (fsEl) fsEl.value = formatDisplayNum(layer.fontSizeMm, u);
+        if (bwEl) bwEl.value = formatDisplayNum(layer.boxWidthMm, u);
+        if (bhEl) bhEl.value = formatDisplayNum(layer.boxHeightMm, u);
+      } else {
+        const wEl = document.getElementById(`input_w_${layer.id}`);
+        const hEl = document.getElementById(`input_h_${layer.id}`);
+        if (wEl) wEl.value = formatDisplayNum(layer.widthMm, u);
+        if (hEl) hEl.value = formatDisplayNum(layer.heightMm, u);
+      }
+    }
+
+    /**
+     * ============================================================================
+     * 11. 模板导入与导出功能 (JSON 序列化与恢复)
+     * ============================================================================
+     */
+    function exportTemplate() {
+      const serializedLayers = state.layers.map(layer => {
+        const copy = { ...layer };
+        if (layer.type === 'image') {
+          copy.singleImage = layer.singleImage
+            ? { name: layer.singleImage.name, src: layer.singleImage.src, naturalWidth: layer.singleImage.naturalWidth, naturalHeight: layer.singleImage.naturalHeight }
+            : null;
+          copy.variableImages = (layer.variableImages || []).map(img => ({
+            name: img.name,
+            src: img.src,
+            naturalWidth: img.naturalWidth,
+            naturalHeight: img.naturalHeight
+          }));
+        }
+        return copy;
+      });
+
+      const templatePayload = {
+        version: '2.0',
+        exportedAt: new Date().toISOString(),
+        projectName: state.projectName,
+        unit: state.unit,
+        canvasWidthMm: state.canvasWidthMm,
+        canvasHeightMm: state.canvasHeightMm,
+        canvasBgColor: state.canvasBgColor,
+        refBgImage: state.refBgImage
+          ? { name: state.refBgImage.name, src: state.refBgImage.src, naturalWidth: state.refBgImage.naturalWidth, naturalHeight: state.refBgImage.naturalHeight }
+          : null,
+        refBgOpacity: state.refBgOpacity,
+        refBgHideOnExport: state.refBgHideOnExport,
+        refBgFitMode: state.refBgFitMode,
+        layers: serializedLayers
+      };
+
+      const jsonStr = JSON.stringify(templatePayload, null, 2);
+      const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8' });
+      const fileName = `${sanitizeFilename(state.projectName)}_模板.json`;
+      triggerDownload(blob, fileName);
+      showToast(`模板已导出：${fileName}`, 'success');
+    }
+
+    async function importTemplate(input) {
+      const file = input.files && input.files[0];
+      if (!file) return;
+
+      try {
+        const text = await file.text();
+        const data = JSON.parse(text);
+        if (!data || !Array.isArray(data.layers)) {
+          throw new Error('无效的模板文件格式');
+        }
+
+        state.projectName = data.projectName || '未命名项目';
+        document.getElementById('projectNameInput').value = state.projectName;
+
+        state.canvasWidthMm = Number(data.canvasWidthMm) || 150;
+        state.canvasHeightMm = Number(data.canvasHeightMm) || 100;
+        state.canvasBgColor = data.canvasBgColor || '#FFFFFF';
+        state.refBgOpacity = typeof data.refBgOpacity === 'number' ? data.refBgOpacity : 0.4;
+        state.refBgHideOnExport = data.refBgHideOnExport !== false;
+        state.refBgFitMode = data.refBgFitMode || 'stretch';
+
+        if (data.refBgImage && data.refBgImage.src) {
+          state.refBgImage = await loadImageFromDataUrl(data.refBgImage.src, data.refBgImage.name);
+        } else {
+          state.refBgImage = null;
+        }
+
+        const restoredLayers = [];
+        for (const rawLayer of data.layers) {
+          const layer = { ...rawLayer, id: 'layer_' + (layerIdCounter++) };
+          if (layer.type === 'image') {
+            layer.singleImage = rawLayer.singleImage && rawLayer.singleImage.src
+              ? await loadImageFromDataUrl(rawLayer.singleImage.src, rawLayer.singleImage.name)
+              : null;
+            layer.variableImages = [];
+            if (Array.isArray(rawLayer.variableImages)) {
+              for (const vImg of rawLayer.variableImages) {
+                if (vImg && vImg.src) {
+                  const loaded = await loadImageFromDataUrl(vImg.src, vImg.name);
+                  if (loaded) layer.variableImages.push(loaded);
+                }
+              }
+            }
+          }
+          restoredLayers.push(layer);
+        }
+
+        state.layers = restoredLayers;
+        state.selectedLayerId = restoredLayers.length ? restoredLayers[0].id : null;
+        state.currentPage = 1;
+
+        if (data.unit && (data.unit === 'mm' || data.unit === 'pt')) {
+          switchUnit(data.unit);
+        } else {
+          syncCanvasInputs();
+        }
+        renderCanvasBgPaletteUI();
+        syncRefBgUI();
+        renderLayersUI();
+        updatePaginationState();
+        renderPreview();
+        showToast(`已成功导入模板：${file.name}`, 'success');
+      } catch (err) {
+        console.error('模板导入失败:', err);
+        showToast('模板导入失败：文件格式不正确或已损坏', 'error');
+      } finally {
+        input.value = '';
+      }
+    }
+
+    /**
+     * ============================================================================
+     * 12. 300 PPI 超高清位图 & 原生真矢量 PDF 批量导出引擎
+     * ============================================================================
+     */
+    function sanitizeFilename(name) {
+      return (name || '未命名项目').replace(/[\\/:*?"<>|]/g, '_').trim();
+    }
+
+    function padSequence(num, total) {
+      const digits = Math.max(2, String(total).length);
+      return String(num).padStart(digits, '0');
+    }
+
+    // 缓存已加载的矢量字体对象，避免重复请求
+    let cachedVectorFont = null;
+    let vectorFontLoadPromise = null;
+
+    async function getVectorFont() {
+      if (cachedVectorFont) return cachedVectorFont;
+      if (vectorFontLoadPromise) return vectorFontLoadPromise;
+
+      vectorFontLoadPromise = (async () => {
+        // 加载支持简体中文的轻量级 WOFF/TTF 开源字体以提取精确真矢量字形轮廓
+        const fontUrls = [
+          'https://cdn.jsdelivr.net/gh/notofonts/noto-cjk@main/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Regular.otf',
+          'https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-sc@5.0.12/files/noto-sans-sc-chinese-simplified-400-normal.woff'
+        ];
+        for (const url of fontUrls) {
+          try {
+            const resp = await fetch(url);
+            if (!resp.ok) continue;
+            const buf = await resp.arrayBuffer();
+            const font = opentype.parse(buf);
+            if (font) {
+              cachedVectorFont = font;
+              return font;
+            }
+          } catch (e) {
+            // 尝试下一个备用源
+          }
+        }
+        return null;
+      })();
+
+      return vectorFontLoadPromise;
+    }
+
+    function hexToRgb(hex) {
+      const clean = (hex || '#000000').replace('#', '');
+      const num = parseInt(clean.length === 3 ? clean.split('').map(c => c + c).join('') : clean, 16);
+      return {
+        r: (num >> 16) & 255,
+        g: (num >> 8) & 255,
+        b: num & 255
+      };
+    }
+
+    /**
+     * 将 OpenType 矢量路径命令直接写入 jsPDF 原生矢量绘图流（100% 真矢量贝塞尔曲线）
+     */
+    function drawOpenTypePathToPdf(doc, otPath, fillRgb) {
+      if (!otPath || !otPath.commands || otPath.commands.length === 0) return;
+      doc.setFillColor(fillRgb.r, fillRgb.g, fillRgb.b);
+
+      const ops = [];
+      let curX = 0, curY = 0;
+
+      for (const cmd of otPath.commands) {
+        if (cmd.type === 'M') {
+          curX = cmd.x;
+          curY = cmd.y;
+          ops.push({ op: 'm', c: [curX, curY] });
+        } else if (cmd.type === 'L') {
+          curX = cmd.x;
+          curY = cmd.y;
+          ops.push({ op: 'l', c: [curX, curY] });
+        } else if (cmd.type === 'Q') {
+          // 二次贝塞尔曲线转三次贝塞尔曲线写入 PDF
+          const c1x = curX + (2 / 3) * (cmd.x1 - curX);
+          const c1y = curY + (2 / 3) * (cmd.y1 - curY);
+          const c2x = cmd.x + (2 / 3) * (cmd.x1 - cmd.x);
+          const c2y = cmd.y + (2 / 3) * (cmd.y1 - cmd.y);
+          curX = cmd.x;
+          curY = cmd.y;
+          ops.push({ op: 'c', c: [c1x, c1y, c2x, c2y, curX, curY] });
+        } else if (cmd.type === 'C') {
+          curX = cmd.x;
+          curY = cmd.y;
+          ops.push({ op: 'c', c: [cmd.x1, cmd.y1, cmd.x2, cmd.y2, curX, curY] });
+        } else if (cmd.type === 'Z') {
+          ops.push({ op: 'h', c: [] });
+        }
+      }
+
+      if (ops.length > 0) {
+        doc.path(ops);
+        doc.fill();
+      }
+    }
+
+    /**
+     * 直接生成并触发下载真矢量 PDF 文件（不依赖 window.print 弹窗，兼容所有浏览器与沙盒预览环境）
+     */
+    async function exportDirectVectorPdf(totalPages, projectName, progressCb) {
+      const { jsPDF } = window.jspdf;
+      const wMm = state.canvasWidthMm;
+      const hMm = state.canvasHeightMm;
+      const orientation = wMm >= hMm ? 'l' : 'p';
+
+      const doc = new jsPDF({
+        orientation,
+        unit: 'mm',
+        format: [wMm, hMm],
+        compress: true
+      });
+
+      // 尝试获取真矢量字体轮廓引擎
+      const vectorFont = await getVectorFont();
+
+      for (let page = 1; page <= totalPages; page++) {
+        if (progressCb) progressCb(page, totalPages);
+        await new Promise(r => setTimeout(r, 8));
+
+        if (page > 1) {
+          doc.addPage([wMm, hMm], orientation);
+        }
+
+        // 1. 矢量纯色画布背景
+        const bgRgb = hexToRgb(state.canvasBgColor);
+        doc.setFillColor(bgRgb.r, bgRgb.g, bgRgb.b);
+        doc.rect(0, 0, wMm, hMm, 'F');
+
+        // 2. 参考背景图（仅当导出不隐藏时）
+        if (state.refBgImage && state.refBgImage.src && !state.refBgHideOnExport) {
+          try {
+            doc.saveGraphicsState();
+            doc.setGState(new doc.GState({ opacity: state.refBgOpacity }));
+            let drawX = 0, drawY = 0, drawW = wMm, drawH = hMm;
+            if (state.refBgFitMode === 'contain' && state.refBgImage.naturalHeight > 0) {
+              const imgRatio = state.refBgImage.naturalWidth / state.refBgImage.naturalHeight;
+              const canvasRatio = wMm / hMm;
+              if (imgRatio > canvasRatio) {
+                drawH = wMm / imgRatio;
+                drawY = (hMm - drawH) / 2;
+              } else {
+                drawW = hMm * imgRatio;
+                drawX = (wMm - drawW) / 2;
+              }
+            }
+            const imgFmt = state.refBgImage.src.startsWith('data:image/jpeg') ? 'JPEG' : 'PNG';
+            doc.addImage(state.refBgImage.src, imgFmt, drawX, drawY, drawW, drawH, undefined, 'FAST');
+            doc.restoreGraphicsState();
+          } catch (e) {}
+        }
+
+        // 3. 逐层写入原生矢量图形、原图无损图片与真矢量文字
+        for (const layer of state.layers) {
+          if (layer.type === 'image') {
+            const imgData = getActiveImageForLayer(layer, page);
+            if (imgData && imgData.src) {
+              const imgFmt = imgData.src.startsWith('data:image/jpeg') ? 'JPEG' : 'PNG';
+              doc.addImage(imgData.src, imgFmt, layer.xMm, layer.yMm, layer.widthMm, layer.heightMm, undefined, 'NONE');
+            }
+          } else if (layer.type === 'rect' || layer.type === 'ellipse' || layer.type === 'line') {
+            const hasFill = layer.type !== 'line' && !layer.fillTransparent;
+            const hasStroke = (layer.strokeWidthMm || 0) > 0;
+            if (!hasFill && !hasStroke) continue;
+
+            if (hasFill) {
+              const fRgb = hexToRgb(layer.fillColor);
+              doc.setFillColor(fRgb.r, fRgb.g, fRgb.b);
+            }
+            if (hasStroke) {
+              const sRgb = hexToRgb(layer.strokeColor);
+              doc.setDrawColor(sRgb.r, sRgb.g, sRgb.b);
+              doc.setLineWidth(layer.strokeWidthMm);
+              doc.setLineCap('round');
+              doc.setLineJoin('round');
+              if (layer.strokeDashed) {
+                doc.setLineDashPattern([Math.max(0.1, layer.dashLengthMm), Math.max(0.1, layer.dashGapMm)], 0);
+              } else {
+                doc.setLineDashPattern([], 0);
+              }
+            }
+
+            const styleFlag = hasFill && hasStroke ? 'FD' : (hasFill ? 'F' : 'S');
+            if (layer.type === 'rect') {
+              doc.rect(layer.xMm, layer.yMm, layer.widthMm, layer.heightMm, styleFlag);
+            } else if (layer.type === 'ellipse') {
+              const rx = Math.max(0.05, layer.widthMm / 2);
+              const ry = Math.max(0.05, layer.heightMm / 2);
+              doc.ellipse(layer.xMm + rx, layer.yMm + ry, rx, ry, styleFlag);
+            } else if (layer.type === 'line') {
+              if (layer.lineDirection === 'bl-tr') {
+                doc.line(layer.xMm, layer.yMm + layer.heightMm, layer.xMm + layer.widthMm, layer.yMm);
+              } else {
+                doc.line(layer.xMm, layer.yMm, layer.xMm + layer.widthMm, layer.yMm + layer.heightMm);
+              }
+            }
+            doc.setLineDashPattern([], 0);
+          } else if (layer.type === 'text') {
+            const content = getActiveTextForLayer(layer, page);
+            if (!content) continue;
+
+            const anchor = layer.anchor || 'left';
+            const textRgb = hexToRgb(layer.color);
+            const fontStack = layer.customFont && layer.customFont.trim()
+              ? `"${layer.customFont.trim()}", ${layer.fontFamily}`
+              : layer.fontFamily;
+
+            const natDims = measureTextDimensionsMm(
+              content,
+              layer.fontSizeMm,
+              layer.letterSpacingMm || 0,
+              layer.lineHeightRatio || 1.2,
+              layer.fontWeight,
+              fontStack
+            );
+
+            const targetWMm = layer.constrainBox ? layer.boxWidthMm : natDims.widthMm;
+            const targetHMm = layer.constrainBox ? layer.boxHeightMm : natDims.heightMm;
+
+            let boxLeftMm = layer.xMm;
+            if (anchor === 'center') boxLeftMm = layer.xMm - targetWMm / 2;
+            else if (anchor === 'right') boxLeftMm = layer.xMm - targetWMm;
+
+            const lines = content.split('\n');
+            const lineHeightMm = layer.fontSizeMm * (layer.lineHeightRatio || 1.2);
+            const stretchX = (layer.constrainBox && natDims.widthMm > 0) ? (targetWMm / natDims.widthMm) : 1;
+            const stretchY = (layer.constrainBox && natDims.heightMm > 0) ? (targetHMm / natDims.heightMm) : 1;
+
+            // 优先使用 OpenType 真矢量轮廓曲线直接写入 PDF（任意放大 1000% 绝对锐利，支持全中文）
+            if (vectorFont && typeof doc.path === 'function') {
+              const unitsPerEm = vectorFont.unitsPerEm || 1000;
+              const ascenderRatio = (vectorFont.ascender || 880) / unitsPerEm;
+
+              lines.forEach((line, lineIdx) => {
+                const chars = Array.from(line);
+                // 计算当前行总宽度
+                let lineWMm = 0;
+                const charWidthsMm = chars.map((ch, cIdx) => {
+                  const glyph = vectorFont.charToGlyph(ch);
+                  const adv = ((glyph.advanceWidth || unitsPerEm * 0.5) / unitsPerEm) * layer.fontSizeMm;
+                  const sp = cIdx < chars.length - 1 ? (layer.letterSpacingMm || 0) : 0;
+                  lineWMm += adv + sp;
+                  return adv;
+                });
+
+                let cursorXMm = 0;
+                if (anchor === 'center') cursorXMm = (natDims.widthMm - lineWMm) / 2;
+                else if (anchor === 'right') cursorXMm = natDims.widthMm - lineWMm;
+
+                const baselineYMm = lineIdx * lineHeightMm + layer.fontSizeMm * ascenderRatio;
+
+                chars.forEach((ch, cIdx) => {
+                  const glyph = vectorFont.charToGlyph(ch);
+                  const rawPath = glyph.getPath(0, 0, layer.fontSizeMm);
+                  // 应用非等比拉伸与最终画布定位
+                  rawPath.commands.forEach(cmd => {
+                    if (cmd.x !== undefined) cmd.x = boxLeftMm + (cursorXMm + cmd.x) * stretchX;
+                    if (cmd.y !== undefined) cmd.y = layer.yMm + (baselineYMm + cmd.y) * stretchY;
+                    if (cmd.x1 !== undefined) cmd.x1 = boxLeftMm + (cursorXMm + cmd.x1) * stretchX;
+                    if (cmd.y1 !== undefined) cmd.y1 = layer.yMm + (baselineYMm + cmd.y1) * stretchY;
+                    if (cmd.x2 !== undefined) cmd.x2 = boxLeftMm + (cursorXMm + cmd.x2) * stretchX;
+                    if (cmd.y2 !== undefined) cmd.y2 = layer.yMm + (baselineYMm + cmd.y2) * stretchY;
+                  });
+                  drawOpenTypePathToPdf(doc, rawPath, textRgb);
+
+                  // 粗体字重模拟微加粗描边保持粗细视觉一致
+                  if (Number(layer.fontWeight) >= 700) {
+                    doc.setDrawColor(textRgb.r, textRgb.g, textRgb.b);
+                    doc.setLineWidth(layer.fontSizeMm * 0.032);
+                    doc.stroke();
+                  }
+
+                  cursorXMm += charWidthsMm[cIdx] + (layer.letterSpacingMm || 0);
+                });
+              });
+            } else {
+              // 离线无网络兜底：以 1200 DPI 超高清单图层透明通道输出
+              const hiScale = 1200 / MM_PER_INCH;
+              const tmpW = Math.max(4, Math.ceil(targetWMm * hiScale) + 8);
+              const tmpH = Math.max(4, Math.ceil(targetHMm * hiScale) + 8);
+              const tCanvas = document.createElement('canvas');
+              tCanvas.width = tmpW;
+              tCanvas.height = tmpH;
+              const tCtx = tCanvas.getContext('2d');
+              const fontSizePx = layer.fontSizeMm * hiScale;
+              const letterSpPx = (layer.letterSpacingMm || 0) * hiScale;
+              const lineHPx = fontSizePx * (layer.lineHeightRatio || 1.2);
+              tCtx.font = `${layer.fontWeight} ${fontSizePx}px ${fontStack}`;
+              tCtx.fillStyle = layer.color;
+              tCtx.textBaseline = 'top';
+              if (layer.constrainBox) tCtx.scale(stretchX, stretchY);
+              lines.forEach((line, idx) => {
+                let cx = 0;
+                const chars = Array.from(line);
+                const lw = chars.reduce((acc, ch, i) => acc + tCtx.measureText(ch).width + (i < chars.length - 1 ? letterSpPx : 0), 0);
+                if (anchor === 'center') cx = (natDims.widthMm * hiScale - lw) / 2;
+                else if (anchor === 'right') cx = natDims.widthMm * hiScale - lw;
+                chars.forEach(ch => {
+                  tCtx.fillText(ch, cx, idx * lineHPx);
+                  cx += tCtx.measureText(ch).width + letterSpPx;
+                });
+              });
+              doc.addImage(tCanvas.toDataURL('image/png'), 'PNG', boxLeftMm, layer.yMm, tmpW / hiScale, tmpH / hiScale, undefined, 'NONE');
+            }
+          }
+        }
+      }
+
+      const pdfBlob = doc.output('blob');
+      triggerDownload(pdfBlob, `${projectName}.pdf`);
+    }
+
+    async function exportBatch(format) {
+      const totalPages = getTotalVariablePages();
+      const projectName = sanitizeFilename(state.projectName);
+      // 600 DPI 超高清物理像素输出（150×100mm 对应 3543×2362px，放大依然极其锐利）
+      const exportDpiMultiplier = 2;
+      const physW = Math.max(1, Math.round(mmToPx(state.canvasWidthMm) * exportDpiMultiplier));
+      const physH = Math.max(1, Math.round(mmToPx(state.canvasHeightMm) * exportDpiMultiplier));
+
+      const modal = document.getElementById('exportModal');
+      const titleEl = document.getElementById('exportModalTitle');
+      const descEl = document.getElementById('exportModalDesc');
+      const barEl = document.getElementById('exportProgressBar');
+      const pctEl = document.getElementById('exportProgressPercent');
+      const resInfoEl = document.getElementById('exportResolutionInfo');
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      barEl.style.width = '0%';
+      pctEl.textContent = '0%';
+
+      try {
+        if (format === 'pdf') {
+          titleEl.textContent = `正在生成真矢量多页 PDF (${totalPages} 页)...`;
+          if (resInfoEl) resInfoEl.textContent = `${state.canvasWidthMm} × ${state.canvasHeightMm} mm · 原生真矢量曲线输出`;
+          descEl.textContent = `正在初始化矢量轮廓引擎...`;
+
+          await exportDirectVectorPdf(totalPages, projectName, (cur, tot) => {
+            descEl.textContent = `正在写入第 ${cur} / ${tot} 页真矢量图形与文字轮廓...`;
+            const pct = Math.round(((cur - 1) / tot) * 92);
+            barEl.style.width = `${pct}%`;
+            pctEl.textContent = `${pct}%`;
+          });
+
+          barEl.style.width = '100%';
+          pctEl.textContent = '100%';
+          showToast(`成功导出真矢量 PDF：${projectName}.pdf（共 ${totalPages} 页）`, 'success');
+          return;
+        }
+
+        titleEl.textContent = `正在导出 600 PPI 超清 ${format.toUpperCase()} (${totalPages} 张)...`;
+        if (resInfoEl) resInfoEl.textContent = `${physW} × ${physH} px · 超高清无损输出`;
+
+        const offscreenCanvas = document.createElement('canvas');
+        offscreenCanvas.width = physW;
+        offscreenCanvas.height = physH;
+        const ctx = offscreenCanvas.getContext('2d', { alpha: format === 'png' });
+
+        const zip = new JSZip();
+        const mimeType = format === 'jpg' ? 'image/jpeg' : 'image/png';
+        const quality = format === 'jpg' ? 1.0 : undefined;
+
+        for (let page = 1; page <= totalPages; page++) {
+          descEl.textContent = `正在渲染第 ${page} / ${totalPages} 张 (${physW} × ${physH} px)...`;
+          const progress = Math.round(((page - 1) / totalPages) * 90);
+          barEl.style.width = `${progress}%`;
+          pctEl.textContent = `${progress}%`;
+
+          await new Promise(r => setTimeout(r, 10));
+
+          renderDocumentToContext(ctx, physW, physH, page, false);
+
+          const blob = await new Promise(resolve => offscreenCanvas.toBlob(resolve, mimeType, quality));
+          const seqStr = padSequence(page, totalPages);
+          zip.file(`${projectName}_${seqStr}.${format}`, blob);
+        }
+
+        descEl.textContent = `正在打包生成 ${projectName}.zip...`;
+        barEl.style.width = '95%';
+        pctEl.textContent = '95%';
+
+        const zipBlob = await zip.generateAsync({ type: 'blob' });
+        triggerDownload(zipBlob, `${projectName}.zip`);
+
+        barEl.style.width = '100%';
+        pctEl.textContent = '100%';
+        showToast(`成功导出 ${projectName}.zip（${physW}×${physH}px 超清 ${format.toUpperCase()}）`, 'success');
+      } catch (err) {
+        console.error('导出失败:', err);
+        showToast('导出过程中发生异常，请检查图片或画布尺寸', 'error');
+      } finally {
+        setTimeout(() => {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+        }, 400);
+      }
+    }
+
+    function triggerDownload(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+    }
+
+    window.addEventListener('DOMContentLoaded', initApp);
+  </script>
+</body>
+</html>
